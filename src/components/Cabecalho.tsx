@@ -1,9 +1,11 @@
-import { useTranslations } from "next-intl";
+import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/routing";
+import { getUtilizadoraAtual } from "@/lib/supabase/server";
 
-export function Cabecalho() {
-  const t = useTranslations("nav");
-  const m = useTranslations("marca");
+export async function Cabecalho() {
+  const t = await getTranslations("nav");
+  const m = await getTranslations("marca");
+  const utilizadora = await getUtilizadoraAtual();
 
   return (
     <header className="w-full">
@@ -20,9 +22,25 @@ export function Cabecalho() {
           <Link href="/sobre" className="hover:text-ocre transition-colors">
             {t("sobre")}
           </Link>
-          <Link href="/entrar" className="hover:text-ocre transition-colors">
-            {t("entrar")}
-          </Link>
+          {utilizadora ? (
+            <>
+              <Link href="/painel" className="hover:text-ocre transition-colors">
+                {t("percurso")}
+              </Link>
+              <form action="/auth/sair" method="post">
+                <button
+                  type="submit"
+                  className="hover:text-ocre transition-colors"
+                >
+                  {t("sair")}
+                </button>
+              </form>
+            </>
+          ) : (
+            <Link href="/entrar" className="hover:text-ocre transition-colors">
+              {t("entrar")}
+            </Link>
+          )}
         </nav>
       </div>
     </header>
