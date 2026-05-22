@@ -1,5 +1,7 @@
 # Infonte
 
+URL oficial: **https://infonte.vivianedossantos.com**
+
 Percurso em sete etapas, da Sete Ecos. Aplicação web (PWA) escrita em
 Next.js (App Router), Supabase, Tailwind, PayPal, Resend.
 
@@ -68,7 +70,7 @@ Ver `.env.example`. Em resumo:
 - `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`
 - `NEXT_PUBLIC_PAYPAL_CLIENT_ID`, `PAYPAL_CLIENT_SECRET`, `PAYPAL_ENV` (sandbox | live)
 - `RESEND_API_KEY`, `RESEND_FROM`
-- `NEXT_PUBLIC_SITE_URL` (URL pública, ex: https://infonte.vercel.app)
+- `NEXT_PUBLIC_SITE_URL=https://infonte.vivianedossantos.com`
 - `CRON_SECRET` (cron da Vercel só corre com Bearer <secret>)
 
 ## Deploy
