@@ -13,20 +13,26 @@ export async function middleware(request: NextRequest) {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   if (url && anon) {
-    const supabase = createServerClient(url, anon, {
-      db: { schema: "infonte" },
-      cookies: {
-        getAll() {
-          return request.cookies.getAll();
+    try {
+      const supabase = createServerClient(url, anon, {
+        db: { schema: "infonte" },
+        cookies: {
+          getAll() {
+            return request.cookies.getAll();
+          },
+          setAll(cookiesToSet: { name: string; value: string; options?: Record<string, unknown> }[]) {
+            for (const { name, value, options } of cookiesToSet) {
+              response.cookies.set(name, value, options);
+            }
+          },
         },
-        setAll(cookiesToSet: { name: string; value: string; options?: Record<string, unknown> }[]) {
-          for (const { name, value, options } of cookiesToSet) {
-            response.cookies.set(name, value, options);
-          }
-        },
-      },
-    });
-    await supabase.auth.getUser();
+      });
+      await supabase.auth.getUser();
+    } catch (e) {
+      // Nunca deixar o middleware rebentar por causa do Supabase
+      // (variáveis erradas, schema não exposto, etc.).
+      console.warn("[middleware] supabase refresh falhou:", e);
+    }
   }
 
   return response;

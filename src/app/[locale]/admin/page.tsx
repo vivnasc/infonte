@@ -2,11 +2,26 @@ import { Link } from "@/i18n/routing";
 import { BotaoSeed } from "@/components/admin/BotaoSeed";
 import { criarClienteServidor } from "@/lib/supabase/server";
 
+async function contarSeguro(
+  supabase: Awaited<ReturnType<typeof criarClienteServidor>>,
+  tabela: string
+): Promise<number | null> {
+  try {
+    const { count, error } = await supabase
+      .from(tabela)
+      .select("*", { count: "exact", head: true });
+    if (error) return null;
+    return count ?? 0;
+  } catch {
+    return null;
+  }
+}
+
 export default async function AdminHome() {
   const supabase = await criarClienteServidor();
-  const [{ count: nEtapas }, { count: nPosts }] = await Promise.all([
-    supabase.from("etapas").select("*", { count: "exact", head: true }),
-    supabase.from("campanha_posts").select("*", { count: "exact", head: true }),
+  const [nEtapas, nPosts] = await Promise.all([
+    contarSeguro(supabase, "etapas"),
+    contarSeguro(supabase, "campanha_posts"),
   ]);
 
   return (

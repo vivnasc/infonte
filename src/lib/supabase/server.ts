@@ -28,15 +28,24 @@ export async function criarClienteServidor() {
 }
 
 export async function getUtilizadoraAtual() {
-  const supabase = await criarClienteServidor();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return null;
-  const { data: utilizadora } = await supabase
-    .from("utilizadoras")
-    .select("*")
-    .eq("auth_id", user.id)
-    .single();
-  return utilizadora;
+  try {
+    const supabase = await criarClienteServidor();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) return null;
+    const { data: utilizadora, error } = await supabase
+      .from("utilizadoras")
+      .select("*")
+      .eq("auth_id", user.id)
+      .maybeSingle();
+    if (error) {
+      console.warn("[getUtilizadoraAtual] erro a ler utilizadoras:", error.message);
+      return null;
+    }
+    return utilizadora;
+  } catch (e) {
+    console.warn("[getUtilizadoraAtual] excecao:", e);
+    return null;
+  }
 }
