@@ -4,13 +4,15 @@
 
 :root {
   --color-creme: #F2E8DC;
+  --color-creme-fundo: #EBE0D0;
   --color-terra: #2E1D12;
-  --color-texto: #2A2018;
+  --color-texto: #1F1810;
   --color-ocre: #B8843D;
+  --color-ocre-forte: #9A6C2C;
   --color-ambar-luz: #EBAE4A;
   --color-ambar-claro: #F4C56A;
-  --color-castanho: #5C3D24;
-  --color-oliva: #6B6B47;
+  --color-castanho: #4A2F1B;
+  --color-oliva: #5C5C3E;
 }
 
 html,
@@ -26,6 +28,8 @@ body {
   max-width: 38rem;
   margin-inline: auto;
   line-height: 1.75;
+  color: var(--color-texto);
+  font-size: 1.1rem;
 }
 
 .prose-infonte h1,
@@ -70,37 +74,41 @@ body {
 
 .btn-ocre {
   background-color: var(--color-ocre);
-  color: var(--color-creme);
-  padding: 0.85rem 1.6rem;
+  color: #fff;
+  padding: 0.95rem 1.8rem;
   border-radius: 9999px;
   font-family: var(--font-sans), Inter, system-ui, sans-serif;
   font-size: 0.95rem;
-  letter-spacing: 0.02em;
-  transition: background-color 200ms ease, transform 200ms ease;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  box-shadow: 0 2px 0 rgba(92, 61, 36, 0.25);
+  transition: background-color 200ms ease, transform 200ms ease, box-shadow 200ms ease;
 }
 
 .btn-ocre:hover {
-  background-color: #a4732f;
+  background-color: var(--color-ocre-forte);
 }
 
 .btn-ocre:active {
   transform: translateY(1px);
+  box-shadow: 0 1px 0 rgba(92, 61, 36, 0.25);
 }
 
 .btn-quieto {
   background: transparent;
   color: var(--color-castanho);
-  padding: 0.7rem 1.3rem;
-  border: 1px solid rgba(92, 61, 36, 0.35);
+  padding: 0.85rem 1.6rem;
+  border: 1.5px solid rgba(74, 47, 27, 0.4);
   border-radius: 9999px;
   font-family: var(--font-sans), Inter, system-ui, sans-serif;
   font-size: 0.95rem;
+  font-weight: 500;
   transition: border-color 200ms ease, background-color 200ms ease;
 }
 
 .btn-quieto:hover {
   border-color: var(--color-castanho);
-  background-color: rgba(92, 61, 36, 0.06);
+  background-color: rgba(74, 47, 27, 0.06);
 }
 
 textarea.infonte-textarea {

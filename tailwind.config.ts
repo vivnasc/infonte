@@ -7,23 +7,29 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        creme: "#F2E8DC",
+        creme: {
+          DEFAULT: "#F2E8DC",
+          fundo: "#EBE0D0",
+        },
         terra: {
           DEFAULT: "#2E1D12",
           escuro: "#2E1D12",
-          texto: "#2A2018",
+          texto: "#1F1810",
         },
-        ocre: "#B8843D",
+        ocre: {
+          DEFAULT: "#B8843D",
+          forte: "#9A6C2C",
+        },
         ambar: {
           luz: "#EBAE4A",
           claro: "#F4C56A",
         },
         castanho: {
-          DEFAULT: "#5C3D24",
-          profundo: "#5C3D24",
+          DEFAULT: "#4A2F1B",
+          profundo: "#4A2F1B",
           medio: "#5C3D24",
         },
-        oliva: "#6B6B47",
+        oliva: "#5C5C3E",
       },
       fontFamily: {
         serif: ["var(--font-serif)", "EB Garamond", "Georgia", "serif"],

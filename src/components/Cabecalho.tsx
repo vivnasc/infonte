@@ -8,17 +8,17 @@ export async function Cabecalho() {
   const utilizadora = await getUtilizadoraAtual();
 
   return (
-    <header className="w-full">
-      <div className="max-w-5xl mx-auto px-6 py-6 flex items-center justify-between">
+    <header className="w-full border-b border-castanho/10 bg-creme/80 backdrop-blur sticky top-0 z-30">
+      <div className="max-w-5xl mx-auto px-6 py-5 flex items-center justify-between">
         <Link href="/" className="flex items-baseline gap-2 group">
-          <span className="font-serif text-2xl text-castanho group-hover:text-ocre transition-colors">
+          <span className="font-serif text-2xl text-castanho group-hover:text-ocre-forte transition-colors">
             infonte
           </span>
-          <span className="font-sans text-xs text-oliva tracking-wide">
+          <span className="font-sans text-[10px] uppercase tracking-[0.25em] text-oliva">
             {m("subnome")}
           </span>
         </Link>
-        <nav className="flex items-center gap-6 text-sm font-sans text-castanho/80">
+        <nav className="flex items-center gap-6 text-sm font-sans text-castanho">
           <Link href="/sobre" className="hover:text-ocre transition-colors">
             {t("sobre")}
           </Link>
