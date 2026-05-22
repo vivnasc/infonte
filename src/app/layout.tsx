@@ -16,7 +16,7 @@ const sans = Inter({
 });
 
 const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://infonte.vivianedossantos.com";
+  process.env.NEXT_PUBLIC_SITE_URL ?? "https://infonte.vivannedossantos.com";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),

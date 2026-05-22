@@ -157,7 +157,7 @@ export function EditorPost({ post }: { post: Post }) {
             value={form.link}
             onChange={(e) => setCampo("link", e.target.value)}
             className="input"
-            placeholder="https://infonte.vivianedossantos.com/lista"
+            placeholder="https://infonte.vivannedossantos.com/lista"
           />
         </Linha>
 
