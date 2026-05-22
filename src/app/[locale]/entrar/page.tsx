@@ -21,9 +21,9 @@ export default async function EntrarPage({
 
   return (
     <div className="px-6 max-w-leitura mx-auto pt-16 pb-24">
-      <h1 className="font-serif text-3xl text-castanho text-center">entrar</h1>
-      <p className="font-serif text-center text-terra-texto/80 mt-3">
-        bem-vinda. usa o teu email para entrar ou criar conta.
+      <h1 className="font-serif text-3xl text-castanho text-center">Entrar</h1>
+      <p className="font-serif text-center text-terra-texto mt-3">
+        Bem-vinda. Usa o teu email para entrar ou criar conta.
       </p>
       <div className="mt-12">
         <FormularioEntrar erro={sp.erro} mensagem={sp.mensagem} />

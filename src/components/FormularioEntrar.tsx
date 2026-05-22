@@ -103,7 +103,7 @@ export function FormularioEntrar({
               : "text-castanho/70 hover:text-castanho"
           }`}
         >
-          entrar
+          Entrar
         </button>
         <button
           onClick={() => setModo("registar")}
@@ -113,14 +113,14 @@ export function FormularioEntrar({
               : "text-castanho/70 hover:text-castanho"
           }`}
         >
-          criar conta
+          Criar conta
         </button>
       </div>
 
       <form onSubmit={submeter} className="space-y-4">
         {modo === "registar" && (
           <label className="block">
-            <span className="block text-sm text-castanho/80 mb-1">nome</span>
+            <span className="block text-sm text-castanho/80 mb-1">Nome</span>
             <input
               type="text"
               value={nome}
@@ -131,7 +131,7 @@ export function FormularioEntrar({
           </label>
         )}
         <label className="block">
-          <span className="block text-sm text-castanho/80 mb-1">email</span>
+          <span className="block text-sm text-castanho/80 mb-1">Email</span>
           <input
             type="email"
             required
@@ -143,7 +143,7 @@ export function FormularioEntrar({
         </label>
         <label className="block">
           <span className="block text-sm text-castanho/80 mb-1">
-            palavra-passe
+            Palavra-passe
           </span>
           <input
             type="password"
@@ -172,7 +172,7 @@ export function FormularioEntrar({
           disabled={a}
           className="btn-ocre w-full disabled:opacity-60"
         >
-          {a ? "a processar..." : modo === "entrar" ? "entrar" : "criar conta"}
+          {a ? "A processar..." : modo === "entrar" ? "Entrar" : "Criar conta"}
         </button>
       </form>
 
@@ -188,14 +188,14 @@ export function FormularioEntrar({
           disabled={a}
           className="btn-quieto w-full disabled:opacity-60"
         >
-          continuar com Google
+          Continuar com Google
         </button>
         <button
           onClick={() => entrarComProvedor("facebook")}
           disabled={a}
           className="btn-quieto w-full disabled:opacity-60"
         >
-          continuar com Facebook
+          Continuar com Facebook
         </button>
         <p className="text-xs text-oliva text-center mt-2">
           (Google e Facebook ficam ativos assim que os provedores forem

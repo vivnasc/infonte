@@ -50,10 +50,10 @@ export default async function PainelPage({
   return (
     <div className="px-6 max-w-leitura mx-auto pt-16 pb-24">
       <h1 className="font-serif text-3xl text-castanho">
-        olá{utilizadora.nome ? `, ${utilizadora.nome}` : ""}.
+        Olá{utilizadora.nome ? `, ${utilizadora.nome}` : ""}.
       </h1>
       <p className="font-serif text-terra-texto/80 mt-3">
-        o teu percurso da Infonte. cada etapa abre {HORAS_GATING / 24} dias depois da anterior.
+        O teu percurso da Infonte. Cada etapa abre {HORAS_GATING / 24} dias depois da anterior.
       </p>
 
       {sp.paypal === "ok" && (
@@ -71,7 +71,7 @@ export default async function PainelPage({
             A etapa 1 é grátis. Para abrires o resto do percurso, falta a compra.
           </p>
           <Link href="/etapa/1" className="btn-ocre inline-block mt-3">
-            começar pela etapa 1
+            Começar pela etapa 1
           </Link>
         </div>
       )}
@@ -85,23 +85,23 @@ export default async function PainelPage({
                 className="flex items-center justify-between p-4 rounded-md border border-castanho/15 hover:border-ocre transition-colors"
               >
                 <span className="font-serif text-lg text-castanho">
-                  etapa {e.n}
+                  Etapa {e.n}
                 </span>
                 <span className="text-sm text-oliva">
-                  {e.concluida ? "concluída" : "aberta"}
+                  {e.concluida ? "Concluída" : "Aberta"}
                 </span>
               </Link>
             ) : (
               <div className="flex items-center justify-between p-4 rounded-md border border-castanho/10 bg-creme/40 opacity-70">
                 <span className="font-serif text-lg text-castanho/70">
-                  etapa {e.n}
+                  Etapa {e.n}
                 </span>
                 <span className="text-sm text-oliva">
                   {e.n > 1 && !utilizadora.comprou
-                    ? "depois da compra"
+                    ? "Depois da compra"
                     : e.abreEm
-                      ? `abre ${e.abreEm.toLocaleDateString("pt-PT")}`
-                      : "fechada"}
+                      ? `Abre ${e.abreEm.toLocaleDateString("pt-PT")}`
+                      : "Fechada"}
                 </span>
               </div>
             )}
@@ -111,7 +111,7 @@ export default async function PainelPage({
 
       <form action="/auth/sair" method="post" className="mt-16 text-center">
         <button type="submit" className="text-sm text-castanho/60 hover:text-castanho">
-          sair
+          Sair
         </button>
       </form>
     </div>

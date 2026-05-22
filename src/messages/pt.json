@@ -2,25 +2,25 @@
   "marca": {
     "nome": "infonte",
     "subnome": "da Sete Ecos",
-    "tagline": "a abundância não responde a quem a persegue, responde a quem se basta"
+    "tagline": "A abundância não responde a quem a persegue. Responde a quem se basta."
   },
   "nav": {
-    "inicio": "início",
-    "sobre": "sobre",
-    "entrar": "entrar",
-    "percurso": "o meu percurso",
-    "sair": "sair"
+    "inicio": "Início",
+    "sobre": "Sobre",
+    "entrar": "Entrar",
+    "percurso": "O meu percurso",
+    "sair": "Sair"
   },
   "landing": {
-    "tagline_topo": "um percurso em sete etapas",
-    "titulo": "a abundância não responde a quem a persegue.",
-    "titulo_b": "responde a quem se basta.",
+    "tagline_topo": "Um percurso em sete etapas",
+    "titulo": "A abundância não responde a quem a persegue.",
+    "titulo_b": "Responde a quem se basta.",
     "intro": "Entras dispersa. Cheia de ideias que não saem do papel, de sonhos que adias, de ruído mental. Sais inteira, com mente limpa, uma direção, e um sonho já partido em ações que começaste a fazer.",
-    "cta_comecar": "começar a etapa 1, grátis",
-    "cta_sobre": "conhecer a autora",
-    "resultado_titulo": "o que ganhas no fim",
+    "cta_comecar": "Começar a etapa 1, grátis",
+    "cta_sobre": "Conhecer a autora",
+    "resultado_titulo": "O que ganhas no fim",
     "resultado_corpo": "Clareza mental. Foco para maximizar o teu potencial. E um sonho ou ideia já partido em ações concretas que tu começaste a executar.",
-    "etapas_titulo": "as sete etapas",
+    "etapas_titulo": "As sete etapas",
     "etapas": [
       "Esvaziar, tirar o ruído e ver quanto do que persegues nem é teu.",
       "Bastar-se, a virada, encontrar o chão de onde se age sem fome.",
@@ -35,6 +35,7 @@
   "rodape": {
     "marca": "infonte",
     "autora": "Vivianne dos Santos",
-    "casa": "Sete Ecos"
+    "casa": "Sete Ecos",
+    "direitos": "Todos os direitos reservados"
   }
 }

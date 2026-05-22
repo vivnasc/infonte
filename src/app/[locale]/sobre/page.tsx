@@ -25,8 +25,8 @@ export default async function SobrePage({
             />
           </div>
           <div>
-            <p className="font-sans text-xs uppercase tracking-[0.25em] text-oliva">
-              a autora
+            <p className="font-sans text-xs uppercase tracking-[0.25em] text-ocre-forte">
+              A autora
             </p>
             <h1 className="font-serif text-4xl text-castanho mt-3 leading-tight">
               Vivianne dos Santos
@@ -81,7 +81,7 @@ export default async function SobrePage({
 
         <div className="mt-12 text-center">
           <Link href="/etapa/1" className="btn-ocre">
-            começar a etapa 1, grátis
+            Começar a etapa 1, grátis
           </Link>
         </div>
       </section>
