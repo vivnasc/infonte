@@ -1,5 +1,7 @@
 # Infonte
 
+URL oficial: **https://infonte.vivannedossantos.com**
+
 Percurso em sete etapas, da Sete Ecos. Aplicação web (PWA) escrita em
 Next.js (App Router), Supabase, Tailwind, PayPal, Resend.
 
@@ -23,16 +25,44 @@ npm run dev
 - Cron diário na Vercel para abrir as etapas
 
 ## Conteúdo
-Markdown em `/content`. O seed lê os ficheiros e popula a tabela `etapas`:
+Markdown em `/content` (etapas) e em `/infonte-campanha-30-dias` (campanha).
+Os seeds lêem os ficheiros e populam as tabelas:
 
 ```
 NEXT_PUBLIC_SUPABASE_URL=... SUPABASE_SERVICE_ROLE_KEY=... npm run seed:etapas
+NEXT_PUBLIC_SUPABASE_URL=... SUPABASE_SERVICE_ROLE_KEY=... npm run seed:campanha
 ```
 
-## Base de dados
-SQL em `supabase/migrations`. Correr no Supabase pela ordem:
-1. `0001_schema.sql`
-2. `0002_rls.sql`
+## Admin e campanha 30 dias
+Em `/admin/campanha` (visível só a quem tiver `is_admin=true`):
+- 30 posts listados por semana, com estado (rascunho, pronto, agendado, publicado).
+- Editor por dia: legenda, pergunta, hashtags, redes, data/hora, URL da arte.
+- Pré-visualização da legenda final (legenda + pergunta + link + hashtags).
+- Botão "exportar CSV Metricool" (uma linha por dia, redes separadas por `;`)
+  e variante "CSV por rede" (uma linha por dia × rede).
+
+O CSV usa as colunas `date,time,text,link,image,networks` aceites pelo
+importador em massa do Metricool. A coluna `image` aceita um URL público
+(p. ex. Supabase Storage); se preferires, podes fazer upload das artes
+diretamente no Metricool depois de importar.
+
+## Base de dados, schema isolado
+A app vive toda no schema `infonte` (não toca em `public`), para coexistir
+no mesmo Supabase com outras apps.
+
+SQL em `supabase/migrations`, correr no SQL editor pela ordem:
+1. `0001_schema.sql` (cria schema infonte, tabelas, triggers, função handle_new_user)
+2. `0002_rls.sql` (Row Level Security em todas as tabelas)
+3. `0003_campanha.sql` (tabela campanha_posts + RLS de admin)
+
+**Importante:** depois de correr o `0001`, ir a Supabase > Project Settings >
+API > "Exposed schemas" e adicionar `infonte` à lista (separado por vírgula).
+Sem isto o PostgREST não responde.
+
+Para te tornares admin:
+```sql
+select infonte.tornar_admin('viv.saraiva@gmail.com');
+```
 
 ## Variáveis de ambiente
 
@@ -40,7 +70,7 @@ Ver `.env.example`. Em resumo:
 - `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`
 - `NEXT_PUBLIC_PAYPAL_CLIENT_ID`, `PAYPAL_CLIENT_SECRET`, `PAYPAL_ENV` (sandbox | live)
 - `RESEND_API_KEY`, `RESEND_FROM`
-- `NEXT_PUBLIC_SITE_URL` (URL pública, ex: https://infonte.vercel.app)
+- `NEXT_PUBLIC_SITE_URL=https://infonte.vivannedossantos.com`
 - `CRON_SECRET` (cron da Vercel só corre com Bearer <secret>)
 
 ## Deploy

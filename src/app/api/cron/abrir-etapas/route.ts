@@ -29,7 +29,7 @@ export async function GET(request: Request) {
   }
 
   const origem =
-    process.env.NEXT_PUBLIC_SITE_URL ?? "https://infonte.example";
+    process.env.NEXT_PUBLIC_SITE_URL ?? "https://infonte.vivannedossantos.com";
   const limiteMs = HORAS_GATING * 60 * 60 * 1000;
 
   const resumo: {

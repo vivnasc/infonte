@@ -27,6 +27,11 @@ export async function Cabecalho() {
               <Link href="/painel" className="hover:text-ocre transition-colors">
                 {t("percurso")}
               </Link>
+              {utilizadora.is_admin && (
+                <Link href="/admin" className="hover:text-ocre transition-colors">
+                  admin
+                </Link>
+              )}
               <form action="/auth/sair" method="post">
                 <button
                   type="submit"

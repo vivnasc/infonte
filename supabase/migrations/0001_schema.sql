@@ -1,20 +1,34 @@
--- Infonte, esquema inicial
--- Tabelas: utilizadoras, etapas, respostas, progresso, compras
+-- Infonte, esquema isolado num schema próprio (`infonte`)
+-- para coexistir com outras apps no mesmo Supabase.
+--
+-- Depois de correr este ficheiro, abrir Supabase > Settings > API e
+-- adicionar `infonte` à lista de "Exposed schemas" (DB > API),
+-- senão o PostgREST não responde.
 
 create extension if not exists "pgcrypto";
 
+create schema if not exists infonte;
+
+-- Acesso à API REST do PostgREST
+grant usage on schema infonte to anon, authenticated, service_role;
+alter default privileges in schema infonte
+  grant select, insert, update, delete on tables to anon, authenticated;
+alter default privileges in schema infonte
+  grant usage, select on sequences to anon, authenticated;
+
 -- Utilizadoras (perfil estendido sobre auth.users)
-create table if not exists public.utilizadoras (
+create table if not exists infonte.utilizadoras (
   id uuid primary key default gen_random_uuid(),
   auth_id uuid unique references auth.users(id) on delete cascade,
   email text unique not null,
   nome text,
   comprou boolean default false,
+  is_admin boolean default false,
   criada_em timestamptz default now()
 );
 
 -- Conteúdo das 7 etapas
-create table if not exists public.etapas (
+create table if not exists infonte.etapas (
   id integer primary key,
   slug text not null,
   titulo text not null,
@@ -23,9 +37,9 @@ create table if not exists public.etapas (
 );
 
 -- Respostas (texto livre por bloco)
-create table if not exists public.respostas (
+create table if not exists infonte.respostas (
   id uuid primary key default gen_random_uuid(),
-  utilizadora_id uuid references public.utilizadoras(id) on delete cascade,
+  utilizadora_id uuid references infonte.utilizadoras(id) on delete cascade,
   bloco_id text not null,
   valor text,
   criada_em timestamptz default now(),
@@ -34,9 +48,9 @@ create table if not exists public.respostas (
 );
 
 -- Progresso por etapa
-create table if not exists public.progresso (
+create table if not exists infonte.progresso (
   id uuid primary key default gen_random_uuid(),
-  utilizadora_id uuid references public.utilizadoras(id) on delete cascade,
+  utilizadora_id uuid references infonte.utilizadoras(id) on delete cascade,
   etapa integer not null check (etapa between 1 and 7),
   desbloqueada_em timestamptz,
   concluida_em timestamptz,
@@ -45,9 +59,9 @@ create table if not exists public.progresso (
 );
 
 -- Compras
-create table if not exists public.compras (
+create table if not exists infonte.compras (
   id uuid primary key default gen_random_uuid(),
-  utilizadora_id uuid references public.utilizadoras(id) on delete cascade,
+  utilizadora_id uuid references infonte.utilizadoras(id) on delete cascade,
   paypal_order_id text,
   valor numeric,
   moeda text,
@@ -55,33 +69,32 @@ create table if not exists public.compras (
   criada_em timestamptz default now()
 );
 
--- Índices úteis
-create index if not exists respostas_utilizadora_idx on public.respostas(utilizadora_id);
-create index if not exists progresso_utilizadora_idx on public.progresso(utilizadora_id);
-create index if not exists compras_utilizadora_idx on public.compras(utilizadora_id);
+create index if not exists respostas_utilizadora_idx on infonte.respostas(utilizadora_id);
+create index if not exists progresso_utilizadora_idx on infonte.progresso(utilizadora_id);
+create index if not exists compras_utilizadora_idx on infonte.compras(utilizadora_id);
 
 -- Trigger para criar utilizadora ao registar
-create or replace function public.handle_new_user()
+create or replace function infonte.handle_new_user()
 returns trigger
 language plpgsql
 security definer
-set search_path = public
+set search_path = infonte, public
 as $$
 begin
-  insert into public.utilizadoras (auth_id, email)
+  insert into infonte.utilizadoras (auth_id, email)
   values (new.id, new.email)
   on conflict (auth_id) do nothing;
   return new;
 end;
 $$;
 
-drop trigger if exists on_auth_user_created on auth.users;
-create trigger on_auth_user_created
+drop trigger if exists on_auth_user_created_infonte on auth.users;
+create trigger on_auth_user_created_infonte
   after insert on auth.users
-  for each row execute function public.handle_new_user();
+  for each row execute function infonte.handle_new_user();
 
 -- Trigger atualizada_em em respostas
-create or replace function public.touch_atualizada_em()
+create or replace function infonte.touch_atualizada_em()
 returns trigger
 language plpgsql
 as $$
@@ -91,7 +104,7 @@ begin
 end;
 $$;
 
-drop trigger if exists trg_respostas_touch on public.respostas;
+drop trigger if exists trg_respostas_touch on infonte.respostas;
 create trigger trg_respostas_touch
-  before update on public.respostas
-  for each row execute function public.touch_atualizada_em();
+  before update on infonte.respostas
+  for each row execute function infonte.touch_atualizada_em();
