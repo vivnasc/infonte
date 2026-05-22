@@ -61,14 +61,18 @@ export function parseEtapa(corpo: string): No[] {
     }
 
     // Marcadores in-line numa única linha
-    let mCampo = linha.match(RE_CAMPO);
-    let mMostrar = linha.match(RE_MOSTRAR);
+    // Suporta também linhas em blockquote: "> [Mostrar resposta "X"]"
+    const linhaSemQuote = linha.replace(/^\s*>\s?/, "");
+    const usaQuote = linhaSemQuote !== linha;
+    const linhaCheck = usaQuote ? linhaSemQuote : linha;
+
+    let mCampo = linhaCheck.match(RE_CAMPO);
+    let mMostrar = linhaCheck.match(RE_MOSTRAR);
 
     if (mCampo) {
-      // texto antes e depois ficam como md
-      const idx = linha.indexOf(mCampo[0]);
-      const antes = linha.slice(0, idx);
-      const depois = linha.slice(idx + mCampo[0].length);
+      const idx = linhaCheck.indexOf(mCampo[0]);
+      const antes = linhaCheck.slice(0, idx);
+      const depois = linhaCheck.slice(idx + mCampo[0].length);
       if (antes.trim()) buffer.push(antes);
       flush();
       nos.push({ tipo: "campo", bloco_id: mCampo[1] });
@@ -77,9 +81,9 @@ export function parseEtapa(corpo: string): No[] {
       continue;
     }
     if (mMostrar) {
-      const idx = linha.indexOf(mMostrar[0]);
-      const antes = linha.slice(0, idx);
-      const depois = linha.slice(idx + mMostrar[0].length);
+      const idx = linhaCheck.indexOf(mMostrar[0]);
+      const antes = linhaCheck.slice(0, idx);
+      const depois = linhaCheck.slice(idx + mMostrar[0].length);
       if (antes.trim()) buffer.push(antes);
       flush();
       nos.push({ tipo: "mostrar", bloco_id: mMostrar[1] });
