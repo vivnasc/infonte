@@ -1,0 +1,40 @@
+{
+  "marca": {
+    "nome": "infonte",
+    "subnome": "by Sete Ecos",
+    "tagline": "abundance does not answer those who chase it, it answers those who are enough"
+  },
+  "nav": {
+    "inicio": "home",
+    "sobre": "about",
+    "entrar": "sign in",
+    "percurso": "my journey",
+    "sair": "sign out"
+  },
+  "landing": {
+    "tagline_topo": "a seven-step journey",
+    "titulo": "abundance does not answer those who chase it.",
+    "titulo_b": "it answers those who are enough.",
+    "intro": "You arrive scattered. Full of ideas that never leave the page, of dreams you postpone, of mental noise. You leave whole, with a clear mind, one direction, and a dream already broken into actions you have begun to do.",
+    "cta_comecar": "start step 1, free",
+    "cta_sobre": "meet the author",
+    "resultado_titulo": "what you take with you",
+    "resultado_corpo": "Mental clarity. Focus to maximise your potential. And a dream or idea already broken into concrete actions you have begun to execute.",
+    "etapas_titulo": "the seven steps",
+    "etapas": [
+      "Empty, clear the noise and see how much of what you chase is not yours.",
+      "Be enough, the turn, find the ground from which one acts without hunger.",
+      "Clarify, of all you want, what is truly yours.",
+      "Focus, cut the rest, choose one thing.",
+      "Materialise, the idea becomes plan becomes first step.",
+      "Sustain, keep the clarity when life brings the noise back.",
+      "Become source, clarity stops being a method and becomes who you are."
+    ],
+    "ferramentas_nota": "Each step delivers a tool that stays with you for life, not a theory."
+  },
+  "rodape": {
+    "marca": "infonte",
+    "autora": "Vivianne dos Santos",
+    "casa": "Sete Ecos"
+  }
+}

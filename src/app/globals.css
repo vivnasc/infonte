@@ -1,0 +1,125 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-creme: #F2E8DC;
+  --color-terra: #2E1D12;
+  --color-texto: #2A2018;
+  --color-ocre: #B8843D;
+  --color-ambar-luz: #EBAE4A;
+  --color-ambar-claro: #F4C56A;
+  --color-castanho: #5C3D24;
+  --color-oliva: #6B6B47;
+}
+
+html,
+body {
+  background-color: var(--color-creme);
+  color: var(--color-texto);
+  font-feature-settings: "kern", "liga", "clig", "calt";
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.prose-infonte {
+  max-width: 38rem;
+  margin-inline: auto;
+  line-height: 1.75;
+}
+
+.prose-infonte h1,
+.prose-infonte h2,
+.prose-infonte h3 {
+  font-family: var(--font-serif), "EB Garamond", Georgia, serif;
+  color: var(--color-castanho);
+  letter-spacing: 0.005em;
+}
+
+.prose-infonte h1 {
+  font-size: 2rem;
+  margin-top: 2rem;
+  margin-bottom: 1.25rem;
+  font-weight: 500;
+}
+
+.prose-infonte h2 {
+  font-size: 1.5rem;
+  margin-top: 2.5rem;
+  margin-bottom: 1rem;
+  font-weight: 500;
+}
+
+.prose-infonte h3 {
+  font-size: 1.2rem;
+  margin-top: 2rem;
+  margin-bottom: 0.75rem;
+  font-weight: 500;
+}
+
+.prose-infonte p {
+  margin-bottom: 1.1rem;
+}
+
+.prose-infonte hr {
+  border: none;
+  border-top: 1px solid rgba(92, 61, 36, 0.18);
+  margin: 3rem auto;
+  width: 60%;
+}
+
+.btn-ocre {
+  background-color: var(--color-ocre);
+  color: var(--color-creme);
+  padding: 0.85rem 1.6rem;
+  border-radius: 9999px;
+  font-family: var(--font-sans), Inter, system-ui, sans-serif;
+  font-size: 0.95rem;
+  letter-spacing: 0.02em;
+  transition: background-color 200ms ease, transform 200ms ease;
+}
+
+.btn-ocre:hover {
+  background-color: #a4732f;
+}
+
+.btn-ocre:active {
+  transform: translateY(1px);
+}
+
+.btn-quieto {
+  background: transparent;
+  color: var(--color-castanho);
+  padding: 0.7rem 1.3rem;
+  border: 1px solid rgba(92, 61, 36, 0.35);
+  border-radius: 9999px;
+  font-family: var(--font-sans), Inter, system-ui, sans-serif;
+  font-size: 0.95rem;
+  transition: border-color 200ms ease, background-color 200ms ease;
+}
+
+.btn-quieto:hover {
+  border-color: var(--color-castanho);
+  background-color: rgba(92, 61, 36, 0.06);
+}
+
+textarea.infonte-textarea {
+  width: 100%;
+  min-height: 12rem;
+  padding: 1rem 1.1rem;
+  border: 1px solid rgba(92, 61, 36, 0.25);
+  border-radius: 0.6rem;
+  background-color: rgba(255, 253, 248, 0.6);
+  font-family: var(--font-serif), Georgia, serif;
+  font-size: 1.02rem;
+  line-height: 1.7;
+  color: var(--color-texto);
+  resize: vertical;
+  transition: border-color 200ms ease, background-color 200ms ease;
+}
+
+textarea.infonte-textarea:focus {
+  outline: none;
+  border-color: var(--color-ocre);
+  background-color: rgba(255, 253, 248, 0.95);
+}

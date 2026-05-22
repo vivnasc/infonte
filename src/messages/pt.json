@@ -1,0 +1,40 @@
+{
+  "marca": {
+    "nome": "infonte",
+    "subnome": "da Sete Ecos",
+    "tagline": "a abundância não responde a quem a persegue, responde a quem se basta"
+  },
+  "nav": {
+    "inicio": "início",
+    "sobre": "sobre",
+    "entrar": "entrar",
+    "percurso": "o meu percurso",
+    "sair": "sair"
+  },
+  "landing": {
+    "tagline_topo": "um percurso em sete etapas",
+    "titulo": "a abundância não responde a quem a persegue.",
+    "titulo_b": "responde a quem se basta.",
+    "intro": "Entras dispersa. Cheia de ideias que não saem do papel, de sonhos que adias, de ruído mental. Sais inteira, com mente limpa, uma direção, e um sonho já partido em ações que começaste a fazer.",
+    "cta_comecar": "começar a etapa 1, grátis",
+    "cta_sobre": "conhecer a autora",
+    "resultado_titulo": "o que ganhas no fim",
+    "resultado_corpo": "Clareza mental. Foco para maximizar o teu potencial. E um sonho ou ideia já partido em ações concretas que tu começaste a executar.",
+    "etapas_titulo": "as sete etapas",
+    "etapas": [
+      "Esvaziar, tirar o ruído e ver quanto do que persegues nem é teu.",
+      "Bastar-se, a virada, encontrar o chão de onde se age sem fome.",
+      "Clarear, de tudo o que queres, o que é mesmo teu.",
+      "Focar, cortar o resto, escolher uma coisa.",
+      "Materializar, a ideia vira plano vira primeiro passo.",
+      "Sustentar, manter a clareza quando a vida traz o ruído de volta.",
+      "Tornar-se fonte, a clareza deixa de ser método e passa a ser quem tu és."
+    ],
+    "ferramentas_nota": "Cada etapa entrega uma ferramenta que fica para a vida, não uma teoria."
+  },
+  "rodape": {
+    "marca": "infonte",
+    "autora": "Vivianne dos Santos",
+    "casa": "Sete Ecos"
+  }
+}
