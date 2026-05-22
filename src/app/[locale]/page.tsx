@@ -1,4 +1,5 @@
 import { setRequestLocale, getTranslations } from "next-intl/server";
+import Image from "next/image";
 import { Link } from "@/i18n/routing";
 
 export default async function LandingPage({
@@ -14,7 +15,7 @@ export default async function LandingPage({
 
   return (
     <div className="px-6">
-      <section className="max-w-leitura mx-auto pt-20 pb-24 text-center">
+      <section className="max-w-leitura mx-auto pt-20 pb-12 text-center">
         <p className="font-sans text-xs uppercase tracking-[0.25em] text-oliva mb-10">
           {t("tagline_topo")}
         </p>
@@ -34,6 +35,19 @@ export default async function LandingPage({
           <Link href="/sobre" className="btn-quieto">
             {t("cta_sobre")}
           </Link>
+        </div>
+      </section>
+
+      <section className="max-w-3xl mx-auto py-8">
+        <div className="relative aspect-[4/5] md:aspect-[16/10] rounded-lg overflow-hidden shadow-md max-h-[520px]">
+          <Image
+            src="/vivianne-ambiente.jpg"
+            alt="Vivianne dos Santos"
+            fill
+            sizes="(min-width: 768px) 768px, 100vw"
+            className="object-cover object-center"
+            priority
+          />
         </div>
       </section>
 

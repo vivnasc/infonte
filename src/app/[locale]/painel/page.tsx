@@ -7,10 +7,13 @@ const HORAS_GATING = 72;
 
 export default async function PainelPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ locale: string }>;
+  searchParams: Promise<{ paypal?: string }>;
 }) {
   const { locale } = await params;
+  const sp = await searchParams;
   setRequestLocale(locale);
 
   const utilizadora = await getUtilizadoraAtual();
@@ -52,6 +55,15 @@ export default async function PainelPage({
       <p className="font-serif text-terra-texto/80 mt-3">
         o teu percurso da Infonte. cada etapa abre {HORAS_GATING / 24} dias depois da anterior.
       </p>
+
+      {sp.paypal === "ok" && (
+        <div className="mt-6 p-4 border border-oliva/40 rounded-lg bg-oliva/5">
+          <p className="font-serif text-castanho">
+            A tua compra está confirmada. Tens agora acesso vitalício às sete
+            etapas.
+          </p>
+        </div>
+      )}
 
       {!utilizadora.comprou && (
         <div className="mt-8 p-5 border border-ocre/40 rounded-lg bg-ocre/5">

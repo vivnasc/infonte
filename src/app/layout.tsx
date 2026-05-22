@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { EB_Garamond, Inter } from "next/font/google";
+import { RegistarSW } from "@/components/RegistarSW";
 import "./globals.css";
 
 const serif = EB_Garamond({
@@ -18,6 +19,7 @@ export const metadata: Metadata = {
   title: "infonte, um percurso em sete etapas",
   description:
     "A abundância não responde a quem a persegue, responde a quem se basta. Um percurso de Vivianne dos Santos, da Sete Ecos.",
+  manifest: "/manifest.webmanifest",
   icons: {
     icon: [
       { url: "/favicon-32.png", sizes: "32x32", type: "image/png" },
@@ -42,6 +44,7 @@ export default function RootLayout({
     <html className={`${serif.variable} ${sans.variable}`} suppressHydrationWarning>
       <body className="font-sans bg-creme text-terra-texto min-h-screen">
         {children}
+        <RegistarSW />
       </body>
     </html>
   );
