@@ -14,6 +14,7 @@ export async function middleware(request: NextRequest) {
   const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   if (url && anon) {
     const supabase = createServerClient(url, anon, {
+      db: { schema: "infonte" },
       cookies: {
         getAll() {
           return request.cookies.getAll();

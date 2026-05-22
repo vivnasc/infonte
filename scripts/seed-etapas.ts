@@ -14,6 +14,7 @@ if (!SUPABASE_URL || !SERVICE_KEY) {
 
 const supabase = createClient(SUPABASE_URL, SERVICE_KEY, {
   auth: { persistSession: false },
+  db: { schema: "infonte" },
 });
 
 type Etapa = {

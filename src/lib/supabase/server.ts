@@ -7,6 +7,7 @@ export async function criarClienteServidor() {
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
+      db: { schema: "infonte" },
       cookies: {
         getAll() {
           return cookieStore.getAll();
