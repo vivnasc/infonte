@@ -1,0 +1,25 @@
+<svg width="900" height="420" viewBox="0 0 900 420" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Paleta Infonte">
+  <rect width="900" height="420" fill="#F2E8DC"/>
+  <text x="60" y="70" font-family="Georgia, serif" font-size="38" fill="#2E1D12">Paleta Infonte</text>
+
+  <rect x="60" y="110" width="180" height="180" rx="14" fill="#2E1D12"/>
+  <text x="60" y="320" font-family="Georgia, serif" font-size="22" fill="#2E1D12">Terra profundo</text>
+  <text x="60" y="348" font-family="monospace" font-size="20" fill="#5C3D24">#2E1D12</text>
+
+  <rect x="270" y="110" width="180" height="180" rx="14" fill="#B8843D"/>
+  <text x="270" y="320" font-family="Georgia, serif" font-size="22" fill="#2E1D12">Ocre</text>
+  <text x="270" y="348" font-family="monospace" font-size="20" fill="#5C3D24">#B8843D</text>
+
+  <rect x="480" y="110" width="180" height="180" rx="14" fill="#EBAE4A"/>
+  <text x="480" y="320" font-family="Georgia, serif" font-size="22" fill="#2E1D12">Âmbar luz</text>
+  <text x="480" y="348" font-family="monospace" font-size="20" fill="#5C3D24">#EBAE4A</text>
+
+  <rect x="690" y="110" width="180" height="180" rx="14" fill="#F4C56A"/>
+  <text x="690" y="320" font-family="Georgia, serif" font-size="22" fill="#2E1D12">Âmbar claro</text>
+  <text x="690" y="348" font-family="monospace" font-size="20" fill="#5C3D24">#F4C56A</text>
+
+  <rect x="60" y="372" width="80" height="32" rx="8" fill="#F2E8DC" stroke="#B8843D" stroke-width="1.5"/>
+  <text x="152" y="394" font-family="monospace" font-size="18" fill="#5C3D24">#F2E8DC creme (fundo claro)</text>
+  <rect x="480" y="372" width="80" height="32" rx="8" fill="#5C3D24"/>
+  <text x="572" y="394" font-family="monospace" font-size="18" fill="#5C3D24">#5C3D24 castanho médio (texto)</text>
+</svg>
