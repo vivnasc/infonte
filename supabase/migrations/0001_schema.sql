@@ -73,25 +73,10 @@ create index if not exists respostas_utilizadora_idx on infonte.respostas(utiliz
 create index if not exists progresso_utilizadora_idx on infonte.progresso(utilizadora_id);
 create index if not exists compras_utilizadora_idx on infonte.compras(utilizadora_id);
 
--- Trigger para criar utilizadora ao registar
-create or replace function infonte.handle_new_user()
-returns trigger
-language plpgsql
-security definer
-set search_path = infonte, public
-as $$
-begin
-  insert into infonte.utilizadoras (auth_id, email)
-  values (new.id, new.email)
-  on conflict (auth_id) do nothing;
-  return new;
-end;
-$$;
-
-drop trigger if exists on_auth_user_created_infonte on auth.users;
-create trigger on_auth_user_created_infonte
-  after insert on auth.users
-  for each row execute function infonte.handle_new_user();
+-- Nota: NÃO usamos trigger em auth.users porque este Supabase é partilhado
+-- com outros produtos. A linha em infonte.utilizadoras é criada pela app
+-- (lazy) na primeira vez que a pessoa acede à Infonte, via a função
+-- garantir_utilizadora() chamada pelo código servidor.
 
 -- Trigger atualizada_em em respostas
 create or replace function infonte.touch_atualizada_em()

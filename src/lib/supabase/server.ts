@@ -34,16 +34,44 @@ export async function getUtilizadoraAtual() {
       data: { user },
     } = await supabase.auth.getUser();
     if (!user) return null;
+
+    // Tenta ler a linha existente
     const { data: utilizadora, error } = await supabase
       .from("utilizadoras")
       .select("*")
       .eq("auth_id", user.id)
       .maybeSingle();
+
     if (error) {
       console.warn("[getUtilizadoraAtual] erro a ler utilizadoras:", error.message);
       return null;
     }
-    return utilizadora;
+
+    // Se existe, devolve
+    if (utilizadora) return utilizadora;
+
+    // Lazy: primeira visita à Infonte, cria a linha
+    const { data: nova, error: errInsert } = await supabase
+      .from("utilizadoras")
+      .insert({
+        auth_id: user.id,
+        email: user.email!,
+        nome: user.user_metadata?.nome ?? user.user_metadata?.name ?? null,
+      })
+      .select("*")
+      .single();
+
+    if (errInsert) {
+      // Pode falhar por race condition (outra tab criou entretanto)
+      const { data: retry } = await supabase
+        .from("utilizadoras")
+        .select("*")
+        .eq("auth_id", user.id)
+        .maybeSingle();
+      return retry ?? null;
+    }
+
+    return nova;
   } catch (e) {
     console.warn("[getUtilizadoraAtual] excecao:", e);
     return null;

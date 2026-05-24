@@ -28,6 +28,12 @@ create policy "utilizadora atualiza o seu perfil"
   on infonte.utilizadoras for update
   using (auth.uid() = auth_id);
 
+-- INSERT: a app cria a linha na primeira visita (lazy, sem trigger em auth.users)
+drop policy if exists "utilizadora cria o seu perfil" on infonte.utilizadoras;
+create policy "utilizadora cria o seu perfil"
+  on infonte.utilizadoras for insert
+  with check (auth.uid() = auth_id);
+
 -- etapas: leitura para autenticadas (o filtro de compra é feito na app)
 drop policy if exists "autenticadas leem etapas" on infonte.etapas;
 create policy "autenticadas leem etapas"

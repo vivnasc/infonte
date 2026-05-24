@@ -30,6 +30,10 @@ desaconselhado.
   Por isso a Infonte vive toda no schema `infonte` (nunca em `public`).
   Os clientes Supabase já apontam `db: { schema: 'infonte' }` por omissão.
 - next-intl, `pt` (default, sem prefixo) e `en` (em `/en`).
+- Sem trigger em `auth.users` (partilhado com outros produtos). A linha
+  em `infonte.utilizadoras` é criada lazy, na primeira visita, pela
+  função `getUtilizadoraAtual()`. Isto evita poluir a tabela com
+  utilizadoras de outros produtos que partilham o mesmo Supabase.
 - Tailwind com tokens da paleta terra (`creme`, `ocre`, `terra-texto`,
   `castanho`, `ambar-*`, `oliva`).
 - PayPal (REST), Resend (email), cron diário da Vercel.
