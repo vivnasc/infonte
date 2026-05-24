@@ -76,6 +76,10 @@ export default async function LandingPage({
 
       <Divisor />
 
+      <ComoFunciona />
+
+      <Divisor />
+
       <Problema />
 
       <Divisor />
@@ -105,6 +109,10 @@ export default async function LandingPage({
       <Divisor />
 
       <Diferenca />
+
+      <Divisor />
+
+      <InstalarApp />
 
       <Divisor />
 
@@ -143,6 +151,66 @@ function Hero({
       <p className="text-xs text-oliva mt-6">
         A etapa 1 é gratuita. Não pedimos cartão.
       </p>
+    </section>
+  );
+}
+
+function ComoFunciona() {
+  const passos = [
+    {
+      n: "1",
+      titulo: "Crias conta",
+      corpo: "Só precisas de email e password. Sem cartão, sem compromisso.",
+    },
+    {
+      n: "2",
+      titulo: "Experimentas a etapa 1 (grátis)",
+      corpo:
+        "A primeira etapa é tua de borla. Usa a ferramenta, escreve, sente se é para ti.",
+    },
+    {
+      n: "3",
+      titulo: "Compras o percurso completo",
+      corpo:
+        "Se quiseres continuar, pagas uma vez via PayPal. Sem subscrição, acesso vitalício.",
+    },
+    {
+      n: "4",
+      titulo: "Avanças uma etapa a cada 3 dias",
+      corpo:
+        "O percurso leva cerca de 3 semanas. Cada etapa abre 72 horas depois da anterior, para a ferramenta enraizar.",
+    },
+    {
+      n: "5",
+      titulo: "Instalas a app no telemóvel",
+      corpo:
+        "A Infonte é uma aplicação web. Podes instalar no ecrã inicial do telemóvel e usar como uma app dedicada, com tudo guardado.",
+    },
+  ];
+
+  return (
+    <section className="max-w-3xl mx-auto py-16">
+      <p className="font-sans text-[11px] uppercase tracking-[0.32em] text-ocre-forte text-center mb-3">
+        Como funciona
+      </p>
+      <h2 className="font-serif text-2xl md:text-3xl text-castanho text-center leading-tight">
+        Cinco passos, do início ao fim.
+      </h2>
+      <ol className="mt-12 space-y-6 max-w-2xl mx-auto">
+        {passos.map((p) => (
+          <li key={p.n} className="flex gap-5 items-start">
+            <span className="w-10 h-10 shrink-0 rounded-full bg-ocre text-white flex items-center justify-center font-sans text-sm font-semibold">
+              {p.n}
+            </span>
+            <div className="flex-1 pt-1">
+              <h3 className="font-serif text-lg text-castanho">{p.titulo}</h3>
+              <p className="font-serif text-base text-terra-texto mt-1 leading-relaxed">
+                {p.corpo}
+              </p>
+            </div>
+          </li>
+        ))}
+      </ol>
     </section>
   );
 }
@@ -405,6 +473,64 @@ function Diferenca() {
           molda o que nos deixamos ter. A formação em constelação familiar é a
           base de ferramentas como esvaziar a mesa.
         </p>
+      </div>
+    </section>
+  );
+}
+
+function InstalarApp() {
+  return (
+    <section className="max-w-3xl mx-auto py-16">
+      <p className="font-sans text-[11px] uppercase tracking-[0.32em] text-ocre-forte text-center mb-3">
+        Leva a Infonte contigo
+      </p>
+      <h2 className="font-serif text-2xl md:text-3xl text-castanho text-center leading-tight">
+        Instala no teu telemóvel. Funciona como uma app.
+      </h2>
+      <p className="font-serif text-base text-terra-texto text-center mt-4 max-w-leitura mx-auto leading-relaxed">
+        A Infonte é uma aplicação web progressiva (PWA). Não precisas de ir à
+        App Store nem ao Google Play. Instalas diretamente do browser, e fica
+        no teu ecrã inicial como qualquer outra app.
+      </p>
+      <div className="grid md:grid-cols-2 gap-6 mt-10 max-w-2xl mx-auto">
+        <div className="p-5 rounded-lg border border-castanho/15 bg-creme-fundo/30">
+          <h3 className="font-sans text-sm font-semibold text-castanho">
+            iPhone ou iPad (Safari)
+          </h3>
+          <ol className="font-serif text-sm text-terra-texto mt-3 space-y-2 list-decimal list-inside">
+            <li>
+              Abre <span className="text-ocre-forte">infonte.vivannedossantos.com</span> no Safari.
+            </li>
+            <li>
+              Carrega no botão de partilha (o quadrado com a seta para cima).
+            </li>
+            <li>
+              Escolhe &ldquo;Adicionar ao ecrã inicial&rdquo;.
+            </li>
+            <li>
+              Confirma. A Infonte aparece no ecrã com a gota dourada.
+            </li>
+          </ol>
+        </div>
+        <div className="p-5 rounded-lg border border-castanho/15 bg-creme-fundo/30">
+          <h3 className="font-sans text-sm font-semibold text-castanho">
+            Android (Chrome)
+          </h3>
+          <ol className="font-serif text-sm text-terra-texto mt-3 space-y-2 list-decimal list-inside">
+            <li>
+              Abre <span className="text-ocre-forte">infonte.vivannedossantos.com</span> no Chrome.
+            </li>
+            <li>
+              Carrega nos três pontos (menu) no canto superior direito.
+            </li>
+            <li>
+              Escolhe &ldquo;Adicionar ao ecrã inicial&rdquo; ou &ldquo;Instalar aplicação&rdquo;.
+            </li>
+            <li>
+              Confirma. A Infonte aparece como app instalada.
+            </li>
+          </ol>
+        </div>
       </div>
     </section>
   );

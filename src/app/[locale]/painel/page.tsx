@@ -57,11 +57,27 @@ export default async function PainelPage({
       </p>
 
       {sp.paypal === "ok" && (
-        <div className="mt-6 p-4 border border-oliva/40 rounded-lg bg-oliva/5">
+        <div className="mt-6 p-5 border border-oliva/40 rounded-lg bg-oliva/5 space-y-3">
           <p className="font-serif text-castanho">
             A tua compra está confirmada. Tens agora acesso vitalício às sete
             etapas.
           </p>
+          <details className="text-sm text-castanho/80">
+            <summary className="cursor-pointer text-ocre-forte hover:underline">
+              Instalar a Infonte no telemóvel
+            </summary>
+            <div className="mt-3 space-y-2 font-serif">
+              <p>
+                <strong>iPhone/iPad:</strong> no Safari, carrega no botão de
+                partilha (quadrado com seta) e escolhe &ldquo;Adicionar ao ecrã
+                inicial&rdquo;.
+              </p>
+              <p>
+                <strong>Android:</strong> no Chrome, carrega nos três pontos
+                (menu) e escolhe &ldquo;Instalar aplicação&rdquo;.
+              </p>
+            </div>
+          </details>
         </div>
       )}
 
