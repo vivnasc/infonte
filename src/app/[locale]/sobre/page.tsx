@@ -31,11 +31,15 @@ export default async function SobrePage({
             <h1 className="font-serif text-4xl text-castanho mt-3 leading-tight">
               Vivianne dos Santos
             </h1>
-            <p className="font-serif text-lg text-terra-texto/90 mt-6 leading-relaxed">
-              Escritora, criadora, e estudiosa dos sistemas que nos formam.
-              Construí o Infonte a partir de uma descoberta simples e difícil,
-              a de que a abundância não vem para quem persegue, vem para quem
-              se basta.
+            <p className="font-sans text-xs uppercase tracking-[0.2em] text-oliva mt-3">
+              Escritora, em formação em constelação familiar sistémica e
+              psicologia transpessoal
+            </p>
+            {/* VERSÃO FINAL: "Escritora, pós-graduada em terapia da constelação
+                familiar sistémica e em psicologia transpessoal" */}
+            <p className="font-serif text-lg text-terra-texto mt-6 leading-relaxed">
+              Construí a Infonte a partir de uma descoberta simples e difícil.
+              A abundância não vem para quem persegue. Vem para quem se basta.
             </p>
           </div>
         </div>
@@ -60,10 +64,11 @@ export default async function SobrePage({
           <p>
             Estudo, há anos, os sistemas que nos formam, a forma como aquilo
             que herdámos, sem escolher, molda o que conseguimos ter e o que
-            não nos deixamos ter. Formei-me em terapia sistémica para
-            perceber isto a fundo, não para te dar uma sessão de terapia,
-            mas para construir ferramentas que funcionam porque tocam a
-            raiz, e não só a superfície.
+            não nos deixamos ter. Estou em formação em psicologia
+            transpessoal, em psicologia e espiritualidade, e em terapia da
+            constelação familiar sistémica, para perceber isto a fundo. Não
+            para te dar uma sessão de terapia. Para construir ferramentas que
+            funcionam porque tocam a raiz, e não só a superfície.
           </p>
           <p>
             O Infonte é isso. Não é mais um curso de mentalidade. É um
@@ -83,6 +88,10 @@ export default async function SobrePage({
           <Link href="/etapa/1" className="btn-ocre">
             Começar a etapa 1, grátis
           </Link>
+          <p className="font-serif text-sm text-oliva mt-8 italic">
+            Um percurso de Vivianne dos Santos, escritora e em formação em
+            constelação familiar sistémica e psicologia transpessoal.
+          </p>
         </div>
       </section>
     </div>

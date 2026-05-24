@@ -303,18 +303,21 @@ function Autora() {
             Vivianne dos Santos
           </h3>
           <p className="font-sans text-xs uppercase tracking-[0.2em] text-oliva mt-2">
-            Escritora, criadora, estudiosa dos sistemas que nos formam
+            Escritora, em formação em constelação familiar sistémica e psicologia transpessoal
           </p>
+          {/* VERSÃO FINAL (destrancar quando concluir, ~8 meses):
+              "Escritora, pós-graduada em terapia da constelação familiar sistémica e em psicologia transpessoal" */}
           <div className="prose-infonte mt-6 space-y-4">
             <p>
               Construí a Infonte a partir de uma descoberta simples e difícil. A
               abundância não vem para quem persegue. Vem para quem se basta.
             </p>
             <p>
-              Estudei terapia sistémica para perceber a raiz, não para te dar
-              uma sessão. Para construir ferramentas que funcionam porque tocam
-              o que herdaste sem escolher. Não te ensino o que tenho. Ensino o
-              caminho até ao bastar-se.
+              Estudo, há anos, os sistemas que nos formam. Estou em formação em
+              psicologia transpessoal, em psicologia e espiritualidade, e em
+              terapia da constelação familiar sistémica. Não para te dar uma
+              sessão de terapia. Para construir ferramentas que funcionam porque
+              tocam o que herdaste sem escolher.
             </p>
           </div>
           <div className="mt-6">
@@ -397,6 +400,11 @@ function Diferenca() {
           Não desejas com mais força. Aprendes a bastar-te. E a abundância
           começa a chegar, como sempre fez para quem deixou de a perseguir.
         </p>
+        <p>
+          O Infonte assenta no trabalho sistémico: aquilo que herdamos e que
+          molda o que nos deixamos ter. A formação em constelação familiar é a
+          base de ferramentas como esvaziar a mesa.
+        </p>
       </div>
     </section>
   );
@@ -417,9 +425,13 @@ function FechoCta() {
           Conhecer a autora
         </Link>
       </div>
-      <p className="text-xs text-oliva mt-6">
-        Vivianne dos Santos · Sete Ecos
+      <p className="font-serif text-sm text-oliva mt-8 italic max-w-leitura mx-auto">
+        Um percurso de Vivianne dos Santos, escritora e em formação em
+        constelação familiar sistémica e psicologia transpessoal.
       </p>
+      {/* VERSÃO FINAL: "Um percurso de Vivianne dos Santos, escritora,
+          pós-graduada em terapia da constelação familiar sistémica e em
+          psicologia transpessoal." */}
     </section>
   );
 }
