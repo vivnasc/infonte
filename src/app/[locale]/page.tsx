@@ -567,11 +567,11 @@ function Divisor() {
     <div className="max-w-leitura mx-auto py-6 flex items-center gap-4">
       <span className="flex-1 h-px bg-castanho/15" />
       <Image
-        src="/infonte-simbolo.svg"
+        src="/gota.svg"
         alt=""
         width={22}
         height={22}
-        className="opacity-70"
+        className="opacity-80"
         aria-hidden
       />
       <span className="flex-1 h-px bg-castanho/15" />

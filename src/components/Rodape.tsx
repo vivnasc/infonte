@@ -7,7 +7,7 @@ export async function Rodape() {
     <footer className="w-full border-t border-castanho/20 mt-24 bg-creme-fundo/50">
       <div className="max-w-5xl mx-auto px-6 py-12 flex flex-col items-center gap-2 text-center">
         <Image
-          src="/infonte-simbolo.svg"
+          src="/gota.svg"
           alt=""
           width={28}
           height={28}

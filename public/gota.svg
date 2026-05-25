@@ -1,0 +1,4 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Infonte">
+  <path d="M256 116 C198 218 166 282 166 334 A90 90 0 0 0 346 334 C346 282 314 218 256 116 Z" fill="none" stroke="#B8843D" stroke-width="15" stroke-linejoin="round"/>
+  <circle cx="256" cy="338" r="32" fill="#B8843D"/>
+</svg>

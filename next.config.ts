@@ -5,6 +5,9 @@ const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  images: {
+    unoptimized: true,
+  },
   // Garante que os markdowns ficam disponíveis em runtime nas serverless
   // functions (para os endpoints de seed lerem o conteúdo do repo).
   outputFileTracingIncludes: {
