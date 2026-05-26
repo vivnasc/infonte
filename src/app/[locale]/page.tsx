@@ -15,49 +15,49 @@ const FERRAMENTAS: Ferramenta[] = [
     titulo: "Esvaziar",
     ferramenta: "Esvaziar a mesa",
     corpo:
-      "Tiras o ruído e vês quanto do que persegues nem é teu. Separas o meu, o emprestado, e o que herdaste de alguém antes de ti.",
+      "Despejares tudo o que andas a perseguir. E ao lado de cada coisa, perguntares: isto é meu, emprestado, ou de alguém antes de mim? A maioria das mulheres descobre que metade da lista não lhe pertence.",
   },
   {
     n: 2,
     titulo: "Bastar-se",
     ferramenta: "Contar o que já tens, e deixar entrar",
     corpo:
-      "Encontras o chão de onde se age sem fome. Três listas curtas, e a porta de receber que andava fechada.",
+      "Encontrares o chão de onde se age sem fome. Veres o que já tens (e que não contas), e abrires a porta de receber que andava fechada.",
   },
   {
     n: 3,
     titulo: "Clarear",
     ferramenta: "Os três filtros",
     corpo:
-      "De tudo o que sobrou, o que é mesmo para seguir. Acende no difícil, o mundo já pediu, vai doer se não fizeres.",
+      "De tudo o que sobrou como genuinamente teu, o que é para seguir agora. Três perguntas que separam o que queres do que precisas.",
   },
   {
     n: 4,
     titulo: "Focar",
     ferramenta: "A linha que protege",
     corpo:
-      "Cortas o resto. Defines o que sai automaticamente, e abres a janela protegida onde a coisa cresce.",
+      "Escolheres uma coisa. Pela primeira vez, não por lealdade, não por compensação, não por medo. Por verdade. E protegeres essa escolha do ruído.",
   },
   {
     n: 5,
     titulo: "Materializar",
     ferramenta: "Partir o sonho",
     corpo:
-      "A ideia vira ano, três meses, semana, primeiro passo em 24 horas. O coração do percurso.",
+      "O que escolheste vira ano, três meses, semana, primeiro passo em 24 horas. A ideia deixa de ser ideia e começa a existir.",
   },
   {
     n: 6,
     titulo: "Sustentar",
     ferramenta: "Encontro semanal contigo",
     corpo:
-      "Vinte minutos por semana com três perguntas fixas. O ritual que protege a clareza quando a vida tenta trazer o ruído de volta.",
+      "Vinte minutos por semana com três perguntas fixas. O ritual que mantém a clareza quando a vida tenta trazer de volta o ruído e os padrões antigos.",
   },
   {
     n: 7,
     titulo: "Tornar-se fonte",
     ferramenta: "Devolução do percurso",
     corpo:
-      "Vês o caminho que fizeste, na tua letra. A clareza deixa de ser método. Passa a ser quem tu és.",
+      "Vês o caminho que fizeste, na tua letra. Já não é método. É quem tu és quando paras de perseguir e começas a ocupar o teu lugar.",
   },
 ];
 
@@ -72,7 +72,7 @@ export default async function LandingPage({
 
   return (
     <div className="px-6">
-      <Hero t={t} />
+      <Hero />
 
       <Divisor />
 
@@ -80,7 +80,7 @@ export default async function LandingPage({
 
       <Divisor />
 
-      <Problema />
+      <ADor />
 
       <Divisor />
 
@@ -88,11 +88,15 @@ export default async function LandingPage({
 
       <Divisor />
 
-      <Virada />
+      <ASubstituicao />
 
       <Divisor />
 
-      <Resultado t={t} />
+      <ODespertar />
+
+      <Divisor />
+
+      <Resultado />
 
       <Divisor />
 
@@ -112,6 +116,10 @@ export default async function LandingPage({
 
       <Divisor />
 
+      <Seguranca />
+
+      <Divisor />
+
       <InstalarApp />
 
       <Divisor />
@@ -121,31 +129,31 @@ export default async function LandingPage({
   );
 }
 
-function Hero({
-  t,
-}: {
-  t: Awaited<ReturnType<typeof getTranslations<"landing">>>;
-}) {
+function Hero() {
   return (
     <section className="max-w-2xl mx-auto pt-16 md:pt-24 pb-12 text-center">
       <p className="font-sans text-[11px] uppercase tracking-[0.32em] text-ocre-forte mb-12">
-        {t("tagline_topo")}
+        Um percurso em sete etapas
       </p>
       <h1 className="font-serif text-[2.4rem] md:text-[3.4rem] text-castanho leading-[1.1] font-medium">
-        {t("titulo")}
+        Fazes tanto. Começas tudo. E no fundo sabes que metade nem era teu.
       </h1>
-      <h2 className="font-serif text-2xl md:text-[2rem] text-ocre-forte leading-snug mt-4 italic">
-        {t("titulo_b")}
-      </h2>
-      <p className="font-serif text-lg md:text-xl text-terra-texto mt-10 leading-relaxed">
-        {t("intro")}
+      <p className="font-serif text-xl md:text-2xl text-ocre-forte mt-6 italic">
+        Pára de perseguir o que nunca foi teu.
+      </p>
+      <p className="font-serif text-lg text-terra-texto mt-10 leading-relaxed max-w-leitura mx-auto">
+        Entras com a agenda cheia e o vazio por baixo. Com talento a mais e
+        clareza a menos. Com anos a correr atrás de metas que, quando as
+        alcanças, te deixam sentir pouco. Sais a saber o que é teu, o que era
+        emprestado, e o que herdaste sem escolher. E começas, pela primeira vez,
+        a construir a partir do que é verdadeiramente teu.
       </p>
       <div className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-4">
         <Link href="/etapa/1" className="btn-ocre">
-          {t("cta_comecar")}
+          Começar a etapa 1, grátis
         </Link>
         <Link href="/sobre" className="btn-quieto">
-          {t("cta_sobre")}
+          Conhecer a autora
         </Link>
       </div>
       <p className="text-xs text-oliva mt-6">
@@ -215,30 +223,32 @@ function ComoFunciona() {
   );
 }
 
-function Problema() {
+function ADor() {
   return (
     <section className="max-w-leitura mx-auto py-16">
       <p className="font-sans text-[11px] uppercase tracking-[0.32em] text-ocre-forte text-center mb-8">
         Para ti
       </p>
       <h2 className="font-serif text-2xl md:text-3xl text-castanho text-center leading-tight">
-        Tu não estás cansada de trabalhar. Estás cansada de perseguir.
+        Tens talento a mais e clareza a menos. E odeias-te por isso.
       </h2>
       <div className="prose-infonte mt-10 space-y-5">
         <p>
-          Acordas com vinte abas abertas na cabeça. Cinco projetos a meio, três
+          Não é falta de capacidade. É excesso. Cinco projetos a meio, três
           versões de ti que ainda não conseguiste viver, e a sensação de que,
           quanto mais corres, mais a vida te escapa.
         </p>
         <p>
-          Não é falta de capacidade. É excesso. A dispersão entre coisas más é
-          fácil de cortar. A dispersão entre coisas boas é a armadilha que
-          prende as mulheres talentosas a vida inteira.
+          Acordas com a agenda cheia. Trabalhas. Conquistas. E quando chegas
+          ao que querias, sentes pouco. Mudas de emprego e o desconforto
+          continua. Recebes a validação e continuas insuficiente. A pergunta
+          instala-se: se fiz tudo certo, porque é que continuo perdida?
         </p>
         <p>
-          E há sonhos que tu carregas e não nasceram em ti. Vieram da pressão,
-          da comparação, do que ficaria bem aos olhos de alguém antes de ti.
-          Andas a gastar a tua vida a correr atrás de coisas que nem escolheste.
+          Há sonhos que carregas e que não nasceram em ti. Vieram da pressão
+          de alguém, da comparação que te invadiu, do que ficaria bem aos
+          olhos de quem veio antes de ti. Andas a gastar a tua vida a correr
+          atrás de coisas que nem escolheste.
         </p>
       </div>
     </section>
@@ -263,44 +273,76 @@ function FotoAmbiente() {
   );
 }
 
-function Virada() {
+function ASubstituicao() {
   return (
     <section className="max-w-leitura mx-auto py-16">
       <p className="font-sans text-[11px] uppercase tracking-[0.32em] text-ocre-forte text-center mb-8">
-        A virada
+        O que ninguém te diz
       </p>
       <h2 className="font-serif text-2xl md:text-3xl text-castanho text-center leading-tight">
-        A abundância não vem para quem persegue. Vem para quem se basta.
+        Não é a meta que está errada. É o que procuras por trás dela.
       </h2>
       <div className="prose-infonte mt-10 space-y-5">
         <p>
-          Não é poesia. É mecânica. Quem persegue age de carência, e a carência
-          dispersa, agarra, sabota. Quem se basta age de clareza, e a clareza
-          foca, e o foco vira ação. E é a ação que muda a vida.
+          Tu não queres sucesso. Queres reconhecimento. Não queres dinheiro.
+          Queres segurança. Não queres produtividade. Queres sentir que vales.
+          Não queres aprovação. Queres pertença. Não queres estatuto. Queres
+          sentir-te suficiente.
         </p>
         <p>
-          Bastar-se não é desistir de querer. É querer de um lugar cheio, não
-          de um lugar vazio. A mesma vontade, a partir de outro chão, dá outro
-          resultado.
+          A meta é só o veículo. Estás a tentar obter no futuro aquilo que
+          faltou no passado. Por isso corres e não chegas: o objetivo nunca foi
+          o problema, nem a solução.
+        </p>
+        <p>
+          Isto não é falta de organização. É substituição. E enquanto não a
+          vires, vais continuar a correr, a começar, a conquistar, e a sentir
+          pouco.
         </p>
       </div>
     </section>
   );
 }
 
-function Resultado({
-  t,
-}: {
-  t: Awaited<ReturnType<typeof getTranslations<"landing">>>;
-}) {
+function ODespertar() {
+  return (
+    <section className="max-w-leitura mx-auto py-16">
+      <p className="font-sans text-[11px] uppercase tracking-[0.32em] text-ocre-forte text-center mb-8">
+        A virada
+      </p>
+      <h2 className="font-serif text-2xl md:text-3xl text-castanho text-center leading-tight">
+        Antes de escolher o caminho, descobre quem está a escolher.
+      </h2>
+      <div className="prose-infonte mt-10 space-y-5">
+        <p>
+          O Infonte não te ensina a fazer mais. Ensina-te a ver. Ver o que
+          estás realmente a procurar (não a meta, a necessidade por trás
+          dela). Diferenciar o que é teu do que herdaste. Reconhecer o que
+          procuras não no objetivo, mas numa necessidade que ainda não foi
+          vista. Devolver as expectativas que não te pertencem. E então,
+          pela primeira vez, escolher. Não por lealdade, não por compensação,
+          não por medo. Por verdade.
+        </p>
+        <p>
+          Não é produtividade. Não é organização. Não é mais um método para
+          fazer melhor o que já fazes de mais. É parar de perseguir o que
+          nunca foi teu, para poderes ocupar o teu lugar.
+        </p>
+      </div>
+    </section>
+  );
+}
+
+function Resultado() {
   return (
     <section className="max-w-leitura mx-auto py-16 text-center">
       <p className="font-sans text-[11px] uppercase tracking-[0.32em] text-ocre-forte mb-6">
-        {t("resultado_titulo")}
+        O que muda
       </p>
       <p className="font-serif text-xl md:text-2xl text-castanho leading-relaxed">
-        Clareza mental. Foco para maximizares o teu potencial. E um sonho ou
-        ideia já partido em ações concretas que tu começaste a executar.
+        Paras de correr atrás do que não é teu. Começas a construir a partir do
+        que é. O ruído baixa. A clareza vem. E o que fazes, pela primeira vez,
+        é teu de verdade.
       </p>
     </section>
   );
@@ -377,15 +419,16 @@ function Autora() {
               "Escritora, pós-graduada em terapia da constelação familiar sistémica e em psicologia transpessoal" */}
           <div className="prose-infonte mt-6 space-y-4">
             <p>
-              Construí a Infonte a partir de uma descoberta simples e difícil. A
-              abundância não vem para quem persegue. Vem para quem se basta.
+              Passei anos a perseguir. A fazer muito para valer. A encher a mesa
+              de metas que nem sempre eram minhas. Até perceber que o que eu
+              procurava não estava no próximo projeto, estava numa necessidade
+              antiga que eu nunca tinha visto.
             </p>
             <p>
-              Estudo, há anos, os sistemas que nos formam. Estou em formação em
-              psicologia transpessoal, em psicologia e espiritualidade, e em
-              terapia da constelação familiar sistémica. Não para te dar uma
-              sessão de terapia. Para construir ferramentas que funcionam porque
-              tocam o que herdaste sem escolher.
+              Estou em formação em constelação familiar sistémica, em psicologia
+              transpessoal, e em psicologia e espiritualidade. Não para te dar
+              uma sessão. Para construir ferramentas que tocam a raiz: o que
+              herdaste, o que é teu, e o que precisas de devolver.
             </p>
           </div>
           <div className="mt-6">
@@ -409,7 +452,7 @@ function Modelo() {
     {
       titulo: "Pagas uma vez, é tua",
       corpo:
-        "Sem subscrição, sem upsell etapa a etapa. Acesso vitalício, podes revisitar sempre que precisares.",
+        "Sem subscrição, sem upsell etapa a etapa. Acesso vitalício. As ferramentas ficam contigo, podes voltar sempre que precisares.",
     },
     {
       titulo: "Em silêncio, contigo",
@@ -419,7 +462,7 @@ function Modelo() {
     {
       titulo: "Uma aplicação para a tua vida",
       corpo:
-        "A Infonte é uma aplicação web. Abres no telemóvel ou no computador. Podes instalar no ecrã inicial, funciona como uma app dedicada. As tuas respostas e o teu percurso ficam guardados, sempre disponíveis quando precisares de voltar.",
+        "A Infonte é uma aplicação web. Abres no telemóvel ou no computador. Podes instalar no ecrã inicial, funciona como uma app dedicada. Tudo guardado, sempre disponível.",
     },
   ];
   return (
@@ -455,23 +498,37 @@ function Diferenca() {
       </p>
       <div className="prose-infonte space-y-5">
         <p>
-          A Infonte não te diagnostica. Não te diz qual é a tua ferida, nem te
-          pede para encaixares num arquétipo. Não te promete riqueza. Não te
-          mostra o que eu tenho.
+          A Infonte não te ensina a ser mais produtiva. Não te dá um planner,
+          um sistema de metas, nem te pede para visualizares com mais força.
+          Não te diagnostica, não te classifica, não te promete riqueza.
         </p>
         <p>
-          A Infonte constrói. Cada etapa põe na tua mão uma ferramenta concreta
-          que tu usas, e que continua a servir-te dez anos depois. Pequenas,
-          simples, sérias. Voltas a elas em qualquer manhã difícil.
-        </p>
-        <p>
-          Não desejas com mais força. Aprendes a bastar-te. E a abundância
-          começa a chegar, como sempre fez para quem deixou de a perseguir.
+          A Infonte põe-te em frente ao que estás realmente a perseguir. Ajuda-te
+          a ver o que é teu, o que é emprestado, e o que carregas por alguém que
+          veio antes de ti. E dá-te ferramentas concretas para devolveres o que
+          não é teu e escolheres, pela primeira vez, a partir de ti.
         </p>
         <p>
           O Infonte assenta no trabalho sistémico: aquilo que herdamos e que
           molda o que nos deixamos ter. A formação em constelação familiar é a
           base de ferramentas como esvaziar a mesa.
+        </p>
+      </div>
+    </section>
+  );
+}
+
+function Seguranca() {
+  return (
+    <section className="max-w-leitura mx-auto py-10">
+      <div className="p-5 rounded-lg border border-castanho/10 bg-creme-fundo/20">
+        <p className="font-serif text-sm text-castanho/80 leading-relaxed">
+          <strong className="text-castanho">Uma nota importante.</strong> O Infonte
+          usa princípios sistémicos como reflexão, não como sessão clínica. Se
+          sentes que a exaustão que vives pode ser burnout, depressão, ou algo
+          que precisa de acompanhamento profissional, por favor procura apoio
+          especializado. As ferramentas do Infonte complementam, não substituem,
+          o cuidado de quem está formado para isso.
         </p>
       </div>
     </section>
@@ -488,9 +545,8 @@ function InstalarApp() {
         Instala no teu telemóvel. Funciona como uma app.
       </h2>
       <p className="font-serif text-base text-terra-texto text-center mt-4 max-w-leitura mx-auto leading-relaxed">
-        A Infonte é uma aplicação web progressiva (PWA). Não precisas de ir à
-        App Store nem ao Google Play. Instalas diretamente do browser, e fica
-        no teu ecrã inicial como qualquer outra app.
+        A Infonte é uma aplicação web progressiva. Não precisas de ir à
+        App Store nem ao Google Play. Instalas diretamente do browser.
       </p>
       <div className="grid md:grid-cols-2 gap-6 mt-10 max-w-2xl mx-auto">
         <div className="p-5 rounded-lg border border-castanho/15 bg-creme-fundo/30">
@@ -498,18 +554,10 @@ function InstalarApp() {
             iPhone ou iPad (Safari)
           </h3>
           <ol className="font-serif text-sm text-terra-texto mt-3 space-y-2 list-decimal list-inside">
-            <li>
-              Abre <span className="text-ocre-forte">infonte.vivannedossantos.com</span> no Safari.
-            </li>
-            <li>
-              Carrega no botão de partilha (o quadrado com a seta para cima).
-            </li>
-            <li>
-              Escolhe &ldquo;Adicionar ao ecrã inicial&rdquo;.
-            </li>
-            <li>
-              Confirma. A Infonte aparece no ecrã com a gota dourada.
-            </li>
+            <li>Abre <span className="text-ocre-forte">infonte.vivannedossantos.com</span> no Safari.</li>
+            <li>Carrega no botão de partilha (o quadrado com a seta para cima).</li>
+            <li>Escolhe &ldquo;Adicionar ao ecrã inicial&rdquo;.</li>
+            <li>Confirma. A Infonte aparece no ecrã com a gota dourada.</li>
           </ol>
         </div>
         <div className="p-5 rounded-lg border border-castanho/15 bg-creme-fundo/30">
@@ -517,18 +565,10 @@ function InstalarApp() {
             Android (Chrome)
           </h3>
           <ol className="font-serif text-sm text-terra-texto mt-3 space-y-2 list-decimal list-inside">
-            <li>
-              Abre <span className="text-ocre-forte">infonte.vivannedossantos.com</span> no Chrome.
-            </li>
-            <li>
-              Carrega nos três pontos (menu) no canto superior direito.
-            </li>
-            <li>
-              Escolhe &ldquo;Adicionar ao ecrã inicial&rdquo; ou &ldquo;Instalar aplicação&rdquo;.
-            </li>
-            <li>
-              Confirma. A Infonte aparece como app instalada.
-            </li>
+            <li>Abre <span className="text-ocre-forte">infonte.vivannedossantos.com</span> no Chrome.</li>
+            <li>Carrega nos três pontos (menu) no canto superior direito.</li>
+            <li>Escolhe &ldquo;Adicionar ao ecrã inicial&rdquo; ou &ldquo;Instalar aplicação&rdquo;.</li>
+            <li>Confirma. A Infonte aparece como app instalada.</li>
           </ol>
         </div>
       </div>
@@ -540,8 +580,8 @@ function FechoCta() {
   return (
     <section className="max-w-leitura mx-auto py-16 text-center">
       <p className="font-serif text-xl md:text-2xl text-castanho leading-relaxed">
-        Quando estiveres pronta, entra pela etapa 1. É gratuita, e fica contigo
-        para sempre.
+        Quando estiveres pronta para parar de perseguir e começar a escolher,
+        entra pela etapa 1. É gratuita, e fica contigo para sempre.
       </p>
       <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
         <Link href="/etapa/1" className="btn-ocre">
