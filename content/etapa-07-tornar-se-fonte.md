@@ -40,7 +40,7 @@ Há umas semanas, tu corrias atrás de tudo e não chegavas a nada. A mente chei
 
 Agora tens uma mente que sabes esvaziar. Um chão de onde partes sem fome. Uma direção. A coragem de cortar o resto. Um sonho já partido em passos, com o primeiro dado. E um encontro semanal contigo que mantém tudo vivo.
 
-Não te tornaste outra pessoa. Tornaste-te a pessoa que já eras por baixo do ruído. A clareza não veio de fora. Estava tapada, e tu destapaste-a.
+Não te tornaste outra pessoa. Tornaste-te a pessoa que já eras por baixo do ruído. No início, a necessidade antiga escolhia por ti: perseguias reconhecimento, segurança, a sensação de que bastava, tudo disfarçado de objetivo. Agora és tu que escolhes. Essa diferença é tudo. A clareza não veio de fora. Estava tapada, e tu destapaste-a.
 
 ## Bloco C, a virada, de sede a fonte
 

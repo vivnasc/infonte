@@ -12,7 +12,7 @@ Focar não é só dizer sim a uma coisa. É dizer não a tudo o resto. E o resto
 
 A mulher dispersa acha que foco é concentração. Não é. Foco é renúncia. É a coragem de deixar morrer coisas que poderiam ter dado certo, para que a coisa que escolheste tenha terreno suficiente para crescer. Uma planta com água a chegar a dez raízes não cresce em nenhuma. A mesma água numa só, e ela sobe.
 
-Tu não tens falta de capacidade. Tens falta de concentração de recursos. Andas a espalhar a tua água.
+Tu não tens falta de capacidade. Tens falta de concentração de recursos. Andas a espalhar a tua água. Talvez esta seja a primeira vez que escolhes de verdade, não por lealdade a quem te criou, não para compensar o que te faltou, não por medo de ficar sem. Pela verdade de quem tu és quando o ruído cala. Essa escolha merece toda a tua água.
 
 ## Bloco B, porque é que isto é tão difícil
 

@@ -12,7 +12,7 @@ A partir do "quando eu tiver, então valho". A partir do "tenho de provar". A pa
 
 Há uma coisa que ninguém te disse sobre as mulheres que constroem coisas grandes. Elas não constroem para se sentirem suficientes. Elas constroem porque já se sentem suficientes. A plenitude não é o prémio no fim. É o ponto de partida. É o chão.
 
-Bastar-se é isto, é deixar de pendurar o teu valor no que ainda não tens, e plantá-lo no que já és. Não quando emagreceres, quando ganhares, quando conseguires. Agora. Tal como estás, a meio, incompleta, com a vida por arrumar. Bastar-se não é estar pronta. É decidir que já chegas, mesmo por arrumar.
+Bastar-se é isto, é deixar de procurar nos objetivos aquilo que já vive dentro de ti. Tu andaste a pedir ao sucesso que te desse reconhecimento, ao dinheiro que te desse segurança, à produtividade que te provasse que vales. Penduraste o teu valor no que ainda não tinhas, como se a suficiência estivesse à espera no fim de uma meta. Nunca esteve. A suficiência é o ponto de partida, não o prémio. Planta-a no que já és. Não quando emagreceres, quando ganhares, quando conseguires. Agora. Tal como estás, a meio, incompleta, com a vida por arrumar. Bastar-se não é estar pronta. É decidir que já chegas, mesmo por arrumar.
 
 ## Bloco B, porque é que isto muda tudo
 
@@ -66,7 +66,9 @@ Recebe um elogio inteiro. Da próxima vez que alguém te elogiar, não minimizes
 
 Aceita uma ajuda. Da próxima vez que alguém te oferecer ajuda e o teu reflexo for "não, eu trato", para e aceita. Deixa receber.
 
-E diz, uma vez por dia, em voz baixa, uma frase que parece simples e não é, eu permito-me ter uma vida boa, mesmo que quem veio antes de mim não a tenha tido. Repara no que se mexe por dentro quando o dizes.
+Diz, uma vez por dia, em voz baixa, uma frase que parece simples e não é, eu permito-me ter uma vida boa, mesmo que quem veio antes de mim não a tenha tido. Repara no que se mexe por dentro quando o dizes.
+
+Por último, completa esta frase por escrito: "O que eu procurava no fundo de tudo era _____. A verdade é que já o tenho, porque _____." Não penses demasiado. Escreve o que vier. Muitas vezes, a resposta que sai primeiro é a mais honesta.
 
 [ campo de texto, guardado em respostas, bloco_id "receber_etapa_2" ]
 

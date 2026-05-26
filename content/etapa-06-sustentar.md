@@ -26,6 +26,8 @@ Quando começares a dizer sim a tudo, a pegar em coisas novas, a abandonar a dir
 
 Quando o sonho voltar a ser só sonho, parado na cabeça, é o medo de materializar a voltar. Parte em passos e dá um, Etapa 5.
 
+Quando deres por ti a correr atrás de algo novo só para te sentires válida outra vez, reconhece o padrão: é a substituição a voltar, a velha carência a disfarçar-se de objetivo. Para, e volta à Etapa 2.
+
 Não tens de evitar o ruído. Tens de o reconhecer e saber qual ferramenta o dissolve. Cada uma das etapas que fizeste é uma ferramenta de regresso.
 
 ## Bloco C, a ferramenta, o realinhamento semanal

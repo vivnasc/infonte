@@ -22,6 +22,8 @@ A segunda, o que é que o mundo já me veio pedir? Repara no que as pessoas te p
 
 A terceira, o que é que, se eu não fizer, vai doer daqui a cinco anos? De tudo o que está na tua lista, qual é aquele que, imaginando-te a não o ter feito, te aperta o peito? Esse arrependimento antecipado é uma bússola. Aponta para o que importa mesmo.
 
+Depois das três, há uma verificação final que vale a pena fazeres: se eu já me sentisse suficiente, ainda escolheria isto? Esta pergunta separa o que é genuinamente teu daquilo que só persegues para preencher uma falta antiga. Se a resposta for sim, é teu. Se hesitares, olha bem para o que está por baixo do desejo.
+
 ## Bloco C, a ferramenta, o filtro dos três
 
 Esta ferramenta fica. Chama-se passar pelos três filtros.

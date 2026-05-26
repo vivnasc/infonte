@@ -50,7 +50,7 @@ Antes de te ensinar a ter mais, tenho de te ensinar a largar. Não a largar os t
 
 Repara de onde vem o ruído.
 
-Vem da comparação, viste alguém e quiseste o que ela tinha sem perguntar se o querias mesmo. Vem do medo, encheste a agenda para não parar, porque parar assusta. Vem da carência antiga, aprendeste cedo que tinhas de fazer muito para valer, e agora confundes movimento com valor. Vem da pressa, achas que se não fizeres tudo agora, perdes o comboio.
+Vem da comparação, viste alguém e quiseste o que ela tinha sem perguntar se o querias mesmo. Vem do medo, encheste a agenda para não parar, porque parar assusta. Vem da carência antiga, aprendeste cedo que tinhas de fazer muito para valer, e agora confundes o objetivo com aquilo que ele te promete por baixo: não é o sucesso que queres, é o reconhecimento; não é o dinheiro, é a segurança; não é a produtividade, é a sensação de que vales. O objetivo é só o veículo, e tu persegue-lo a pensar que, quando chegares, a carência vai fechar. Só que não fecha, porque o que te faltou não se resolve no futuro, resolve-se quando o vês pelo que é. Vem da pressa, achas que se não fizeres tudo agora, perdes o comboio.
 
 E vem de um sítio mais fundo, que quase ninguém vê. Alguns dos sonhos que tu persegues não nasceram em ti. Nasceram antes de ti. É o sonho que o teu pai não conseguiu realizar e tu carregas sem saber. É a vida que a tua mãe não teve e tu sentes que tens de viver por ela. É a ambição que alguém da tua família pousou nos teus ombros quando eras pequena. Tu corres atrás disso a vida inteira a achar que é teu, e não é. É uma dívida que herdaste, não um desejo que escolheste.
 
@@ -67,6 +67,8 @@ Faz isto agora, com papel, ou no campo abaixo.
 Primeiro, despeja. Escreve tudo o que andas a perseguir. Tudo. Os projetos, os sonhos, as ideias, os objetivos, as coisas que achas que devias estar a fazer. Sem ordem, sem julgar. Esvazia a cabeça toda para fora. Não pares enquanto houver coisa lá dentro.
 
 Depois, ao lado de cada uma, escreve uma só palavra, de quem é isto. Escreve "meu" se for genuinamente teu, se te acende mesmo quando ninguém está a ver. Escreve "emprestado" se vier de comparação, de pressão, do que os outros esperam, do que parece bonito mas não te aquece. E escreve "de outro" se, quando olhas com honestidade, vês que aquele sonho é de alguém da tua família, uma coisa que tu pegaste para realizar por eles, ou em vez deles, ou para que eles ficassem orgulhosos.
+
+A cada item marcado como meu, pergunta ainda: o que acredito que isto me vai dar? Escreve ao lado. Reconhecimento, segurança, pertença, a sensação de que valho. Se a resposta for uma dessas, não risques, mas repara: talvez o desejo seja teu e a urgência venha de outro sítio.
 
 Agora olha para a lista. Olha quanto está marcado como emprestado, e quanto está marcado como de outro. Essa é a quantidade de vida que andas a gastar a perseguir coisas que nem são tuas.
 
@@ -89,6 +91,8 @@ Durante os próximos três dias, de cada vez que te pegares a perseguir algo, a 
 À noite, escreve, hoje persegui _____ coisas emprestadas. O que senti quando reparei foi _____.
 
 Em três dias, abre a Etapa 2, onde encontras o chão de onde se age sem fome.
+
+Uma nota, com cuidado. Se ao esvaziar a mesa sentires que o cansaço é mais do que ruído, se for algo que te pesa o corpo ou te tira o sono, considera falar com alguém de confiança ou procurar apoio profissional. Clarear a mente é poderoso, e pedir ajuda também é.
 
 ---
 

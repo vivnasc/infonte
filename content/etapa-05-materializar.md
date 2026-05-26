@@ -28,6 +28,8 @@ A armadilha do tudo ou nada, achas que se não fizeres em condições, mais vale
 
 Esta ferramenta é o coração do Infonte, e fica para a vida. Chama-se partir o sonho até caber numa semana.
 
+Antes de começar, confirma uma coisa rápida: este sonho é teu mesmo, ou é a necessidade antiga vestida de projeto? Se já passaste pelos filtros da Etapa 3 e a resposta foi sim, avança sem dúvida.
+
 Pega na tua direção, da Etapa 3.
 
 Primeiro, escreve o sonho grande, a versão completa, como gostavas que estivesse daqui a um ano. Sem te conteres.
