@@ -8,7 +8,7 @@ export const maxDuration = 30;
 const STYLE_BASE = `editorial still life photograph, painterly contemplative atmosphere, fixed palette: deep terra #2E1D12, warm cream #F2E8DC, soft ocre #B8843D, amber gold #EBAE4A, olive #6B6B47; allowed materials: raw linen, dark walnut wood, warm terracotta ceramic, natural raffia, aged paper; allowed botanicals: dried grasses, eucalyptus, cotton branches; supports: hand-troweled warm stucco wall, worn wooden table; single oblique soft afternoon light, gentle chiaroscuro; no people, no faces, no hands, no text, no logos, no watermarks; 8k, --ar 9:16`;
 
 export async function POST(
-  _request: Request,
+  request: Request,
   ctx: { params: Promise<{ dia: string }> }
 ) {
   const admin = await exigirAdmin();
@@ -26,12 +26,19 @@ export async function POST(
 
   const { dia: diaStr } = await ctx.params;
   const dia = parseInt(diaStr, 10);
+  if (!Number.isFinite(dia) || dia < 1 || dia > 30) {
+    return NextResponse.json({ erro: "dia inválido" }, { status: 400 });
+  }
+
+  const url = new URL(request.url);
+  const slot = url.searchParams.get("slot") ?? "manha";
 
   const sb = criarClienteAdmin();
   const { data: post } = await sb
     .from("campanha_posts")
     .select("dia, tema, texto_imagem, legenda, formato")
     .eq("dia", dia)
+    .eq("slot", slot)
     .single();
 
   if (!post) {

@@ -10,7 +10,13 @@ export async function POST(request: Request) {
     return NextResponse.json({ erro: "não autenticada" }, { status: 401 });
   }
 
-  const { bloco_id, valor } = await request.json();
+  let body: { bloco_id?: unknown; valor?: unknown };
+  try {
+    body = await request.json();
+  } catch {
+    return NextResponse.json({ erro: "corpo JSON inválido" }, { status: 400 });
+  }
+  const { bloco_id, valor } = body;
   if (typeof bloco_id !== "string" || bloco_id.length === 0) {
     return NextResponse.json({ erro: "bloco_id inválido" }, { status: 400 });
   }

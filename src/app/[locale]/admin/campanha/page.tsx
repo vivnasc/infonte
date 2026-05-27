@@ -4,6 +4,34 @@ import { BotaoSeed } from "@/components/admin/BotaoSeed";
 
 type Estado = "rascunho" | "pronto" | "agendado" | "publicado";
 
+type PostResumo = {
+  dia: number;
+  semana: number;
+  tema: string;
+  formato: string | null;
+  estado: string | null;
+  data_publicacao: string | null;
+  imagem_url: string | null;
+  redes: string[] | null;
+  slot: string | null;
+};
+
+function agruparPorDia(posts: PostResumo[]) {
+  const mapa = new Map<number, { dia: number; manha: PostResumo | null; tarde: PostResumo | null }>();
+  for (const p of posts) {
+    if (!mapa.has(p.dia)) {
+      mapa.set(p.dia, { dia: p.dia, manha: null, tarde: null });
+    }
+    const grupo = mapa.get(p.dia)!;
+    if (p.slot === "tarde") {
+      grupo.tarde = p;
+    } else {
+      grupo.manha = p;
+    }
+  }
+  return Array.from(mapa.values()).sort((a, b) => a.dia - b.dia);
+}
+
 const corEstado: Record<Estado, string> = {
   rascunho: "bg-castanho/10 text-castanho/70",
   pronto: "bg-oliva/20 text-oliva",
@@ -16,9 +44,10 @@ export default async function CampanhaListaPage() {
   const { data: posts } = await supabase
     .from("campanha_posts")
     .select(
-      "dia, semana, tema, formato, estado, data_publicacao, imagem_url, redes"
+      "dia, semana, tema, formato, estado, data_publicacao, imagem_url, redes, slot"
     )
-    .order("dia", { ascending: true });
+    .order("dia", { ascending: true })
+    .order("slot", { ascending: true });
 
   if (!posts || posts.length === 0) {
     return (
@@ -98,44 +127,58 @@ export default async function CampanhaListaPage() {
               semana {semana}
             </h2>
             <ul className="mt-4 divide-y divide-castanho/10">
-              {pSemana.map((p) => {
-                const estado = (p.estado as Estado) ?? "rascunho";
-                const dataStr = p.data_publicacao
-                  ? new Date(p.data_publicacao).toLocaleString("pt-PT", {
-                      day: "2-digit",
-                      month: "2-digit",
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })
-                  : null;
-                return (
-                  <li key={p.dia}>
+              {agruparPorDia(pSemana).map(({ dia, manha, tarde }) => (
+                <li key={dia} className="py-2">
+                  {manha && (
                     <Link
-                      href={`/admin/campanha/${p.dia}`}
-                      className="grid grid-cols-[3rem_1fr_auto] items-center gap-4 py-3 hover:bg-creme/60 px-2 rounded"
+                      href={`/admin/campanha/${dia}?slot=manha`}
+                      className="grid grid-cols-[3rem_1fr_auto] items-center gap-4 py-2 hover:bg-creme/60 px-2 rounded"
                     >
                       <span className="font-serif text-ocre text-lg">
-                        {p.dia}
+                        {dia}
                       </span>
                       <span>
                         <span className="font-serif text-castanho">
-                          {p.tema}
+                          {manha.tema}
                         </span>
                         <span className="block text-xs text-castanho/60 mt-0.5">
-                          {p.formato ?? "sem formato"}
-                          {p.imagem_url ? " · arte" : " · sem arte"}
-                          {dataStr ? ` · ${dataStr}` : ""}
+                          10h · {manha.formato ?? "sem formato"}
+                          {manha.imagem_url ? " · arte" : " · sem arte"}
                         </span>
                       </span>
                       <span
-                        className={`text-xs px-2 py-1 rounded-full ${corEstado[estado]}`}
+                        className={`text-xs px-2 py-1 rounded-full ${corEstado[(manha.estado as Estado) ?? "rascunho"]}`}
                       >
-                        {estado}
+                        {(manha.estado as Estado) ?? "rascunho"}
                       </span>
                     </Link>
-                  </li>
-                );
-              })}
+                  )}
+                  {tarde && (
+                    <Link
+                      href={`/admin/campanha/${dia}?slot=tarde`}
+                      className="grid grid-cols-[3rem_1fr_auto] items-center gap-4 py-2 hover:bg-creme/60 px-2 rounded"
+                    >
+                      <span className="font-serif text-ocre/60 text-lg">
+                        {!manha ? dia : ""}
+                      </span>
+                      <span>
+                        <span className="font-serif text-castanho/80">
+                          {tarde.tema}
+                        </span>
+                        <span className="block text-xs text-castanho/60 mt-0.5">
+                          13h · emocional
+                          {tarde.imagem_url ? " · arte" : " · sem arte"}
+                        </span>
+                      </span>
+                      <span
+                        className={`text-xs px-2 py-1 rounded-full ${corEstado[(tarde.estado as Estado) ?? "rascunho"]}`}
+                      >
+                        {(tarde.estado as Estado) ?? "rascunho"}
+                      </span>
+                    </Link>
+                  )}
+                </li>
+              ))}
             </ul>
           </div>
         ))}

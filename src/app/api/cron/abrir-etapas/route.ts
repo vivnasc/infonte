@@ -78,8 +78,8 @@ export async function GET(request: Request) {
       }
 
       // Envia email, se ainda não foi enviado
-      const refreshed = atual ?? (await mapa.set(n, { etapa: n, desbloqueada_em: agora.toISOString(), email_aberta_enviado_em: null }).get(n));
-      if (!refreshed?.email_aberta_enviado_em && u.email) {
+      const jaTinhaMail = atual?.email_aberta_enviado_em;
+      if (!jaTinhaMail && u.email) {
         const r = await enviarEmailEtapaAberta({
           email: u.email,
           nome: u.nome,

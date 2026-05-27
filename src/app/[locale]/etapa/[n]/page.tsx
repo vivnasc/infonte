@@ -5,14 +5,18 @@ import { criarClienteAdmin } from "@/lib/supabase/admin";
 import { podeAbrir, HORAS_GATING, dataDeAbertura } from "@/lib/etapas/gating";
 import { RendererEtapa } from "@/components/RendererEtapa";
 import { OfertaCompra } from "@/components/OfertaCompra";
+import { BotaoConcluir } from "@/components/BotaoConcluir";
 import { Link } from "@/i18n/routing";
 
 export default async function EtapaPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ locale: string; n: string }>;
+  searchParams: Promise<{ paypal?: string }>;
 }) {
   const { locale, n: nStr } = await params;
+  const sp = await searchParams;
   setRequestLocale(locale);
   const n = parseInt(nStr, 10);
   if (!Number.isFinite(n) || n < 1 || n > 7) notFound();
@@ -114,6 +118,22 @@ export default async function EtapaPage({
         </h1>
       </div>
 
+      {sp.paypal === "cancelado" && (
+        <div className="max-w-leitura mx-auto mb-8 p-5 border border-ocre/40 rounded-lg bg-ocre/5">
+          <p className="font-serif text-castanho">
+            O pagamento foi cancelado. Podes tentar de novo quando quiseres.
+          </p>
+        </div>
+      )}
+      {(sp.paypal === "erro" || sp.paypal === "falhou") && (
+        <div className="max-w-leitura mx-auto mb-8 p-5 border border-red-300 rounded-lg bg-red-50">
+          <p className="font-serif text-castanho">
+            Houve um problema a processar o pagamento. Se o valor foi cobrado,
+            contacta ola@vivannedossantos.com para resolvermos.
+          </p>
+        </div>
+      )}
+
       <RendererEtapa corpo={etapa.corpo_md} respostas={respostas} />
 
       {n === 1 && !utilizadora.comprou && (
@@ -122,17 +142,14 @@ export default async function EtapaPage({
         </div>
       )}
 
-      <div className="max-w-leitura mx-auto mt-16 text-center">
-        {n < 7 && utilizadora.comprou && (
-          <p className="font-serif text-terra-texto/80">
-            a etapa {n + 1} abre em{" "}
-            {abreSeguinte
-              ? abreSeguinte.toLocaleString("pt-PT")
-              : `${HORAS_GATING / 24} dias`}
-            .
-          </p>
-        )}
-        <div className="mt-8">
+      <div className="max-w-leitura mx-auto mt-16 space-y-8">
+        <BotaoConcluir
+          etapa={n}
+          jaConcluida={!!progressoAtual?.concluida_em}
+          abreSeguinteStr={abreSeguinte?.toISOString() ?? null}
+        />
+
+        <div className="text-center">
           <Link href="/painel" className="btn-quieto inline-block">
             voltar ao percurso
           </Link>

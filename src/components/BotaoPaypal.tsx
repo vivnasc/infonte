@@ -1,12 +1,14 @@
 "use client";
 
-// Placeholder, a Fase 6 substitui pelo PayPal JS SDK e botão real.
 import { useState } from "react";
 
 export function BotaoPaypal() {
   const [a, setA] = useState(false);
+  const [erro, setErro] = useState<string | null>(null);
+
   async function comprar() {
     setA(true);
+    setErro(null);
     try {
       const r = await fetch("/api/paypal/criar-ordem", { method: "POST" });
       const json = await r.json();
@@ -14,16 +16,31 @@ export function BotaoPaypal() {
         window.location.href = json.url_aprovacao;
         return;
       }
-      alert(json.erro ?? "Não foi possível iniciar a compra agora.");
-    } catch (e) {
-      alert("Erro a iniciar a compra.");
+      // Mensagem amigável se as variáveis PayPal não estão configuradas
+      if (json.erro?.includes("PayPal") || json.erro?.includes("variáveis") || r.status === 500) {
+        setErro(
+          "O pagamento ainda não está disponível. Envia um email para ola@vivannedossantos.com para garantires o teu acesso."
+        );
+      } else {
+        setErro(json.erro ?? "Não foi possível iniciar a compra agora. Tenta novamente.");
+      }
+    } catch {
+      setErro("Erro de ligação. Verifica a tua internet e tenta novamente.");
     } finally {
       setA(false);
     }
   }
+
   return (
-    <button onClick={comprar} disabled={a} className="btn-ocre">
-      {a ? "a abrir o PayPal..." : "abrir o percurso completo"}
-    </button>
+    <div>
+      <button onClick={comprar} disabled={a} className="btn-ocre">
+        {a ? "a abrir o PayPal..." : "abrir o percurso completo"}
+      </button>
+      {erro && (
+        <p className="text-sm text-castanho/80 mt-3 max-w-sm mx-auto">
+          {erro}
+        </p>
+      )}
+    </div>
   );
 }

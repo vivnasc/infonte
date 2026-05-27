@@ -20,6 +20,7 @@ type Post = {
   data_publicacao: string | null;
   estado: string | null;
   notas: string | null;
+  slot: string | null;
 };
 
 const REDES_DISPONIVEIS = [
@@ -72,7 +73,8 @@ export function EditorPost({ post }: { post: Post }) {
     setEstado("a-guardar");
     setMensagem(null);
     try {
-      const r = await fetch(`/api/admin/campanha/${post.dia}`, {
+      const slot = post.slot ?? "manha";
+      const r = await fetch(`/api/admin/campanha/${post.dia}?slot=${slot}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -99,7 +101,8 @@ export function EditorPost({ post }: { post: Post }) {
     setEstadoMJ("a-gerar");
     setPromptMJ(null);
     try {
-      const r = await fetch(`/api/admin/campanha/${post.dia}/prompt-mj`, { method: "POST" });
+      const slot = post.slot ?? "manha";
+      const r = await fetch(`/api/admin/campanha/${post.dia}/prompt-mj?slot=${slot}`, { method: "POST" });
       const j = await r.json();
       if (!r.ok) throw new Error(j.erro ?? "erro");
       setPromptMJ(j.prompt);
@@ -112,7 +115,8 @@ export function EditorPost({ post }: { post: Post }) {
   async function gerarArte() {
     setEstadoArte("a-gerar");
     try {
-      const r = await fetch(`/api/admin/campanha/${post.dia}/arte`, {
+      const slot = post.slot ?? "manha";
+      const r = await fetch(`/api/admin/campanha/${post.dia}/arte?slot=${slot}`, {
         method: "POST",
       });
       if (!r.ok) {

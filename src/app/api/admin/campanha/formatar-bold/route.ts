@@ -51,7 +51,8 @@ export async function POST() {
     const { error } = await sb
       .from("campanha_posts")
       .update({ texto_imagem: texto })
-      .eq("dia", dia);
+      .eq("dia", dia)
+      .eq("slot", "manha");
     if (error) {
       log.push(`Dia ${dia}: erro, ${error.message}`);
     } else {

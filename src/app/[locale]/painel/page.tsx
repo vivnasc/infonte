@@ -81,6 +81,25 @@ export default async function PainelPage({
         </div>
       )}
 
+      {sp.paypal === "cancelado" && (
+        <div className="mt-6 p-5 border border-ocre/40 rounded-lg bg-ocre/5">
+          <p className="font-serif text-castanho">
+            O pagamento foi cancelado. Se quiseres tentar de novo, podes
+            fazê-lo a qualquer momento a partir da etapa 1.
+          </p>
+        </div>
+      )}
+
+      {sp.paypal === "erro" && (
+        <div className="mt-6 p-5 border border-red-300 rounded-lg bg-red-50">
+          <p className="font-serif text-castanho">
+            Houve um problema a processar o pagamento. Se o valor foi cobrado,
+            contacta ola@vivannedossantos.com para resolvermos. Se não, podes
+            tentar de novo.
+          </p>
+        </div>
+      )}
+
       {!utilizadora.comprou && (
         <div className="mt-8 p-5 border border-ocre/40 rounded-lg bg-ocre/5">
           <p className="font-serif text-castanho">

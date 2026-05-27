@@ -7,7 +7,7 @@ export const runtime = "nodejs";
 export const maxDuration = 60;
 
 export async function POST(
-  _request: Request,
+  request: Request,
   ctx: { params: Promise<{ dia: string }> }
 ) {
   const admin = await exigirAdmin();
@@ -22,10 +22,14 @@ export async function POST(
   }
 
   const sb = criarClienteAdmin();
+  const url = new URL(request.url);
+  const slot = url.searchParams.get("slot") ?? "manha";
+
   const { data: post, error } = await sb
     .from("campanha_posts")
     .select("dia, tema, texto_imagem, formato, imagem_url, imagens")
     .eq("dia", dia)
+    .eq("slot", slot)
     .single();
 
   if (error || !post) {
@@ -52,7 +56,15 @@ export async function POST(
     return NextResponse.json({ erro: "sem slides para gerar" }, { status: 400 });
   }
 
-  const rendered = await renderSlides(slides);
+  let rendered: Awaited<ReturnType<typeof renderSlides>>;
+  try {
+    rendered = await renderSlides(slides);
+  } catch (e) {
+    return NextResponse.json(
+      { erro: "erro a gerar imagens", detalhe: e instanceof Error ? e.message : String(e) },
+      { status: 500 }
+    );
+  }
 
   // Devolver a primeira imagem como PNG (para posts únicos)
   // ou todas num JSON com base64 (para carrosséis)

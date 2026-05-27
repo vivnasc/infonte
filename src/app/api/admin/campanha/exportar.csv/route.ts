@@ -30,6 +30,7 @@ type Post = {
   imagem_url: string | null;
   redes: string[] | null;
   data_publicacao: string | null;
+  slot: string | null;
 };
 
 const NOME_REDE: Record<string, string> = {
@@ -53,9 +54,10 @@ export async function GET(request: Request) {
   const { data, error } = await sb
     .from("campanha_posts")
     .select(
-      "dia, semana, tema, legenda, pergunta, hashtags, link, imagem_url, redes, data_publicacao"
+      "dia, semana, tema, legenda, pergunta, hashtags, link, imagem_url, redes, data_publicacao, slot"
     )
-    .order("dia", { ascending: true });
+    .order("dia", { ascending: true })
+    .order("slot", { ascending: true });
 
   if (error) return NextResponse.json({ erro: error.message }, { status: 500 });
 
@@ -71,7 +73,7 @@ export async function GET(request: Request) {
       (r) => NOME_REDE[r] ?? r
     );
 
-    const { date, time } = formatarData(p.data_publicacao);
+    const { date, time } = formatarData(p.data_publicacao, p.slot);
 
     if (modo === "por-rede") {
       for (const r of redes) {
@@ -104,8 +106,10 @@ function composarTexto(p: Post): string {
   return partes.join("\n\n");
 }
 
-function formatarData(iso: string | null): { date: string; time: string } {
-  if (!iso) return { date: "", time: "" };
+function formatarData(iso: string | null, slot?: string | null): { date: string; time: string } {
+  // Se não há data de publicação definida, usar hora padrão pelo slot
+  const horaSlot = slot === "tarde" ? "13:00" : "10:00";
+  if (!iso) return { date: "", time: horaSlot };
   const d = new Date(iso);
   const pad = (n: number) => String(n).padStart(2, "0");
   return {

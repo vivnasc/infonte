@@ -142,6 +142,7 @@ export async function POST() {
       .from("campanha_posts")
       .select("id")
       .eq("dia", p.dia)
+      .eq("slot", "manha")
       .maybeSingle();
     if (existente) {
       const { error } = await sb
