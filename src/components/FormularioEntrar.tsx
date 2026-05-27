@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "@/i18n/routing";
 import { criarClienteBrowser } from "@/lib/supabase/client";
 
 type Modo = "entrar" | "registar";
@@ -20,7 +19,6 @@ export function FormularioEntrar({
   const [a, setA] = useState(false);
   const [msg, setMsg] = useState<string | null>(mensagem ?? null);
   const [err, setErr] = useState<string | null>(erro ?? null);
-  const router = useRouter();
 
   async function submeter(e: React.FormEvent) {
     e.preventDefault();
@@ -33,36 +31,29 @@ export function FormularioEntrar({
         const { error } = await supabase.auth.signUp({
           email,
           password,
-          options: {
-            data: { nome },
-            emailRedirectTo:
-              typeof window !== "undefined"
-                ? `${window.location.origin}/auth/callback?proximo=/painel`
-                : undefined,
-          },
+          options: { data: { nome } },
         });
         if (error) throw error;
-        setMsg(
-          "Conta criada. Se a confirmação de email estiver ativa, confirma para entrar."
-        );
         // Tenta entrar de imediato (caso confirmação esteja desligada)
         const { error: e2 } = await supabase.auth.signInWithPassword({
           email,
           password,
         });
         if (!e2) {
-          router.push("/painel");
-          router.refresh();
+          window.location.href = "/painel";
           return;
         }
+        setMsg(
+          "Conta criada. Se a confirmação de email estiver ativa, verifica a caixa de entrada."
+        );
       } else {
         const { error } = await supabase.auth.signInWithPassword({
           email,
           password,
         });
         if (error) throw error;
-        router.push("/painel");
-        router.refresh();
+        window.location.href = "/painel";
+        return;
       }
     } catch (e: unknown) {
       const m =
