@@ -78,7 +78,7 @@ function layoutFotoTopo(opts: FullOpts): string {
   <div style="font-size:${fs}px;line-height:1.2;color:${CREME};text-shadow:0 2px 12px rgba(0,0,0,0.3);">
     ${linhas.map(l => `<p style="margin-bottom:12px;">${l}</p>`).join("")}
   </div>
-  <div style="color:${CREME};strong{color:#fff;}"</div>
+  <style>strong{color:#EBAE4A;font-weight:700;}</style>
   ${opts.slideNum && opts.totalSlides && opts.totalSlides > 1 ? `
   <div style="position:absolute;bottom:32px;left:56px;color:rgba(255,255,255,0.5);">${ARRASTE}</div>
   <div style="position:absolute;bottom:32px;right:40px;">${paginacao(opts.slideNum, opts.totalSlides, false)}</div>` : ""}
@@ -110,7 +110,7 @@ function layoutFotoLado(opts: FullOpts): string {
   <div style="width:58%;background:${TERRA};padding:60px 48px;display:flex;flex-direction:column;justify-content:center;">
     <div style="color:${AMBAR};margin-bottom:24px;">${MARCA}</div>
     <div style="font-size:${fs}px;line-height:1.25;color:${CREME};">
-      <style>strong{color:#fff;}</style>
+      <style>strong{color:#EBAE4A;font-weight:700;}</style>
       ${linhas.map(l => `<p style="margin-bottom:12px;">${l}</p>`).join("")}
     </div>
     ${opts.slideNum && opts.totalSlides && opts.totalSlides > 1 ? `
@@ -145,7 +145,7 @@ function layoutStatement(opts: FullOpts): string {
   <div style="position:relative;z-index:1;height:100%;display:flex;flex-direction:column;justify-content:center;padding:80px 72px;text-align:center;">
     <div style="margin-bottom:32px;">${MARCA}</div>
     <div style="font-size:${fs}px;line-height:1.2;color:${CREME};text-shadow:0 3px 20px rgba(0,0,0,0.5);">
-      <style>strong{color:#fff;font-weight:700;}</style>
+      <style>strong{color:#EBAE4A;font-weight:700;}</style>
       ${linhas.map(l => `<p style="margin-bottom:16px;">${l}</p>`).join("")}
     </div>
     <div style="margin-top:36px;font-family:'EB Garamond',serif;font-size:22px;color:${CREME};">infonte</div>
@@ -177,7 +177,7 @@ function layoutCta(opts: FullOpts): string {
   <div style="position:relative;z-index:1;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 64px;text-align:center;">
     <div style="margin-bottom:40px;">${GOTA_SVG}</div>
     <div style="font-size:62px;line-height:1.2;color:rgba(242,232,220,0.9);text-shadow:0 2px 16px rgba(0,0,0,0.4);">
-      <style>strong{color:#fff;font-weight:700;}</style>
+      <style>strong{color:#EBAE4A;font-weight:700;}</style>
       ${linhas.map(l => `<p style="margin-bottom:14px;">${l}</p>`).join("")}
     </div>
     <div style="margin-top:36px;display:inline-block;background:${OCRE};color:#fff;padding:22px 52px;border-radius:9999px;font-family:Inter,sans-serif;font-size:22px;font-weight:600;letter-spacing:0.03em;box-shadow:0 4px 0 rgba(154,108,44,0.5);">Começar a etapa 1, grátis</div>
