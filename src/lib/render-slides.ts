@@ -265,12 +265,27 @@ function escolherLayout(opts: SlideOpts): string {
 
 function inferirLayout(opts: SlideOpts): string {
   if (opts.modo === "cta") return "cta";
-  if (opts.modo === "capa" && opts.imagemUrl) return "foto-topo";
-  if (opts.modo === "capa") return "statement";
-  if (opts.modo === "conteudo" && opts.imagemUrl) {
-    return opts.slideNum && opts.slideNum % 2 === 0 ? "foto-lado" : "foto-topo";
+
+  const temImagem = !!opts.imagemUrl;
+  const diaPar = opts.dia % 2 === 0;
+  const resumoSemana = [7, 15, 23, 30].includes(opts.dia);
+
+  // Resumos de semana: sempre statement puro (momento de pausa)
+  if (resumoSemana) return "statement";
+
+  // Capa: dias pares com imagem → foto-topo, ímpares → statement
+  if (opts.modo === "capa") {
+    if (temImagem) return "foto-topo";
+    return diaPar ? "foto-topo" : "statement";
   }
-  return opts.slideNum && opts.slideNum % 2 === 0 ? "claro" : "statement";
+
+  // Conteúdo de carrossel: alternar claro e statement para ritmo visual
+  if (opts.modo === "conteudo") {
+    if (temImagem) return opts.slideNum && opts.slideNum % 2 === 0 ? "foto-lado" : "foto-topo";
+    return opts.slideNum && opts.slideNum % 2 === 0 ? "claro" : "statement";
+  }
+
+  return "statement";
 }
 
 export async function renderSlides(
