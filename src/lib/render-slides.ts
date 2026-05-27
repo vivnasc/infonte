@@ -14,6 +14,12 @@ const OCRE_FORTE = "#9A6C2C";
 const AMBAR = "#EBAE4A";
 const AMBAR_CLARO = "#F4C56A";
 
+// Paleta Infonte conforme sistema dos 5 mundos:
+// Bg: âmbar #B8843D | Bold: dourado #EBAE4A
+const BG_SLIDE = "#B8843D";
+const BOLD_COR = "#EBAE4A";
+const TEXTO_SOBRE_BG = "#FFFBF5";
+
 function esc(s: string): string {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
@@ -85,14 +91,14 @@ function layoutFotoTopo(opts: FullOpts): string {
 <div style="position:relative;width:${W}px;height:${fotoH}px;overflow:hidden;">
   ${opts.imagemUrl
     ? `<img src="${opts.imagemUrl}" style="width:100%;height:100%;object-fit:cover;object-position:center 25%;"/>
-       <div style="position:absolute;inset:0;background:linear-gradient(180deg,transparent 40%,${TERRA} 100%);"></div>`
-    : `<div style="width:100%;height:100%;background:linear-gradient(160deg,${TERRA} 0%,#3a2515 100%);"></div>
+       <div style="position:absolute;inset:0;background:linear-gradient(180deg,transparent 40%,${BG_SLIDE} 100%);"></div>`
+    : `<div style="width:100%;height:100%;background:linear-gradient(160deg,${BG_SLIDE} 0%,#7A5C2A 100%);"></div>
        <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 50%,rgba(184,132,61,0.15) 0%,transparent 70%);"></div>`
   }
   <div style="position:absolute;top:32px;left:40px;z-index:2;">${marca(false)}</div>
 </div>
-<div style="position:relative;width:${W}px;height:${textoH}px;background:${TERRA};padding:48px 56px;display:flex;flex-direction:column;justify-content:center;">
-  <style>strong{color:#EBAE4A;font-weight:700;}</style>
+<div style="position:relative;width:${W}px;height:${textoH}px;background:${BG_SLIDE};padding:48px 56px;display:flex;flex-direction:column;justify-content:center;">
+  <style>strong{color:${BOLD_COR};font-weight:700;}</style>
   <div style="font-size:${fs}px;line-height:1.2;color:${CREME};text-shadow:0 2px 12px rgba(0,0,0,0.3);">
     ${linhas.map(l => `<p style="margin-bottom:12px;">${l}</p>`).join("")}
   </div>
@@ -119,16 +125,16 @@ function layoutFotoLado(opts: FullOpts): string {
   <div style="width:42%;position:relative;overflow:hidden;">
     ${opts.imagemUrl
       ? `<img src="${opts.imagemUrl}" style="width:100%;height:100%;object-fit:cover;object-position:center;"/>
-         <div style="position:absolute;inset:0;background:linear-gradient(90deg,transparent 60%,${TERRA} 100%);"></div>`
-      : `<div style="width:100%;height:100%;background:linear-gradient(135deg,#3a2515 0%,${TERRA} 100%);display:flex;align-items:center;justify-content:center;">
+         <div style="position:absolute;inset:0;background:linear-gradient(90deg,transparent 60%,${BG_SLIDE} 100%);"></div>`
+      : `<div style="width:100%;height:100%;background:linear-gradient(135deg,#3a2515 0%,${BG_SLIDE} 100%);display:flex;align-items:center;justify-content:center;">
            ${GOTA_SVG}
          </div>`
     }
   </div>
-  <div style="width:58%;background:${TERRA};padding:60px 48px;display:flex;flex-direction:column;justify-content:center;position:relative;">
+  <div style="width:58%;background:${BG_SLIDE};padding:60px 48px;display:flex;flex-direction:column;justify-content:center;position:relative;">
     <div style="margin-bottom:28px;">${marca(false)}</div>
     <div style="font-size:${fs}px;line-height:1.25;color:${CREME};">
-      <style>strong{color:#EBAE4A;font-weight:700;}</style>
+      <style>strong{color:${BOLD_COR};font-weight:700;}</style>
       ${linhas.map(l => `<p style="margin-bottom:12px;">${l}</p>`).join("")}
     </div>
     ${opts.slideNum && opts.totalSlides && opts.totalSlides > 1 ? `
@@ -156,13 +162,13 @@ function layoutStatement(opts: FullOpts): string {
 <div style="position:relative;width:${W}px;height:${h}px;">
   ${opts.imagemUrl
     ? `<img src="${opts.imagemUrl}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;"/>
-       <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(46,29,18,0.5) 0%,rgba(46,29,18,0.8) 50%,rgba(46,29,18,0.95) 100%);"></div>`
-    : `<div style="position:absolute;inset:0;background:linear-gradient(160deg,${TERRA} 0%,#3a2515 40%,#1a120a 100%);"></div>
+       <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(184,132,61,0.5) 0%,rgba(130,95,45,0.8) 50%,rgba(107,80,37,0.95) 100%);"></div>`
+    : `<div style="position:absolute;inset:0;background:linear-gradient(160deg,${BG_SLIDE} 0%,#8B6830 40%,#6B5025 100%);"></div>
        <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 30% 30%,rgba(184,132,61,0.12) 0%,transparent 60%);"></div>`
   }
   <div style="position:absolute;top:36px;left:48px;z-index:2;">${marca(false)}</div>
   <div style="position:relative;z-index:1;height:100%;display:flex;flex-direction:column;justify-content:center;padding:80px 72px;text-align:center;">
-    <style>strong{color:#EBAE4A;font-weight:700;}</style>
+    <style>strong{color:${BOLD_COR};font-weight:700;}</style>
     <div style="font-size:${fs}px;line-height:1.2;color:${CREME};text-shadow:0 3px 20px rgba(0,0,0,0.5);">
       ${linhas.map(l => `<p style="margin-bottom:16px;">${l}</p>`).join("")}
     </div>
@@ -187,15 +193,15 @@ function layoutCta(opts: FullOpts): string {
 <div style="position:relative;width:${W}px;height:${h}px;">
   ${opts.imagemUrl
     ? `<img src="${opts.imagemUrl}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;"/>
-       <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(46,29,18,0.6) 0%,rgba(46,29,18,0.9) 100%);"></div>`
-    : `<div style="position:absolute;inset:0;background:linear-gradient(160deg,${TERRA} 0%,#3a2515 100%);"></div>
+       <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(184,132,61,0.6) 0%,rgba(107,80,37,0.9) 100%);"></div>`
+    : `<div style="position:absolute;inset:0;background:linear-gradient(160deg,${BG_SLIDE} 0%,#7A5C2A 100%);"></div>
        <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 70% 70%,rgba(184,132,61,0.12) 0%,transparent 60%);"></div>`
   }
   <div style="position:absolute;top:36px;left:48px;z-index:2;">${marca(false)}</div>
   <div style="position:relative;z-index:1;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 64px;text-align:center;">
     <div style="margin-bottom:40px;">${GOTA_SVG}</div>
     <div style="font-size:62px;line-height:1.2;color:rgba(242,232,220,0.9);text-shadow:0 2px 16px rgba(0,0,0,0.4);">
-      <style>strong{color:#EBAE4A;font-weight:700;}</style>
+      <style>strong{color:${BOLD_COR};font-weight:700;}</style>
       ${linhas.map(l => `<p style="margin-bottom:14px;">${l}</p>`).join("")}
     </div>
     <div style="margin-top:36px;display:inline-block;background:${OCRE};color:#fff;padding:22px 52px;border-radius:9999px;font-family:Inter,sans-serif;font-size:22px;font-weight:600;letter-spacing:0.03em;box-shadow:0 4px 0 rgba(154,108,44,0.5);">Começar a etapa 1, grátis</div>
