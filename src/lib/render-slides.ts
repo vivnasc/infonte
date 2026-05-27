@@ -16,7 +16,9 @@ const AMBAR_CLARO = "#F4C56A";
 
 // Paleta Infonte conforme sistema dos 5 mundos:
 // Bg: âmbar #B8843D | Bold: dourado #EBAE4A
-const BG_SLIDE = "#B8843D";
+// Slides usam terra escuro como fundo principal (mais impacto),
+// com o âmbar no bold e acentos.
+const BG_SLIDE = "#2E1D12";
 const BOLD_COR = "#EBAE4A";
 const TEXTO_SOBRE_BG = "#FFFBF5";
 
@@ -92,7 +94,7 @@ function layoutFotoTopo(opts: FullOpts): string {
   ${opts.imagemUrl
     ? `<img src="${opts.imagemUrl}" style="width:100%;height:100%;object-fit:cover;object-position:center 25%;"/>
        <div style="position:absolute;inset:0;background:linear-gradient(180deg,transparent 40%,${BG_SLIDE} 100%);"></div>`
-    : `<div style="width:100%;height:100%;background:linear-gradient(160deg,${BG_SLIDE} 0%,#7A5C2A 100%);"></div>
+    : `<div style="width:100%;height:100%;background:linear-gradient(160deg,${BG_SLIDE} 0%,#3a2515 100%);"></div>
        <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 50%,rgba(184,132,61,0.15) 0%,transparent 70%);"></div>`
   }
   <div style="position:absolute;top:32px;left:40px;z-index:2;">${marca(false)}</div>
@@ -162,8 +164,8 @@ function layoutStatement(opts: FullOpts): string {
 <div style="position:relative;width:${W}px;height:${h}px;">
   ${opts.imagemUrl
     ? `<img src="${opts.imagemUrl}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;"/>
-       <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(184,132,61,0.5) 0%,rgba(130,95,45,0.8) 50%,rgba(107,80,37,0.95) 100%);"></div>`
-    : `<div style="position:absolute;inset:0;background:linear-gradient(160deg,${BG_SLIDE} 0%,#8B6830 40%,#6B5025 100%);"></div>
+       <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(46,29,18,0.5) 0%,rgba(46,29,18,0.8) 50%,rgba(46,29,18,0.95) 100%);"></div>`
+    : `<div style="position:absolute;inset:0;background:linear-gradient(160deg,${BG_SLIDE} 0%,#3a2515 40%,#1a120a 100%);"></div>
        <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 30% 30%,rgba(184,132,61,0.12) 0%,transparent 60%);"></div>`
   }
   <div style="position:absolute;top:36px;left:48px;z-index:2;">${marca(false)}</div>
@@ -193,8 +195,8 @@ function layoutCta(opts: FullOpts): string {
 <div style="position:relative;width:${W}px;height:${h}px;">
   ${opts.imagemUrl
     ? `<img src="${opts.imagemUrl}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;"/>
-       <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(184,132,61,0.6) 0%,rgba(107,80,37,0.9) 100%);"></div>`
-    : `<div style="position:absolute;inset:0;background:linear-gradient(160deg,${BG_SLIDE} 0%,#7A5C2A 100%);"></div>
+       <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(46,29,18,0.6) 0%,rgba(46,29,18,0.9) 100%);"></div>`
+    : `<div style="position:absolute;inset:0;background:linear-gradient(160deg,${BG_SLIDE} 0%,#3a2515 100%);"></div>
        <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 70% 70%,rgba(184,132,61,0.12) 0%,transparent 60%);"></div>`
   }
   <div style="position:absolute;top:36px;left:48px;z-index:2;">${marca(false)}</div>
