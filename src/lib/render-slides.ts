@@ -267,21 +267,17 @@ function inferirLayout(opts: SlideOpts): string {
   if (opts.modo === "cta") return "cta";
 
   const temImagem = !!opts.imagemUrl;
-  const diaPar = opts.dia % 2 === 0;
-  const resumoSemana = [7, 15, 23, 30].includes(opts.dia);
 
-  // Resumos de semana: sempre statement puro (momento de pausa)
-  if (resumoSemana) return "statement";
-
-  // Capa: dias pares com imagem → foto-topo, ímpares → statement
   if (opts.modo === "capa") {
-    if (temImagem) return "foto-topo";
-    return diaPar ? "foto-topo" : "statement";
+    return temImagem ? "foto-topo" : "statement";
   }
 
-  // Conteúdo de carrossel: alternar claro e statement para ritmo visual
+  // Slides internos de carrossel: com imagem alterna foto-topo/foto-lado,
+  // sem imagem alterna claro/statement (cria ritmo visual dentro do carrossel)
   if (opts.modo === "conteudo") {
-    if (temImagem) return opts.slideNum && opts.slideNum % 2 === 0 ? "foto-lado" : "foto-topo";
+    if (temImagem) {
+      return opts.slideNum && opts.slideNum % 3 === 0 ? "foto-lado" : "foto-topo";
+    }
     return opts.slideNum && opts.slideNum % 2 === 0 ? "claro" : "statement";
   }
 
@@ -334,17 +330,35 @@ export function parseTextoImagemToSlides(
   if (numerados && numerados.length >= 2) {
     const total = numerados.length + 2;
     const slides: SlideOpts[] = [];
-    slides.push({ texto: tema, dia, tema, modo: "capa", formato: fmt, slideNum: 1, totalSlides: total, imagemUrl: img });
+
+    // Slide 1 (capa): sempre com imagem se disponível
+    slides.push({
+      texto: tema, dia, tema, modo: "capa", formato: fmt,
+      slideNum: 1, totalSlides: total, imagemUrl: img,
+    });
+
+    // Slides internos: alternam com e sem imagem
+    // Pares (2, 4, 6) com imagem, ímpares (3, 5, 7) sem (claro ou statement)
     numerados.forEach((line, i) => {
+      const slideN = i + 2;
+      const usaImagem = slideN % 2 === 0;
       slides.push({
         texto: line.replace(/^\d+\.\s*/, ""), dia, tema, modo: "conteudo", formato: fmt,
-        slideNum: i + 2, totalSlides: total,
-        imagemUrl: i === 0 ? img : undefined,
+        slideNum: slideN, totalSlides: total,
+        imagemUrl: usaImagem ? img : undefined,
       });
     });
-    slides.push({ texto: "**Pára de perseguir** o que nunca foi teu.\nComeça pela etapa 1, grátis.", dia, tema, modo: "cta", formato: fmt, slideNum: total, totalSlides: total, imagemUrl: img });
+
+    // Último slide (CTA): com imagem
+    slides.push({
+      texto: "**Pára de perseguir** o que nunca foi teu.\nComeça pela etapa 1, grátis.",
+      dia, tema, modo: "cta", formato: fmt,
+      slideNum: total, totalSlides: total, imagemUrl: img,
+    });
+
     return slides;
   }
 
+  // Post único: com imagem se disponível
   return [{ texto: textoImagem.trim(), dia, tema, modo: "capa", formato: fmt, imagemUrl: img }];
 }
