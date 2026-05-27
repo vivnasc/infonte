@@ -111,10 +111,8 @@ Devolve APENAS o JSON, sem explicação.`,
       }).eq("id", existente.id);
       log.push(`Dia ${dia}: atualizado`);
     } else {
-      // Inserir como dia 31-60 (para não colidir com os 1-30 da manhã)
-      // Ou usar o slot para diferenciar
       const { error } = await sb.from("campanha_posts").insert({
-        dia: dia + 30, // 31-60 para os da tarde
+        dia,
         semana: Math.ceil(dia / 7),
         tema: `${temaManha} (emocional)`,
         formato: "post-unico",
