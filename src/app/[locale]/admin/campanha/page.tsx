@@ -1,5 +1,6 @@
 import { criarClienteServidor } from "@/lib/supabase/server";
 import { Link } from "@/i18n/routing";
+import { BotaoSeed } from "@/components/admin/BotaoSeed";
 
 type Estado = "rascunho" | "pronto" | "agendado" | "publicado";
 
@@ -56,21 +57,22 @@ export default async function CampanhaListaPage() {
             Um post por dia, Instagram e TikTok. Empacotar para Metricool.
           </p>
         </div>
-        <div className="flex gap-3">
-          <a
-            href="/api/admin/campanha/exportar.csv"
-            className="btn-quieto"
-          >
-            exportar CSV Metricool
+        <div className="flex flex-wrap gap-3">
+          <a href="/api/admin/campanha/exportar.csv" className="btn-quieto">
+            CSV Metricool
           </a>
-          <a
-            href="/api/admin/campanha/exportar.csv?modo=por-rede"
-            className="btn-quieto"
-            title="Uma linha por dia × rede (versão alternativa)"
-          >
+          <a href="/api/admin/campanha/exportar.csv?modo=por-rede" className="btn-quieto">
             CSV por rede
           </a>
         </div>
+      </div>
+
+      <div className="mt-6 flex flex-wrap gap-3">
+        <BotaoSeed
+          url="/api/admin/campanha/formatar-bold"
+          titulo="Aplicar bold aos 30 posts"
+          descricao="Formata os texto_imagem com **negrito** nas palavras-chave para as artes."
+        />
       </div>
 
       <div className="mt-6 flex flex-wrap gap-2 text-xs">

@@ -53,6 +53,8 @@ export function EditorPost({ post }: { post: Post }) {
   const [estado, setEstado] = useState<"calmo" | "a-guardar" | "guardado" | "erro">("calmo");
   const [mensagem, setMensagem] = useState<string | null>(null);
   const [estadoArte, setEstadoArte] = useState<"calmo" | "a-gerar" | "ok" | "erro">("calmo");
+  const [estadoMJ, setEstadoMJ] = useState<"calmo" | "a-gerar" | "ok" | "erro">("calmo");
+  const [promptMJ, setPromptMJ] = useState<string | null>(null);
 
   function setCampo<K extends keyof typeof form>(k: K, v: (typeof form)[K]) {
     setForm({ ...form, [k]: v });
@@ -87,6 +89,20 @@ export function EditorPost({ post }: { post: Post }) {
     } catch (e: unknown) {
       setEstado("erro");
       setMensagem(e instanceof Error ? e.message : "erro a guardar");
+    }
+  }
+
+  async function gerarPromptMJ() {
+    setEstadoMJ("a-gerar");
+    setPromptMJ(null);
+    try {
+      const r = await fetch(`/api/admin/campanha/${post.dia}/prompt-mj`, { method: "POST" });
+      const j = await r.json();
+      if (!r.ok) throw new Error(j.erro ?? "erro");
+      setPromptMJ(j.prompt);
+      setEstadoMJ("ok");
+    } catch {
+      setEstadoMJ("erro");
     }
   }
 
@@ -279,7 +295,38 @@ export function EditorPost({ post }: { post: Post }) {
 
         <div className="p-4 rounded-lg border border-castanho/15 bg-creme/50">
           <h3 className="font-sans text-xs uppercase tracking-[0.2em] text-oliva mb-3">
-            Gerar arte
+            Prompt Midjourney
+          </h3>
+          <button
+            type="button"
+            onClick={gerarPromptMJ}
+            disabled={estadoMJ === "a-gerar"}
+            className="btn-quieto w-full disabled:opacity-60 text-sm"
+          >
+            {estadoMJ === "a-gerar" ? "A gerar via Claude..." : "Gerar prompt MJ"}
+          </button>
+          {promptMJ && (
+            <div className="mt-3">
+              <pre className="whitespace-pre-wrap text-xs text-terra-texto/80 bg-creme-fundo/50 p-3 rounded border border-castanho/10 max-h-40 overflow-y-auto">
+                {promptMJ}
+              </pre>
+              <button
+                type="button"
+                onClick={() => navigator.clipboard.writeText(promptMJ)}
+                className="text-xs text-ocre hover:underline mt-2"
+              >
+                Copiar prompt
+              </button>
+            </div>
+          )}
+          {estadoMJ === "erro" && (
+            <p className="text-xs text-red-700 mt-2">Erro a gerar o prompt.</p>
+          )}
+        </div>
+
+        <div className="p-4 rounded-lg border border-castanho/15 bg-creme/50">
+          <h3 className="font-sans text-xs uppercase tracking-[0.2em] text-oliva mb-3">
+            Gerar arte PNG
           </h3>
           <p className="text-xs text-castanho/70 mb-3">
             Gera PNG a partir do texto da imagem, com a paleta terra da Infonte.
