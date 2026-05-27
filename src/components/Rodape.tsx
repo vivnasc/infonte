@@ -21,12 +21,15 @@ export async function Rodape() {
         <span className="font-sans text-[11px] uppercase tracking-[0.3em] text-oliva mt-2">
           {t("casa")}
         </span>
-        <a
-          href="mailto:ola@viviannedossantos.com"
-          className="font-sans text-xs text-castanho/60 hover:text-ocre-forte transition-colors mt-3"
-        >
-          ola@viviannedossantos.com
-        </a>
+        <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 mt-3 font-sans text-xs text-castanho/60">
+          <a href="mailto:ola@viviannedossantos.com" className="hover:text-ocre-forte transition-colors">
+            ola@viviannedossantos.com
+          </a>
+          <span>·</span>
+          <a href="https://wa.me/258845243875" target="_blank" rel="noopener noreferrer" className="hover:text-ocre-forte transition-colors">
+            WhatsApp +258 84 524 3875
+          </a>
+        </div>
       </div>
     </footer>
   );

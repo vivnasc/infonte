@@ -596,7 +596,9 @@ function FechoCta() {
         constelação familiar sistémica e psicologia transpessoal.
       </p>
       <p className="font-sans text-xs text-castanho/60 mt-4">
-        ola@viviannedossantos.com
+        <a href="mailto:ola@viviannedossantos.com" className="hover:text-ocre-forte transition-colors">ola@viviannedossantos.com</a>
+        <span className="mx-2">·</span>
+        <a href="https://wa.me/258845243875" target="_blank" rel="noopener noreferrer" className="hover:text-ocre-forte transition-colors">WhatsApp +258 84 524 3875</a>
       </p>
       {/* VERSÃO FINAL: "Um percurso de Vivianne dos Santos, escritora,
           pós-graduada em terapia da constelação familiar sistémica e em
