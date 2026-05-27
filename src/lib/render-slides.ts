@@ -14,193 +14,209 @@ const OCRE_FORTE = "#9A6C2C";
 const AMBAR = "#EBAE4A";
 const AMBAR_CLARO = "#F4C56A";
 
-const GOTA_SVG = `<svg width="40" height="40" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
-  <path d="M256 116 C198 218 166 282 166 334 A90 90 0 0 0 346 334 C346 282 314 218 256 116 Z" fill="none" stroke="${AMBAR}" stroke-width="18" stroke-linejoin="round"/>
-  <circle cx="256" cy="338" r="34" fill="${AMBAR_CLARO}"/>
-</svg>`;
-
-const GOTA_SMALL = `<svg width="24" height="24" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
-  <path d="M256 116 C198 218 166 282 166 334 A90 90 0 0 0 346 334 C346 282 314 218 256 116 Z" fill="none" stroke="rgba(235,174,74,0.6)" stroke-width="18" stroke-linejoin="round"/>
-  <circle cx="256" cy="338" r="34" fill="rgba(244,197,106,0.6)"/>
-</svg>`;
-
-// Converte **texto** em <strong>texto</strong> para negrito selectivo
-function parseBold(s: string): string {
-  return esc(s).replace(/\*\*([^*]+)\*\*/g, '<strong style="color:#fff;font-weight:700;">$1</strong>');
-}
-
 function esc(s: string): string {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
-function slideHtml(opts: {
-  texto: string;
-  dia: number;
-  tema: string;
-  modo: "capa" | "conteudo" | "cta";
-  formato: "feed" | "story";
-  slideNum?: number;
-  totalSlides?: number;
-  fotoFundo?: string;
-}): string {
-  const h = opts.formato === "story" ? H_STORY : H_FEED;
-  const isCapa = opts.modo === "capa";
-  const isCta = opts.modo === "cta";
-  const usaFoto = !!opts.fotoFundo;
+function parseBold(s: string): string {
+  return esc(s).replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+}
 
-  // Aplica negrito antes de dividir em linhas (pode abranger várias linhas)
-  const textoComBold = parseBold(opts.texto);
-  const linhas = textoComBold
-    .split(/\n/)
-    .map((l) => l.trim())
-    .filter(Boolean);
+const GOTA_SVG = `<svg width="36" height="36" viewBox="0 0 512 512"><path d="M256 116 C198 218 166 282 166 334 A90 90 0 0 0 346 334 C346 282 314 218 256 116 Z" fill="none" stroke="${AMBAR}" stroke-width="18" stroke-linejoin="round"/><circle cx="256" cy="338" r="34" fill="${AMBAR_CLARO}"/></svg>`;
 
-  const charCount = opts.texto.replace(/\*\*/g, "").length;
-  let fontSize: number;
-  if (charCount < 40) fontSize = 84;
-  else if (charCount < 70) fontSize = 72;
-  else if (charCount < 120) fontSize = 60;
-  else if (charCount < 200) fontSize = 48;
-  else if (charCount < 350) fontSize = 38;
-  else fontSize = 32;
+const MARCA = `<div style="display:flex;align-items:center;gap:10px;">
+  <svg width="22" height="22" viewBox="0 0 512 512"><path d="M256 116 C198 218 166 282 166 334 A90 90 0 0 0 346 334 C346 282 314 218 256 116 Z" fill="none" stroke="${AMBAR}" stroke-width="20" stroke-linejoin="round"/><circle cx="256" cy="338" r="34" fill="${AMBAR_CLARO}"/></svg>
+  <span style="font-family:'EB Garamond',serif;font-size:20px;letter-spacing:0.02em;">INFONTE</span>
+</div>`;
 
-  const textShadow = usaFoto || isCapa
-    ? "text-shadow: 0 2px 24px rgba(0,0,0,0.6), 0 1px 4px rgba(0,0,0,0.4);"
-    : "";
+const ARRASTE = `<div style="display:flex;align-items:center;justify-content:center;gap:8px;font-family:Inter,sans-serif;font-size:14px;font-weight:500;letter-spacing:0.05em;">Arraste para o lado <span style="font-size:20px;">→</span></div>`;
 
-  const bgLayer = usaFoto
-    ? `<div style="position:absolute;inset:0;z-index:0;">
-        <img src="${opts.fotoFundo}" style="width:100%;height:100%;object-fit:cover;object-position:center 20%;"/>
-        <div style="position:absolute;inset:0;background:linear-gradient(180deg, rgba(46,29,18,0.55) 0%, rgba(46,29,18,0.85) 60%, rgba(46,29,18,0.95) 100%);"></div>
-       </div>`
-    : isCapa
-      ? `<div style="position:absolute;inset:0;z-index:0;background:linear-gradient(160deg, ${TERRA} 0%, #3a2515 40%, #1a120a 100%);"></div>
-         <div style="position:absolute;inset:0;z-index:0;background:radial-gradient(ellipse at 30% 30%, rgba(184,132,61,0.12) 0%, transparent 60%);"></div>`
-      : isCta
-        ? `<div style="position:absolute;inset:0;z-index:0;background:linear-gradient(160deg, ${TERRA} 0%, #3a2515 100%);"></div>
-           <div style="position:absolute;inset:0;z-index:0;background:radial-gradient(ellipse at 70% 70%, rgba(184,132,61,0.15) 0%, transparent 60%);"></div>`
-        : `<div style="position:absolute;inset:0;z-index:0;background:linear-gradient(175deg, ${CREME} 0%, #e8ddd0 60%, #ddd2c3 100%);"></div>
-           <div style="position:absolute;inset:0;z-index:0;background:radial-gradient(ellipse at 60% 40%, rgba(184,132,61,0.06) 0%, transparent 50%);"></div>`;
+function paginacao(atual: number, total: number, light: boolean): string {
+  const dots = Array.from({ length: total }, (_, i) =>
+    `<div style="width:8px;height:8px;border-radius:50%;background:${i + 1 === atual
+      ? (light ? OCRE : "#fff")
+      : (light ? "rgba(74,47,27,0.2)" : "rgba(255,255,255,0.3)")
+    };"></div>`
+  ).join("");
+  return `<div style="display:flex;gap:6px;">${dots}</div>`;
+}
 
-  const textColor = isCapa || usaFoto ? "rgba(242,232,220,0.95)" : CASTANHO;
-  const boldColor = isCapa || usaFoto ? "#fff" : OCRE_FORTE;
-  const ctaTextColor = "rgba(242,232,220,0.85)";
-  const labelColor = AMBAR;
-
-  return `<!DOCTYPE html>
-<html>
-<head>
-<meta charset="utf-8"/>
+function base(w: number, h: number): string {
+  return `<!DOCTYPE html><html><head><meta charset="utf-8"/>
 <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
 <style>
-* { margin:0;padding:0;box-sizing:border-box; }
-body {
-  width:${W}px;height:${h}px;position:relative;overflow:hidden;
-  font-family:'EB Garamond',Georgia,serif;
-  -webkit-font-smoothing:antialiased;
+*{margin:0;padding:0;box-sizing:border-box;}
+body{width:${w}px;height:${h}px;overflow:hidden;font-family:'EB Garamond',Georgia,serif;-webkit-font-smoothing:antialiased;}
+strong{font-weight:700;}
+</style></head><body>`;
 }
-.content {
-  position:relative;z-index:1;
-  display:flex;flex-direction:column;justify-content:center;
-  padding:80px 72px;
-  height:100%;
-}
-.label {
-  font-family:Inter,system-ui,sans-serif;font-size:15px;
-  letter-spacing:0.3em;text-transform:uppercase;color:${labelColor};
-  ${textShadow}
-}
-.texto {
-  font-size:${fontSize}px;line-height:1.25;color:${textColor};
-  ${textShadow}
-  font-weight:400;
-}
-.texto strong { color:${isCta ? "#fff" : boldColor};font-weight:700; }
-.cta-text { color:${ctaTextColor}; }
-.texto p { margin-bottom:${fontSize < 40 ? 14 : 20}px; }
-.marca {
-  font-family:'EB Garamond',serif;font-size:26px;
-  color:${isCapa || usaFoto ? CREME : CASTANHO};${textShadow}
-}
-.watermark {
-  position:absolute;top:36px;right:40px;z-index:2;opacity:0.7;
-}
-.arraste {
-  position:absolute;bottom:44px;left:0;right:0;z-index:2;
-  display:flex;align-items:center;justify-content:center;gap:8px;
-  font-family:Inter,sans-serif;font-size:15px;font-weight:500;
-  color:${isCapa || usaFoto ? "rgba(255,255,255,0.6)" : "rgba(74,47,27,0.45)"};
-  letter-spacing:0.05em;
-}
-.paginacao {
-  position:absolute;bottom:44px;right:48px;z-index:2;
-  display:flex;gap:6px;
-}
-.paginacao .dot {
-  width:8px;height:8px;border-radius:50%;
-  background:${isCapa || usaFoto ? "rgba(255,255,255,0.3)" : "rgba(74,47,27,0.2)"};
-}
-.paginacao .dot.active {
-  background:${isCapa || usaFoto ? "rgba(255,255,255,0.9)" : OCRE};
-}
-.cta-btn {
-  display:inline-block;margin-top:36px;
-  background:${OCRE};color:#fff;
-  padding:22px 48px;border-radius:9999px;
-  font-family:Inter,sans-serif;font-size:24px;font-weight:600;
-  letter-spacing:0.03em;
-  box-shadow:0 4px 0 rgba(154,108,44,0.5);
-}
-.sub {
-  font-family:Inter,sans-serif;font-size:14px;letter-spacing:0.2em;
-  text-transform:uppercase;
-  color:${isCapa || usaFoto ? "rgba(255,255,255,0.45)" : "rgba(92,92,62,0.7)"};
-  ${textShadow}
-}
-</style>
-</head>
-<body>
-  ${bgLayer}
 
-  <div class="watermark">${GOTA_SMALL}</div>
+// ═══════════════════════════════════════════════════
+// LAYOUT A: Foto metade superior, texto metade inferior
+// (estilo Modo Caverna principal)
+// ═══════════════════════════════════════════════════
+function layoutFotoTopo(opts: FullOpts): string {
+  const h = opts.formato === "story" ? H_STORY : H_FEED;
+  const fotoH = Math.round(h * 0.45);
+  const textoH = h - fotoH;
+  const textoComBold = parseBold(opts.texto);
+  const linhas = textoComBold.split(/\n/).map(l => l.trim()).filter(Boolean);
+  const charCount = opts.texto.replace(/\*\*/g, "").length;
+  const fs = charCount < 50 ? 64 : charCount < 100 ? 52 : charCount < 180 ? 42 : 34;
 
-  <div class="content">
-    ${isCapa ? `
-      <div style="text-align:center;">
-        <div style="margin-bottom:40px;">${GOTA_SVG}</div>
-        <div class="label" style="margin-bottom:28px;">infonte · Dia ${opts.dia}</div>
-        <div class="texto">${linhas.map((l) => `<p>${l}</p>`).join("")}</div>
-        <div style="margin-top:48px;">
-          <div class="marca">infonte</div>
-          <div class="sub" style="margin-top:6px;">Vivianne dos Santos · Sete Ecos</div>
-        </div>
-      </div>
-    ` : isCta ? `
-      <div style="text-align:center;">
-        <div style="margin-bottom:32px;">${GOTA_SVG}</div>
-        <div class="texto" style="color:${ctaTextColor};">${linhas.map((l) => `<p>${l}</p>`).join("")}</div>
-        <div class="cta-btn">Começar a etapa 1, grátis</div>
-        <div style="margin-top:28px;">
-          <div class="sub">infonte.vivannedossantos.com</div>
-        </div>
-      </div>
-    ` : `
-      <div>
-        <div class="label" style="margin-bottom:36px;">infonte · Dia ${opts.dia}</div>
-        <div class="texto">${linhas.map((l) => `<p>${l}</p>`).join("")}</div>
-      </div>
-    `}
+  return `${base(W, h)}
+<div style="position:relative;width:${W}px;height:${fotoH}px;overflow:hidden;">
+  ${opts.imagemUrl
+    ? `<img src="${opts.imagemUrl}" style="width:100%;height:100%;object-fit:cover;object-position:center 25%;"/>
+       <div style="position:absolute;inset:0;background:linear-gradient(180deg,transparent 40%,${TERRA} 100%);"></div>`
+    : `<div style="width:100%;height:100%;background:linear-gradient(160deg,${TERRA} 0%,#3a2515 100%);"></div>
+       <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 50%,rgba(184,132,61,0.15) 0%,transparent 70%);"></div>`
+  }
+  <div style="position:absolute;top:28px;left:32px;color:${AMBAR};">${MARCA}</div>
+</div>
+<div style="width:${W}px;height:${textoH}px;background:${TERRA};padding:40px 56px;display:flex;flex-direction:column;justify-content:center;">
+  <div style="font-size:${fs}px;line-height:1.2;color:${CREME};text-shadow:0 2px 12px rgba(0,0,0,0.3);">
+    ${linhas.map(l => `<p style="margin-bottom:12px;">${l}</p>`).join("")}
   </div>
-
-  ${opts.slideNum != null && opts.totalSlides != null && opts.totalSlides > 1 ? `
-    <div class="arraste">Arraste para o lado →</div>
-    <div class="paginacao">
-      ${Array.from({ length: opts.totalSlides }, (_, i) => `<div class="dot ${i + 1 === opts.slideNum ? "active" : ""}"></div>`).join("")}
-    </div>
-  ` : ""}
-</body>
-</html>`;
+  <div style="color:${CREME};strong{color:#fff;}"</div>
+  ${opts.slideNum && opts.totalSlides && opts.totalSlides > 1 ? `
+  <div style="position:absolute;bottom:32px;left:56px;color:rgba(255,255,255,0.5);">${ARRASTE}</div>
+  <div style="position:absolute;bottom:32px;right:40px;">${paginacao(opts.slideNum, opts.totalSlides, false)}</div>` : ""}
+</div>
+</body></html>`;
 }
+
+// ═══════════════════════════════════════════════════
+// LAYOUT B: Foto metade esquerda, texto metade direita
+// ═══════════════════════════════════════════════════
+function layoutFotoLado(opts: FullOpts): string {
+  const h = opts.formato === "story" ? H_STORY : H_FEED;
+  const textoComBold = parseBold(opts.texto);
+  const linhas = textoComBold.split(/\n/).map(l => l.trim()).filter(Boolean);
+  const charCount = opts.texto.replace(/\*\*/g, "").length;
+  const fs = charCount < 50 ? 48 : charCount < 100 ? 40 : charCount < 180 ? 34 : 28;
+
+  return `${base(W, h)}
+<div style="display:flex;width:${W}px;height:${h}px;">
+  <div style="width:50%;position:relative;overflow:hidden;">
+    ${opts.imagemUrl
+      ? `<img src="${opts.imagemUrl}" style="width:100%;height:100%;object-fit:cover;object-position:center;"/>
+         <div style="position:absolute;inset:0;background:linear-gradient(90deg,transparent 60%,${TERRA} 100%);"></div>`
+      : `<div style="width:100%;height:100%;background:linear-gradient(135deg,#3a2515 0%,${TERRA} 100%);display:flex;align-items:center;justify-content:center;">
+           ${GOTA_SVG}
+         </div>`
+    }
+  </div>
+  <div style="width:50%;background:${TERRA};padding:60px 44px;display:flex;flex-direction:column;justify-content:center;">
+    <div style="color:${AMBAR};margin-bottom:24px;">${MARCA}</div>
+    <div style="font-size:${fs}px;line-height:1.25;color:${CREME};">
+      <style>strong{color:#fff;}</style>
+      ${linhas.map(l => `<p style="margin-bottom:12px;">${l}</p>`).join("")}
+    </div>
+    ${opts.slideNum && opts.totalSlides && opts.totalSlides > 1 ? `
+    <div style="margin-top:auto;padding-top:24px;display:flex;justify-content:space-between;align-items:center;">
+      <div style="color:rgba(255,255,255,0.4);font-family:Inter,sans-serif;font-size:13px;">Arraste →</div>
+      ${paginacao(opts.slideNum, opts.totalSlides, false)}
+    </div>` : ""}
+  </div>
+</div>
+</body></html>`;
+}
+
+// ═══════════════════════════════════════════════════
+// LAYOUT C: Texto grande sobre fundo cheio (foto ou gradiente)
+// com scrim forte (estilo statement)
+// ═══════════════════════════════════════════════════
+function layoutStatement(opts: FullOpts): string {
+  const h = opts.formato === "story" ? H_STORY : H_FEED;
+  const textoComBold = parseBold(opts.texto);
+  const linhas = textoComBold.split(/\n/).map(l => l.trim()).filter(Boolean);
+  const charCount = opts.texto.replace(/\*\*/g, "").length;
+  const fs = charCount < 40 ? 80 : charCount < 70 ? 68 : charCount < 120 ? 56 : charCount < 200 ? 46 : 36;
+
+  return `${base(W, h)}
+<div style="position:relative;width:${W}px;height:${h}px;">
+  ${opts.imagemUrl
+    ? `<img src="${opts.imagemUrl}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;"/>
+       <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(46,29,18,0.5) 0%,rgba(46,29,18,0.8) 50%,rgba(46,29,18,0.95) 100%);"></div>`
+    : `<div style="position:absolute;inset:0;background:linear-gradient(160deg,${TERRA} 0%,#3a2515 40%,#1a120a 100%);"></div>
+       <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 30% 30%,rgba(184,132,61,0.12) 0%,transparent 60%);"></div>`
+  }
+  <div style="position:relative;z-index:1;height:100%;display:flex;flex-direction:column;justify-content:center;padding:80px 72px;text-align:center;">
+    <div style="margin-bottom:32px;">${MARCA}</div>
+    <div style="font-size:${fs}px;line-height:1.2;color:${CREME};text-shadow:0 3px 20px rgba(0,0,0,0.5);">
+      <style>strong{color:#fff;font-weight:700;}</style>
+      ${linhas.map(l => `<p style="margin-bottom:16px;">${l}</p>`).join("")}
+    </div>
+    <div style="margin-top:36px;font-family:'EB Garamond',serif;font-size:22px;color:${CREME};">infonte</div>
+    <div style="font-family:Inter,sans-serif;font-size:11px;letter-spacing:0.25em;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-top:6px;">Vivianne dos Santos · Sete Ecos</div>
+  </div>
+  ${opts.slideNum && opts.totalSlides && opts.totalSlides > 1 ? `
+  <div style="position:absolute;bottom:32px;left:0;right:0;z-index:2;display:flex;justify-content:center;color:rgba(255,255,255,0.5);">${ARRASTE}</div>
+  <div style="position:absolute;bottom:32px;right:40px;z-index:2;">${paginacao(opts.slideNum, opts.totalSlides, false)}</div>` : ""}
+</div>
+</body></html>`;
+}
+
+// ═══════════════════════════════════════════════════
+// LAYOUT D: CTA final com botão
+// ═══════════════════════════════════════════════════
+function layoutCta(opts: FullOpts): string {
+  const h = opts.formato === "story" ? H_STORY : H_FEED;
+  const textoComBold = parseBold(opts.texto);
+  const linhas = textoComBold.split(/\n/).map(l => l.trim()).filter(Boolean);
+
+  return `${base(W, h)}
+<div style="position:relative;width:${W}px;height:${h}px;">
+  ${opts.imagemUrl
+    ? `<img src="${opts.imagemUrl}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;"/>
+       <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(46,29,18,0.6) 0%,rgba(46,29,18,0.9) 100%);"></div>`
+    : `<div style="position:absolute;inset:0;background:linear-gradient(160deg,${TERRA} 0%,#3a2515 100%);"></div>
+       <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 70% 70%,rgba(184,132,61,0.12) 0%,transparent 60%);"></div>`
+  }
+  <div style="position:relative;z-index:1;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 64px;text-align:center;">
+    <div style="margin-bottom:40px;">${GOTA_SVG}</div>
+    <div style="font-size:48px;line-height:1.25;color:rgba(242,232,220,0.9);text-shadow:0 2px 16px rgba(0,0,0,0.4);">
+      <style>strong{color:#fff;font-weight:700;}</style>
+      ${linhas.map(l => `<p style="margin-bottom:14px;">${l}</p>`).join("")}
+    </div>
+    <div style="margin-top:36px;display:inline-block;background:${OCRE};color:#fff;padding:22px 52px;border-radius:9999px;font-family:Inter,sans-serif;font-size:22px;font-weight:600;letter-spacing:0.03em;box-shadow:0 4px 0 rgba(154,108,44,0.5);">Começar a etapa 1, grátis</div>
+    <div style="margin-top:20px;font-family:Inter,sans-serif;font-size:14px;letter-spacing:0.2em;text-transform:uppercase;color:rgba(255,255,255,0.4);">infonte.vivannedossantos.com</div>
+  </div>
+  ${opts.slideNum && opts.totalSlides ? `
+  <div style="position:absolute;bottom:32px;right:40px;z-index:2;">${paginacao(opts.slideNum, opts.totalSlides, false)}</div>` : ""}
+</div>
+</body></html>`;
+}
+
+// ═══════════════════════════════════════════════════
+// LAYOUT E: Fundo claro, texto escuro (variação limpa)
+// ═══════════════════════════════════════════════════
+function layoutClaro(opts: FullOpts): string {
+  const h = opts.formato === "story" ? H_STORY : H_FEED;
+  const textoComBold = parseBold(opts.texto);
+  const linhas = textoComBold.split(/\n/).map(l => l.trim()).filter(Boolean);
+  const charCount = opts.texto.replace(/\*\*/g, "").length;
+  const fs = charCount < 50 ? 64 : charCount < 100 ? 52 : charCount < 180 ? 42 : 34;
+
+  return `${base(W, h)}
+<div style="position:relative;width:${W}px;height:${h}px;background:linear-gradient(175deg,${CREME} 0%,#e8ddd0 60%,#ddd2c3 100%);">
+  <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 60% 40%,rgba(184,132,61,0.06) 0%,transparent 50%);"></div>
+  <div style="position:relative;z-index:1;height:100%;display:flex;flex-direction:column;justify-content:center;padding:80px 72px;">
+    <div style="color:${OCRE};margin-bottom:32px;">${MARCA}</div>
+    <div style="font-size:${fs}px;line-height:1.25;color:${CASTANHO};">
+      <style>strong{color:${OCRE_FORTE};font-weight:700;}</style>
+      ${linhas.map(l => `<p style="margin-bottom:14px;">${l}</p>`).join("")}
+    </div>
+  </div>
+  ${opts.slideNum && opts.totalSlides && opts.totalSlides > 1 ? `
+  <div style="position:absolute;bottom:32px;left:72px;color:rgba(74,47,27,0.4);">${ARRASTE}</div>
+  <div style="position:absolute;bottom:32px;right:40px;">${paginacao(opts.slideNum, opts.totalSlides, true)}</div>` : ""}
+</div>
+</body></html>`;
+}
+
+// ═══════════════════════════════════════════════════
 
 export type SlideOpts = {
   texto: string;
@@ -208,10 +224,35 @@ export type SlideOpts = {
   tema: string;
   modo: "capa" | "conteudo" | "cta";
   formato: "feed" | "story";
+  layout?: "foto-topo" | "foto-lado" | "statement" | "cta" | "claro";
   slideNum?: number;
   totalSlides?: number;
-  fotoFundo?: string;
+  imagemUrl?: string;
 };
+
+type FullOpts = SlideOpts;
+
+function escolherLayout(opts: SlideOpts): string {
+  const layout = opts.layout ?? inferirLayout(opts);
+  switch (layout) {
+    case "foto-topo": return layoutFotoTopo(opts);
+    case "foto-lado": return layoutFotoLado(opts);
+    case "statement": return layoutStatement(opts);
+    case "cta": return layoutCta(opts);
+    case "claro": return layoutClaro(opts);
+    default: return layoutStatement(opts);
+  }
+}
+
+function inferirLayout(opts: SlideOpts): string {
+  if (opts.modo === "cta") return "cta";
+  if (opts.modo === "capa" && opts.imagemUrl) return "foto-topo";
+  if (opts.modo === "capa") return "statement";
+  if (opts.modo === "conteudo" && opts.imagemUrl) {
+    return opts.slideNum && opts.slideNum % 2 === 0 ? "foto-lado" : "foto-topo";
+  }
+  return opts.slideNum && opts.slideNum % 2 === 0 ? "claro" : "statement";
+}
 
 export async function renderSlides(
   slides: SlideOpts[]
@@ -220,18 +261,17 @@ export async function renderSlides(
     executablePath: CHROME_PATH,
     args: ["--no-sandbox", "--disable-gpu"],
   });
-
   const results: { name: string; buffer: Buffer }[] = [];
-
   for (let i = 0; i < slides.length; i++) {
     const s = slides[i];
     const h = s.formato === "story" ? H_STORY : H_FEED;
+    const html = escolherLayout(s);
     const ctx = await browser.newContext({
       viewport: { width: W, height: h },
       deviceScaleFactor: SCALE,
     });
     const page = await ctx.newPage();
-    await page.setContent(slideHtml(s), { waitUntil: "networkidle" });
+    await page.setContent(html, { waitUntil: "networkidle" });
     await page.waitForTimeout(500);
     const buf = await page.screenshot({ type: "png" });
     results.push({
@@ -240,7 +280,6 @@ export async function renderSlides(
     });
     await ctx.close();
   }
-
   await browser.close();
   return results;
 }
@@ -249,62 +288,29 @@ export function parseTextoImagemToSlides(
   dia: number,
   tema: string,
   textoImagem: string,
-  formato: string | null
+  formato: string | null,
+  imagemUrl?: string | null,
 ): SlideOpts[] {
   if (!textoImagem?.trim()) return [];
-
   const isStory = formato === "reel";
   const fmt: "feed" | "story" = isStory ? "story" : "feed";
+  const img = imagemUrl || undefined;
 
-  // Detecta slides numerados (1. xxx)
   const numerados = textoImagem.match(/^\d+\.\s*.+$/gm);
   if (numerados && numerados.length >= 2) {
     const total = numerados.length + 2;
     const slides: SlideOpts[] = [];
-
-    slides.push({
-      texto: tema,
-      dia,
-      tema,
-      modo: "capa",
-      formato: fmt,
-      slideNum: 1,
-      totalSlides: total,
-    });
-
+    slides.push({ texto: tema, dia, tema, modo: "capa", formato: fmt, slideNum: 1, totalSlides: total, imagemUrl: img });
     numerados.forEach((line, i) => {
       slides.push({
-        texto: line.replace(/^\d+\.\s*/, ""),
-        dia,
-        tema,
-        modo: "conteudo",
-        formato: fmt,
-        slideNum: i + 2,
-        totalSlides: total,
+        texto: line.replace(/^\d+\.\s*/, ""), dia, tema, modo: "conteudo", formato: fmt,
+        slideNum: i + 2, totalSlides: total,
+        imagemUrl: i === 0 ? img : undefined,
       });
     });
-
-    slides.push({
-      texto: "**Pára de perseguir** o que nunca foi teu.\nComeça pela etapa 1, grátis.",
-      dia,
-      tema,
-      modo: "cta",
-      formato: fmt,
-      slideNum: total,
-      totalSlides: total,
-    });
-
+    slides.push({ texto: "**Pára de perseguir** o que nunca foi teu.\nComeça pela etapa 1, grátis.", dia, tema, modo: "cta", formato: fmt, slideNum: total, totalSlides: total, imagemUrl: img });
     return slides;
   }
 
-  // Post unico ou reel
-  return [
-    {
-      texto: textoImagem.trim(),
-      dia,
-      tema,
-      modo: "capa",
-      formato: fmt,
-    },
-  ];
+  return [{ texto: textoImagem.trim(), dia, tema, modo: "capa", formato: fmt, imagemUrl: img }];
 }
