@@ -62,7 +62,7 @@ function layoutFotoTopo(opts: FullOpts): string {
   const textoComBold = parseBold(opts.texto);
   const linhas = textoComBold.split(/\n/).map(l => l.trim()).filter(Boolean);
   const charCount = opts.texto.replace(/\*\*/g, "").length;
-  const fs = charCount < 50 ? 64 : charCount < 100 ? 52 : charCount < 180 ? 42 : 34;
+  const fs = charCount < 30 ? 96 : charCount < 50 ? 82 : charCount < 80 ? 68 : charCount < 120 ? 56 : charCount < 180 ? 46 : 38;
 
   return `${base(W, h)}
 <div style="position:relative;width:${W}px;height:${fotoH}px;overflow:hidden;">
@@ -98,7 +98,7 @@ function layoutFotoLado(opts: FullOpts): string {
 
   return `${base(W, h)}
 <div style="display:flex;width:${W}px;height:${h}px;">
-  <div style="width:50%;position:relative;overflow:hidden;">
+  <div style="width:42%;position:relative;overflow:hidden;">
     ${opts.imagemUrl
       ? `<img src="${opts.imagemUrl}" style="width:100%;height:100%;object-fit:cover;object-position:center;"/>
          <div style="position:absolute;inset:0;background:linear-gradient(90deg,transparent 60%,${TERRA} 100%);"></div>`
@@ -107,7 +107,7 @@ function layoutFotoLado(opts: FullOpts): string {
          </div>`
     }
   </div>
-  <div style="width:50%;background:${TERRA};padding:60px 44px;display:flex;flex-direction:column;justify-content:center;">
+  <div style="width:58%;background:${TERRA};padding:60px 48px;display:flex;flex-direction:column;justify-content:center;">
     <div style="color:${AMBAR};margin-bottom:24px;">${MARCA}</div>
     <div style="font-size:${fs}px;line-height:1.25;color:${CREME};">
       <style>strong{color:#fff;}</style>
@@ -132,7 +132,7 @@ function layoutStatement(opts: FullOpts): string {
   const textoComBold = parseBold(opts.texto);
   const linhas = textoComBold.split(/\n/).map(l => l.trim()).filter(Boolean);
   const charCount = opts.texto.replace(/\*\*/g, "").length;
-  const fs = charCount < 40 ? 80 : charCount < 70 ? 68 : charCount < 120 ? 56 : charCount < 200 ? 46 : 36;
+  const fs = charCount < 30 ? 100 : charCount < 50 ? 86 : charCount < 80 ? 72 : charCount < 120 ? 60 : charCount < 200 ? 48 : 38;
 
   return `${base(W, h)}
 <div style="position:relative;width:${W}px;height:${h}px;">
@@ -176,7 +176,7 @@ function layoutCta(opts: FullOpts): string {
   }
   <div style="position:relative;z-index:1;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 64px;text-align:center;">
     <div style="margin-bottom:40px;">${GOTA_SVG}</div>
-    <div style="font-size:48px;line-height:1.25;color:rgba(242,232,220,0.9);text-shadow:0 2px 16px rgba(0,0,0,0.4);">
+    <div style="font-size:62px;line-height:1.2;color:rgba(242,232,220,0.9);text-shadow:0 2px 16px rgba(0,0,0,0.4);">
       <style>strong{color:#fff;font-weight:700;}</style>
       ${linhas.map(l => `<p style="margin-bottom:14px;">${l}</p>`).join("")}
     </div>
@@ -197,7 +197,7 @@ function layoutClaro(opts: FullOpts): string {
   const textoComBold = parseBold(opts.texto);
   const linhas = textoComBold.split(/\n/).map(l => l.trim()).filter(Boolean);
   const charCount = opts.texto.replace(/\*\*/g, "").length;
-  const fs = charCount < 50 ? 64 : charCount < 100 ? 52 : charCount < 180 ? 42 : 34;
+  const fs = charCount < 30 ? 96 : charCount < 50 ? 82 : charCount < 80 ? 68 : charCount < 120 ? 56 : charCount < 180 ? 46 : 38;
 
   return `${base(W, h)}
 <div style="position:relative;width:${W}px;height:${h}px;background:linear-gradient(175deg,${CREME} 0%,#e8ddd0 60%,#ddd2c3 100%);">
