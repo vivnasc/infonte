@@ -62,13 +62,20 @@ export async function getUtilizadoraAtual() {
       .single();
 
     if (errInsert) {
-      // Pode falhar por race condition (outra tab criou entretanto)
       const { data: retry } = await supabase
         .from("utilizadoras")
         .select("*")
         .eq("auth_id", user.id)
         .maybeSingle();
       return retry ?? null;
+    }
+
+    // Email de boas-vindas (não bloqueia)
+    try {
+      const { enviarEmailBoasVindas } = await import("@/lib/emails");
+      await enviarEmailBoasVindas({ email: user.email!, nome: nova.nome });
+    } catch (e) {
+      console.warn("[boas-vindas] email falhou:", e);
     }
 
     return nova;

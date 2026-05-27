@@ -73,6 +73,11 @@ export default async function CampanhaListaPage() {
           titulo="Aplicar bold aos 30 posts"
           descricao="Formata os texto_imagem com **negrito** nas palavras-chave para as artes."
         />
+        <BotaoSeed
+          url="/api/admin/campanha/gerar-tarde"
+          titulo="Gerar 30 posts da tarde (Claude API)"
+          descricao="Gera os posts emocionais das 13h via Claude. Cada um é o par emocional do post didático da manhã."
+        />
       </div>
 
       <div className="mt-6 flex flex-wrap gap-2 text-xs">
