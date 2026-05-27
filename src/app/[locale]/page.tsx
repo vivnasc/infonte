@@ -595,6 +595,9 @@ function FechoCta() {
         Um percurso de Vivianne dos Santos, escritora e em formação em
         constelação familiar sistémica e psicologia transpessoal.
       </p>
+      <p className="font-sans text-xs text-castanho/60 mt-4">
+        ola@viviannedossantos.com
+      </p>
       {/* VERSÃO FINAL: "Um percurso de Vivianne dos Santos, escritora,
           pós-graduada em terapia da constelação familiar sistémica e em
           psicologia transpessoal." */}

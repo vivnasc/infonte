@@ -21,6 +21,12 @@ export async function Rodape() {
         <span className="font-sans text-[11px] uppercase tracking-[0.3em] text-oliva mt-2">
           {t("casa")}
         </span>
+        <a
+          href="mailto:ola@viviannedossantos.com"
+          className="font-sans text-xs text-castanho/60 hover:text-ocre-forte transition-colors mt-3"
+        >
+          ola@viviannedossantos.com
+        </a>
       </div>
     </footer>
   );
