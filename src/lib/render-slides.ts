@@ -320,45 +320,54 @@ export function parseTextoImagemToSlides(
   textoImagem: string,
   formato: string | null,
   imagemUrl?: string | null,
+  imagens?: string[] | null,
 ): SlideOpts[] {
   if (!textoImagem?.trim()) return [];
   const isStory = formato === "reel";
   const fmt: "feed" | "story" = isStory ? "story" : "feed";
-  const img = imagemUrl || undefined;
+
+  // Pool de imagens: usa o array de múltiplas, ou fallback para a URL única
+  const pool = imagens && imagens.length > 0
+    ? imagens
+    : imagemUrl ? [imagemUrl] : [];
+
+  // Distribui imagens circulando pelo pool
+  const imgPara = (idx: number): string | undefined =>
+    pool.length > 0 ? pool[idx % pool.length] : undefined;
 
   const numerados = textoImagem.match(/^\d+\.\s*.+$/gm);
   if (numerados && numerados.length >= 2) {
     const total = numerados.length + 2;
     const slides: SlideOpts[] = [];
+    let imgIdx = 0;
 
-    // Slide 1 (capa): sempre com imagem se disponível
+    // Capa: com imagem
     slides.push({
       texto: tema, dia, tema, modo: "capa", formato: fmt,
-      slideNum: 1, totalSlides: total, imagemUrl: img,
+      slideNum: 1, totalSlides: total, imagemUrl: imgPara(imgIdx++),
     });
 
-    // Slides internos: alternam com e sem imagem
-    // Pares (2, 4, 6) com imagem, ímpares (3, 5, 7) sem (claro ou statement)
+    // Slides internos: pares com imagem (cada uma diferente), ímpares sem
     numerados.forEach((line, i) => {
       const slideN = i + 2;
       const usaImagem = slideN % 2 === 0;
       slides.push({
         texto: line.replace(/^\d+\.\s*/, ""), dia, tema, modo: "conteudo", formato: fmt,
         slideNum: slideN, totalSlides: total,
-        imagemUrl: usaImagem ? img : undefined,
+        imagemUrl: usaImagem ? imgPara(imgIdx++) : undefined,
       });
     });
 
-    // Último slide (CTA): com imagem
+    // CTA: com imagem
     slides.push({
       texto: "**Pára de perseguir** o que nunca foi teu.\nComeça pela etapa 1, grátis.",
       dia, tema, modo: "cta", formato: fmt,
-      slideNum: total, totalSlides: total, imagemUrl: img,
+      slideNum: total, totalSlides: total, imagemUrl: imgPara(imgIdx),
     });
 
     return slides;
   }
 
-  // Post único: com imagem se disponível
-  return [{ texto: textoImagem.trim(), dia, tema, modo: "capa", formato: fmt, imagemUrl: img }];
+  // Post único
+  return [{ texto: textoImagem.trim(), dia, tema, modo: "capa", formato: fmt, imagemUrl: imgPara(0) }];
 }

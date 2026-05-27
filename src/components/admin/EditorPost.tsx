@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { DropImagem } from "./DropImagem";
+import { DropImagens } from "./DropImagens";
 
 type Post = {
   id: string;
@@ -15,6 +15,7 @@ type Post = {
   hashtags: string | null;
   link: string | null;
   imagem_url: string | null;
+  imagens: string[] | null;
   redes: string[] | null;
   data_publicacao: string | null;
   estado: string | null;
@@ -44,6 +45,7 @@ export function EditorPost({ post }: { post: Post }) {
     hashtags: post.hashtags ?? "",
     link: post.link ?? "",
     imagem_url: post.imagem_url ?? "",
+    imagens: post.imagens ?? [],
     redes: post.redes ?? ["instagram", "tiktok"],
     data_publicacao: post.data_publicacao
       ? toLocalDatetime(post.data_publicacao)
@@ -217,11 +219,14 @@ export function EditorPost({ post }: { post: Post }) {
           />
         </Linha>
 
-        <Linha label="Imagem (arrasta do MJ ou clica)">
-          <DropImagem
+        <Linha label="Imagens MJ (arrasta várias de uma vez)">
+          <DropImagens
             dia={post.dia}
-            imagemAtual={form.imagem_url || null}
-            onUpload={(url) => setCampo("imagem_url", url)}
+            imagensAtuais={form.imagens}
+            onUpload={(urls) => {
+              setCampo("imagens", urls);
+              setCampo("imagem_url", urls[0] ?? "");
+            }}
           />
         </Linha>
 

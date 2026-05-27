@@ -24,7 +24,7 @@ export async function POST(
   const sb = criarClienteAdmin();
   const { data: post, error } = await sb
     .from("campanha_posts")
-    .select("dia, tema, texto_imagem, formato")
+    .select("dia, tema, texto_imagem, formato, imagem_url, imagens")
     .eq("dia", dia)
     .single();
 
@@ -43,7 +43,9 @@ export async function POST(
     post.dia,
     post.tema,
     post.texto_imagem,
-    post.formato
+    post.formato,
+    post.imagem_url,
+    post.imagens,
   );
 
   if (slides.length === 0) {

@@ -11,6 +11,7 @@ const CAMPOS_PERMITIDOS = [
   "hashtags",
   "link",
   "imagem_url",
+  "imagens",
   "redes",
   "data_publicacao",
   "estado",

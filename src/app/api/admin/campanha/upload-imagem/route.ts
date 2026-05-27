@@ -13,6 +13,7 @@ export async function POST(request: Request) {
   const formData = await request.formData();
   const file = formData.get("file") as File | null;
   const dia = formData.get("dia") as string | null;
+  const indice = formData.get("indice") as string | null;
 
   if (!file || !dia) {
     return NextResponse.json({ erro: "ficheiro e dia obrigatórios" }, { status: 400 });
@@ -27,7 +28,8 @@ export async function POST(request: Request) {
   }
 
   const ext = file.name.split(".").pop()?.toLowerCase() ?? "jpg";
-  const path = `infonte-campanha/dia-${dia.padStart(2, "0")}.${ext}`;
+  const suffix = indice && indice !== "0" ? `-${indice}` : "";
+  const path = `infonte-campanha/dia-${dia.padStart(2, "0")}${suffix}.${ext}`;
   const buffer = Buffer.from(await file.arrayBuffer());
 
   const sb = criarClienteAdmin();
@@ -57,12 +59,6 @@ export async function POST(request: Request) {
     .getPublicUrl(path);
 
   const url = urlData.publicUrl;
-
-  // Atualiza o campo imagem_url do post
-  await sb
-    .from("campanha_posts")
-    .update({ imagem_url: url })
-    .eq("dia", parseInt(dia, 10));
 
   return NextResponse.json({ ok: true, url });
 }
