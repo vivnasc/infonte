@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { DropImagem } from "./DropImagem";
 
 type Post = {
   id: string;
@@ -216,18 +217,12 @@ export function EditorPost({ post }: { post: Post }) {
           />
         </Linha>
 
-        <Linha label="URL da imagem ou vídeo">
-          <input
-            type="url"
-            value={form.imagem_url}
-            onChange={(e) => setCampo("imagem_url", e.target.value)}
-            className="input"
-            placeholder="https://..."
+        <Linha label="Imagem (arrasta do MJ ou clica)">
+          <DropImagem
+            dia={post.dia}
+            imagemAtual={form.imagem_url || null}
+            onUpload={(url) => setCampo("imagem_url", url)}
           />
-          <p className="text-xs text-castanho/60 mt-1">
-            O Metricool aceita ligações públicas. Em alternativa, fazes upload
-            direto na interface deles após importar o CSV.
-          </p>
         </Linha>
 
         <Linha label="notas internas">
