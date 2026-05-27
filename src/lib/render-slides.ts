@@ -84,6 +84,7 @@ function slideHtml(opts: {
 
   const textColor = isCapa || usaFoto ? "rgba(242,232,220,0.95)" : CASTANHO;
   const boldColor = isCapa || usaFoto ? "#fff" : OCRE_FORTE;
+  const ctaTextColor = "rgba(242,232,220,0.85)";
   const labelColor = AMBAR;
 
   return `<!DOCTYPE html>
@@ -101,7 +102,7 @@ body {
 .content {
   position:relative;z-index:1;
   display:flex;flex-direction:column;justify-content:center;
-  padding:${isCapa ? "80px 64px" : "72px 64px"};
+  padding:80px 72px;
   height:100%;
 }
 .label {
@@ -114,7 +115,8 @@ body {
   ${textShadow}
   font-weight:400;
 }
-.texto strong { color:${boldColor};font-weight:700; }
+.texto strong { color:${isCta ? "#fff" : boldColor};font-weight:700; }
+.cta-text { color:${ctaTextColor}; }
 .texto p { margin-bottom:${fontSize < 40 ? 14 : 20}px; }
 .marca {
   font-family:'EB Garamond',serif;font-size:26px;
@@ -175,8 +177,8 @@ body {
       </div>
     ` : isCta ? `
       <div style="text-align:center;">
-        <div style="margin-bottom:24px;">${GOTA_SVG}</div>
-        <div class="texto">${linhas.map((l) => `<p>${l}</p>`).join("")}</div>
+        <div style="margin-bottom:32px;">${GOTA_SVG}</div>
+        <div class="texto" style="color:${ctaTextColor};">${linhas.map((l) => `<p>${l}</p>`).join("")}</div>
         <div class="cta-btn">Começar a etapa 1, grátis</div>
         <div style="margin-top:28px;">
           <div class="sub">infonte.vivannedossantos.com</div>
