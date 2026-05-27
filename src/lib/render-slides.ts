@@ -22,12 +22,29 @@ function parseBold(s: string): string {
   return esc(s).replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
 }
 
-const GOTA_SVG = `<svg width="36" height="36" viewBox="0 0 512 512"><path d="M256 116 C198 218 166 282 166 334 A90 90 0 0 0 346 334 C346 282 314 218 256 116 Z" fill="none" stroke="${AMBAR}" stroke-width="18" stroke-linejoin="round"/><circle cx="256" cy="338" r="34" fill="${AMBAR_CLARO}"/></svg>`;
+const GOTA_SVG = `<svg width="48" height="48" viewBox="0 0 512 512"><path d="M256 116 C198 218 166 282 166 334 A90 90 0 0 0 346 334 C346 282 314 218 256 116 Z" fill="none" stroke="${AMBAR}" stroke-width="18" stroke-linejoin="round"/><circle cx="256" cy="338" r="34" fill="${AMBAR_CLARO}"/></svg>`;
 
-const MARCA = `<div style="display:flex;align-items:center;gap:10px;">
-  <svg width="22" height="22" viewBox="0 0 512 512"><path d="M256 116 C198 218 166 282 166 334 A90 90 0 0 0 346 334 C346 282 314 218 256 116 Z" fill="none" stroke="${AMBAR}" stroke-width="20" stroke-linejoin="round"/><circle cx="256" cy="338" r="34" fill="${AMBAR_CLARO}"/></svg>
-  <span style="font-family:'EB Garamond',serif;font-size:20px;letter-spacing:0.02em;">INFONTE</span>
-</div>`;
+const GOTA_ICON = (size: number, cor: string = AMBAR, fill: string = AMBAR_CLARO) =>
+  `<svg width="${size}" height="${size}" viewBox="0 0 512 512"><path d="M256 116 C198 218 166 282 166 334 A90 90 0 0 0 346 334 C346 282 314 218 256 116 Z" fill="none" stroke="${cor}" stroke-width="20" stroke-linejoin="round"/><circle cx="256" cy="338" r="34" fill="${fill}"/></svg>`;
+
+// Marca: gota 36px + "infonte" em 24px, sempre bem visível
+function marca(light: boolean): string {
+  const cor = light ? OCRE_FORTE : AMBAR;
+  const textCor = light ? CASTANHO : CREME;
+  const fill = light ? OCRE : AMBAR_CLARO;
+  return `<div style="display:flex;align-items:center;gap:12px;">
+    ${GOTA_ICON(36, cor, fill)}
+    <span style="font-family:'EB Garamond',serif;font-size:24px;color:${textCor};letter-spacing:0.02em;font-style:italic;">infonte</span>
+  </div>`;
+}
+
+// Crédito inferior: © viviannedossantos (como o FreeMe)
+function credito(light: boolean): string {
+  const cor = light ? "rgba(74,47,27,0.4)" : "rgba(255,255,255,0.4)";
+  return `<div style="display:flex;align-items:center;gap:6px;font-family:Inter,sans-serif;font-size:13px;color:${cor};">
+    <span>©</span> <span>viviannedossantos</span>
+  </div>`;
+}
 
 const ARRASTE = `<div style="display:flex;align-items:center;justify-content:center;gap:8px;font-family:Inter,sans-serif;font-size:14px;font-weight:500;letter-spacing:0.05em;">Arraste para o lado <span style="font-size:20px;">→</span></div>`;
 
@@ -72,15 +89,16 @@ function layoutFotoTopo(opts: FullOpts): string {
     : `<div style="width:100%;height:100%;background:linear-gradient(160deg,${TERRA} 0%,#3a2515 100%);"></div>
        <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 50%,rgba(184,132,61,0.15) 0%,transparent 70%);"></div>`
   }
-  <div style="position:absolute;top:28px;left:32px;color:${AMBAR};">${MARCA}</div>
+  <div style="position:absolute;top:32px;left:40px;z-index:2;">${marca(false)}</div>
 </div>
-<div style="width:${W}px;height:${textoH}px;background:${TERRA};padding:40px 56px;display:flex;flex-direction:column;justify-content:center;">
+<div style="position:relative;width:${W}px;height:${textoH}px;background:${TERRA};padding:48px 56px;display:flex;flex-direction:column;justify-content:center;">
+  <style>strong{color:#EBAE4A;font-weight:700;}</style>
   <div style="font-size:${fs}px;line-height:1.2;color:${CREME};text-shadow:0 2px 12px rgba(0,0,0,0.3);">
     ${linhas.map(l => `<p style="margin-bottom:12px;">${l}</p>`).join("")}
   </div>
-  <style>strong{color:#EBAE4A;font-weight:700;}</style>
+  <div style="position:absolute;bottom:32px;left:56px;">${credito(false)}</div>
   ${opts.slideNum && opts.totalSlides && opts.totalSlides > 1 ? `
-  <div style="position:absolute;bottom:32px;left:56px;color:rgba(255,255,255,0.5);">${ARRASTE}</div>
+  <div style="position:absolute;bottom:56px;left:0;right:0;display:flex;justify-content:center;color:rgba(255,255,255,0.5);">${ARRASTE}</div>
   <div style="position:absolute;bottom:32px;right:40px;">${paginacao(opts.slideNum, opts.totalSlides, false)}</div>` : ""}
 </div>
 </body></html>`;
@@ -107,8 +125,8 @@ function layoutFotoLado(opts: FullOpts): string {
          </div>`
     }
   </div>
-  <div style="width:58%;background:${TERRA};padding:60px 48px;display:flex;flex-direction:column;justify-content:center;">
-    <div style="color:${AMBAR};margin-bottom:24px;">${MARCA}</div>
+  <div style="width:58%;background:${TERRA};padding:60px 48px;display:flex;flex-direction:column;justify-content:center;position:relative;">
+    <div style="margin-bottom:28px;">${marca(false)}</div>
     <div style="font-size:${fs}px;line-height:1.25;color:${CREME};">
       <style>strong{color:#EBAE4A;font-weight:700;}</style>
       ${linhas.map(l => `<p style="margin-bottom:12px;">${l}</p>`).join("")}
@@ -142,15 +160,14 @@ function layoutStatement(opts: FullOpts): string {
     : `<div style="position:absolute;inset:0;background:linear-gradient(160deg,${TERRA} 0%,#3a2515 40%,#1a120a 100%);"></div>
        <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 30% 30%,rgba(184,132,61,0.12) 0%,transparent 60%);"></div>`
   }
+  <div style="position:absolute;top:36px;left:48px;z-index:2;">${marca(false)}</div>
   <div style="position:relative;z-index:1;height:100%;display:flex;flex-direction:column;justify-content:center;padding:80px 72px;text-align:center;">
-    <div style="margin-bottom:32px;">${MARCA}</div>
+    <style>strong{color:#EBAE4A;font-weight:700;}</style>
     <div style="font-size:${fs}px;line-height:1.2;color:${CREME};text-shadow:0 3px 20px rgba(0,0,0,0.5);">
-      <style>strong{color:#EBAE4A;font-weight:700;}</style>
       ${linhas.map(l => `<p style="margin-bottom:16px;">${l}</p>`).join("")}
     </div>
-    <div style="margin-top:36px;font-family:'EB Garamond',serif;font-size:22px;color:${CREME};">infonte</div>
-    <div style="font-family:Inter,sans-serif;font-size:11px;letter-spacing:0.25em;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-top:6px;">Vivianne dos Santos · Sete Ecos</div>
   </div>
+  <div style="position:absolute;bottom:32px;left:48px;z-index:2;">${credito(false)}</div>
   ${opts.slideNum && opts.totalSlides && opts.totalSlides > 1 ? `
   <div style="position:absolute;bottom:32px;left:0;right:0;z-index:2;display:flex;justify-content:center;color:rgba(255,255,255,0.5);">${ARRASTE}</div>
   <div style="position:absolute;bottom:32px;right:40px;z-index:2;">${paginacao(opts.slideNum, opts.totalSlides, false)}</div>` : ""}
@@ -174,6 +191,7 @@ function layoutCta(opts: FullOpts): string {
     : `<div style="position:absolute;inset:0;background:linear-gradient(160deg,${TERRA} 0%,#3a2515 100%);"></div>
        <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 70% 70%,rgba(184,132,61,0.12) 0%,transparent 60%);"></div>`
   }
+  <div style="position:absolute;top:36px;left:48px;z-index:2;">${marca(false)}</div>
   <div style="position:relative;z-index:1;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 64px;text-align:center;">
     <div style="margin-bottom:40px;">${GOTA_SVG}</div>
     <div style="font-size:62px;line-height:1.2;color:rgba(242,232,220,0.9);text-shadow:0 2px 16px rgba(0,0,0,0.4);">
@@ -203,14 +221,15 @@ function layoutClaro(opts: FullOpts): string {
 <div style="position:relative;width:${W}px;height:${h}px;background:linear-gradient(175deg,${CREME} 0%,#e8ddd0 60%,#ddd2c3 100%);">
   <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 60% 40%,rgba(184,132,61,0.06) 0%,transparent 50%);"></div>
   <div style="position:relative;z-index:1;height:100%;display:flex;flex-direction:column;justify-content:center;padding:80px 72px;">
-    <div style="color:${OCRE};margin-bottom:32px;">${MARCA}</div>
+    <div style="margin-bottom:32px;">${marca(true)}</div>
     <div style="font-size:${fs}px;line-height:1.25;color:${CASTANHO};">
       <style>strong{color:${OCRE_FORTE};font-weight:700;}</style>
       ${linhas.map(l => `<p style="margin-bottom:14px;">${l}</p>`).join("")}
     </div>
   </div>
+  <div style="position:absolute;bottom:32px;left:72px;">${credito(true)}</div>
   ${opts.slideNum && opts.totalSlides && opts.totalSlides > 1 ? `
-  <div style="position:absolute;bottom:32px;left:72px;color:rgba(74,47,27,0.4);">${ARRASTE}</div>
+  <div style="position:absolute;bottom:56px;left:0;right:0;display:flex;justify-content:center;color:rgba(74,47,27,0.4);">${ARRASTE}</div>
   <div style="position:absolute;bottom:32px;right:40px;">${paginacao(opts.slideNum, opts.totalSlides, true)}</div>` : ""}
 </div>
 </body></html>`;

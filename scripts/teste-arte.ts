@@ -2,7 +2,7 @@ import { renderSlides, SlideOpts } from "../src/lib/render-slides";
 import { writeFile, mkdir } from "node:fs/promises";
 import { join } from "node:path";
 
-const OUT = join(process.cwd(), "mockups", "artes-v3");
+const OUT = join(process.cwd(), "mockups", "artes-final");
 
 const slides: SlideOpts[] = [
   {
@@ -32,6 +32,17 @@ const slides: SlideOpts[] = [
     dia: 1, tema: "CTA", modo: "cta", formato: "feed",
     layout: "cta", slideNum: 5, totalSlides: 5,
     imagemUrl: `file://${join(process.cwd(), "public", "vivianne-retrato.jpg")}`,
+  },
+  {
+    texto: "A abundância não responde\na quem a persegue.\n**Responde a quem\nse basta.**",
+    dia: 8, tema: "A FRASE QUE MUDA TUDO", modo: "capa", formato: "feed",
+    layout: "statement",
+  },
+  {
+    texto: "Quem tem fome\n**aceita migalhas.**\nQuem se basta\n**cobra o que vale.**",
+    dia: 11, tema: "MIGALHAS", modo: "capa", formato: "feed",
+    layout: "foto-topo",
+    imagemUrl: `file://${join(process.cwd(), "public", "vivianne-ambiente.jpg")}`,
   },
 ];
 
