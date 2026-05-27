@@ -52,6 +52,7 @@ export function EditorPost({ post }: { post: Post }) {
   });
   const [estado, setEstado] = useState<"calmo" | "a-guardar" | "guardado" | "erro">("calmo");
   const [mensagem, setMensagem] = useState<string | null>(null);
+  const [estadoArte, setEstadoArte] = useState<"calmo" | "a-gerar" | "ok" | "erro">("calmo");
 
   function setCampo<K extends keyof typeof form>(k: K, v: (typeof form)[K]) {
     setForm({ ...form, [k]: v });
@@ -86,6 +87,44 @@ export function EditorPost({ post }: { post: Post }) {
     } catch (e: unknown) {
       setEstado("erro");
       setMensagem(e instanceof Error ? e.message : "erro a guardar");
+    }
+  }
+
+  async function gerarArte() {
+    setEstadoArte("a-gerar");
+    try {
+      const r = await fetch(`/api/admin/campanha/${post.dia}/arte`, {
+        method: "POST",
+      });
+      if (!r.ok) {
+        const j = await r.json().catch(() => ({ erro: "erro" }));
+        throw new Error(j.erro ?? "erro");
+      }
+      const contentType = r.headers.get("content-type") ?? "";
+      if (contentType.includes("image/png")) {
+        const blob = await r.blob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `infonte-dia-${post.dia}.png`;
+        a.click();
+        URL.revokeObjectURL(url);
+      } else {
+        const json = await r.json();
+        for (const img of json.imagens ?? []) {
+          const bytes = Uint8Array.from(atob(img.base64), (c) => c.charCodeAt(0));
+          const blob = new Blob([bytes], { type: "image/png" });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = img.nome;
+          a.click();
+          URL.revokeObjectURL(url);
+        }
+      }
+      setEstadoArte("ok");
+    } catch {
+      setEstadoArte("erro");
     }
   }
 
@@ -240,7 +279,30 @@ export function EditorPost({ post }: { post: Post }) {
 
         <div className="p-4 rounded-lg border border-castanho/15 bg-creme/50">
           <h3 className="font-sans text-xs uppercase tracking-[0.2em] text-oliva mb-3">
-            pré-visualização da legenda
+            Gerar arte
+          </h3>
+          <p className="text-xs text-castanho/70 mb-3">
+            Gera PNG a partir do texto da imagem, com a paleta terra da Infonte.
+          </p>
+          <button
+            type="button"
+            onClick={gerarArte}
+            disabled={estadoArte === "a-gerar" || !form.texto_imagem.trim()}
+            className="btn-quieto w-full disabled:opacity-60"
+          >
+            {estadoArte === "a-gerar" ? "A gerar..." : "Gerar arte PNG"}
+          </button>
+          {estadoArte === "ok" && (
+            <p className="text-xs text-oliva mt-2">Arte gerada. Faz download ou vê no link acima.</p>
+          )}
+          {estadoArte === "erro" && (
+            <p className="text-xs text-red-700 mt-2">Erro a gerar a arte.</p>
+          )}
+        </div>
+
+        <div className="p-4 rounded-lg border border-castanho/15 bg-creme/50">
+          <h3 className="font-sans text-xs uppercase tracking-[0.2em] text-oliva mb-3">
+            Pré-visualização da legenda
           </h3>
           <pre className="whitespace-pre-wrap font-serif text-sm text-terra-texto/90 leading-relaxed">
             {textoCompleto || "(vazio)"}
