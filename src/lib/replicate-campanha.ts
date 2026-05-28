@@ -1,10 +1,9 @@
 import { criarClienteAdmin } from "@/lib/supabase/admin";
 
-const STYLE_BASE = `editorial still life photograph, painterly contemplative atmosphere, fixed palette: deep terra #2E1D12, warm cream #F2E8DC, soft ocre #B8843D, amber gold #EBAE4A, olive #6B6B47; allowed materials: raw linen, dark walnut wood, warm terracotta ceramic, natural raffia, aged paper; allowed botanicals: dried grasses, eucalyptus, cotton branches; supports: hand-troweled warm stucco wall, worn wooden table; single oblique soft afternoon light, gentle chiaroscuro`;
-
-// Sufixo anti-pessoas. Anexado sempre, mesmo se a Claude se esquecer.
-// Repetido propositadamente para a FLUX dar mais peso.
-const SUPRESSAO = `absolutely no people, no faces, no human figures, no portraits, no bodies, no hands, no fingers, no skin, no silhouettes, no shadows of people, no text, no letters, no logos, no watermarks; pure still life only`;
+// Linha de paleta e qualidade que se anexa sempre no fim, para a FLUX
+// ler em último lugar. NÃO impõe assunto (still life, pessoas, etc.):
+// a decisão do que mostrar é da Claude, post a post.
+const QUALIDADE = `warm terra and ocre palette (#2E1D12 deep terra, #F2E8DC cream, #B8843D ocre, #EBAE4A amber gold, #6B6B47 olive), painterly editorial photography, soft natural light, gentle chiaroscuro, 9:16 vertical, high resolution, no text in image, no logos, no watermarks, no extreme close-up faces, no faces filling the frame, no portrait headshots`;
 
 // Remove flags de Midjourney (--ar, --v, etc.) que o Replicate não
 // entende. O aspect ratio passa em campo separado do input.
@@ -15,10 +14,8 @@ function limparPromptParaReplicate(prompt: string): string {
     .trim();
 }
 
-// Garante que o prompt final NUNCA sai sem a supressão. Vai no fim
-// para a FLUX ler em último lugar.
-function aplicarSupressao(prompt: string): string {
-  return `${prompt}, ${SUPRESSAO}`;
+function fixarQualidade(prompt: string): string {
+  return `${prompt}, ${QUALIDADE}`;
 }
 
 async function gerarPromptViaClaude(
@@ -37,22 +34,27 @@ async function gerarPromptViaClaude(
       max_tokens: 1024,
       messages: [{
         role: "user",
-        content: `Gera um prompt para uma imagem de fundo de um post de Instagram da marca Infonte (percurso de desenvolvimento pessoal feminino, estética terra/ocre/âmbar).
+        content: `És directora de arte da Infonte, percurso de desenvolvimento pessoal feminino com estética terra/ocre/âmbar. Vais gerar um prompt para o FLUX 1.1 Pro produzir UMA imagem para este post de Instagram.
 
 Contexto do post (dia ${contexto.dia}, tema "${contexto.tema}"):
 ${contexto.texto}
 
-O prompt deve:
-1. Descrever uma cena contemplativa, abstracta ou simbólica que transmita a emoção do texto
-2. PROIBIDO descrever ou sugerir pessoas, rostos, mãos, corpos, figuras humanas, retratos, silhuetas ou sombras de pessoas. Apenas objectos, plantas, materiais, luz e textura. Nada que sugira presença humana directa.
-3. Usar a paleta terra/ocre/âmbar/creme
-4. Ser específico nos materiais e na luz
-5. Terminar com o estilo base abaixo
+Tens liberdade criativa total para decidir o que mostra a imagem. Pensa primeiro qual é a emoção e a verdade do texto, e escolhe a representação que melhor a serve. Pode ser:
+- Uma cena com pessoa(s) a interagir num ambiente (cozinha, secretária, varanda, caminho), captadas a média ou longa distância, com naturalidade documental
+- Mãos a fazer algo (escrever, regar uma planta, segurar uma chávena) sem mostrar a cara
+- Um interior, paisagem ou objecto que simbolize a mensagem
+- Uma composição abstracta com luz, sombra e materiais
+- Qualquer mistura que faça sentido
 
-Estilo base obrigatório no fim:
-${STYLE_BASE}
+Regras inegociáveis:
+- NUNCA close-ups de cara, retratos de cabeça, ou cara a olhar directamente para a câmara
+- NUNCA texto, palavras ou logótipos dentro da imagem
+- Paleta terra (#2E1D12), creme (#F2E8DC), ocre (#B8843D), âmbar (#EBAE4A), oliva (#6B6B47). Pequenos desvios tonais ok.
+- Luz natural suave, atmosfera editorial contemplativa, vertical 9:16
 
-Devolve APENAS o prompt, sem explicações, sem aspas, sem prefixos. Uma linha.`,
+Princípio: a imagem deve conversar com o texto, não competir nem decorar. Se a frase é sobre fome, a imagem pode ser uma mesa quase vazia. Se é sobre permissão, pode ser uma porta entreaberta. Se é sobre cansaço de perseguir, pode ser passos numa estrada. Escolhe a metáfora visual que mais ressoa.
+
+Devolve APENAS o prompt para o FLUX, em inglês, uma linha, sem aspas, sem explicações, sem prefixos. Sê concreto: nomeia os materiais, os objectos, a luz, a composição.`,
       }],
     }),
   });
@@ -158,7 +160,7 @@ export async function gerarEUploadDia(opts: {
     tema: post.tema,
     texto: textoContexto,
   });
-  const prompt = aplicarSupressao(limparPromptParaReplicate(promptCru));
+  const prompt = fixarQualidade(limparPromptParaReplicate(promptCru));
 
   const imagemUrl = await chamarReplicate(opts.replicateToken, prompt);
   const buffer = await descarregar(imagemUrl);

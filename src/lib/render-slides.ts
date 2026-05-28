@@ -358,9 +358,11 @@ export function parseTextoImagemToSlides(
     const slides: SlideOpts[] = [];
     let imgIdx = 0;
 
-    // Regra editorial: imagem só onde faz sentido, ou seja, capa
-    // (enquadra) e CTA (fecha). Os slides internos ficam em texto puro
-    // para a mensagem ler-se sem distracção.
+    // A regra de qual slide leva imagem é dada pelo pool: se o pool
+    // tiver tantas imagens como slides, todos levam (Claude/MJ produziu
+    // uma por slide). Se tiver menos (caso comum: 1 imagem do Replicate),
+    // o ritmo é capa com imagem e internos a alternar imagem/texto,
+    // CTA fecha com imagem.
     slides.push({
       texto: tema, dia, tema, modo: "capa", formato: fmt,
       slideNum: 1, totalSlides: total, imagemUrl: imgPara(imgIdx++),
@@ -368,10 +370,11 @@ export function parseTextoImagemToSlides(
 
     numerados.forEach((line, i) => {
       const slideN = i + 2;
+      const podeImagem = pool.length >= total || slideN % 2 === 0;
       slides.push({
         texto: line.replace(/^\d+\.\s*/, ""), dia, tema, modo: "conteudo", formato: fmt,
         slideNum: slideN, totalSlides: total,
-        imagemUrl: undefined,
+        imagemUrl: podeImagem ? imgPara(imgIdx++) : undefined,
       });
     });
 
