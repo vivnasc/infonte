@@ -31,9 +31,21 @@ export function BotaoSeed({
     setResposta(null);
     try {
       const r = await fetch(url, { method: "POST" });
-      const json = (await r.json()) as Resposta;
+      const texto = await r.text();
+      let json: Resposta;
+      try {
+        json = JSON.parse(texto) as Resposta;
+      } catch {
+        // Vercel devolve "An error occurred..." em texto puro em timeouts
+        // e gateway errors. Mostramos o início do corpo em vez de rebentar.
+        const trecho = texto.trim().slice(0, 200);
+        json = {
+          erro: `${r.status} ${r.statusText || "resposta não-JSON"}`.trim(),
+          detalhe: trecho || "(corpo vazio)",
+        };
+      }
       setResposta(json);
-      setEstado(r.ok ? "ok" : "erro");
+      setEstado(r.ok && !json.erro ? "ok" : "erro");
     } catch (e: unknown) {
       setResposta({ erro: e instanceof Error ? e.message : "erro" });
       setEstado("erro");

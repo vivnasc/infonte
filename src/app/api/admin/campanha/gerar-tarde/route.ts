@@ -3,7 +3,7 @@ import { exigirAdmin } from "@/lib/admin";
 import { criarClienteAdmin } from "@/lib/supabase/admin";
 
 export const runtime = "nodejs";
-export const maxDuration = 120;
+export const maxDuration = 60;
 
 const TEMAS_MANHA: Record<number, string> = {
   1: "MANIFESTO", 2: "AS VINTE ABAS", 3: "O SONHO QUE NEM É TEU",
@@ -33,13 +33,13 @@ export async function POST() {
   const log: string[] = [];
   let gerados = 0;
 
-  for (let dia = 1; dia <= 30; dia++) {
+  async function processarDia(dia: number): Promise<void> {
     const temaManha = TEMAS_MANHA[dia] ?? `DIA ${dia}`;
 
     const r = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
       headers: {
-        "x-api-key": apiKey,
+        "x-api-key": apiKey!,
         "anthropic-version": "2023-06-01",
         "content-type": "application/json",
       },
@@ -76,14 +76,14 @@ Devolve APENAS o JSON, sem explicação.`,
 
     if (!r.ok) {
       log.push(`Dia ${dia}: erro Claude ${r.status}`);
-      continue;
+      return;
     }
 
     const j = await r.json();
     const texto = j.content?.[0]?.text?.trim();
     if (!texto) {
       log.push(`Dia ${dia}: resposta vazia`);
-      continue;
+      return;
     }
 
     let parsed: { texto_imagem: string; legenda: string; pergunta: string };
@@ -92,10 +92,9 @@ Devolve APENAS o JSON, sem explicação.`,
       parsed = JSON.parse(jsonStr);
     } catch {
       log.push(`Dia ${dia}: JSON inválido`);
-      continue;
+      return;
     }
 
-    // Verificar se já existe post da tarde para este dia
     const { data: existente } = await sb
       .from("campanha_posts")
       .select("id")
@@ -130,6 +129,17 @@ Devolve APENAS o JSON, sem explicação.`,
         gerados++;
       }
     }
+  }
+
+  // Processar em lotes paralelos para caber no maxDuration do Vercel
+  // (30 chamadas sequenciais à Claude ultrapassam fácil os 60s).
+  const CONCORRENCIA = 5;
+  const dias = Array.from({ length: 30 }, (_, i) => i + 1);
+  for (let i = 0; i < dias.length; i += CONCORRENCIA) {
+    const lote = dias.slice(i, i + CONCORRENCIA);
+    await Promise.all(lote.map((d) => processarDia(d).catch((e) => {
+      log.push(`Dia ${d}: excepção ${e instanceof Error ? e.message : String(e)}`);
+    })));
   }
 
   return NextResponse.json({ ok: true, gerados, log });
