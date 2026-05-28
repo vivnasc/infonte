@@ -74,7 +74,15 @@ Ao montar do zero:
    PAYPAL_ENV=sandbox                 (live só quando estiver tudo testado)
    ADMIN_EMAIL=viv.saraiva@gmail.com
    ADMIN_PASSWORD=<palavra-passe forte só tua>
+   ANTHROPIC_API_KEY=...   (gerar posts da tarde e prompts MJ)
+   REPLICATE_API_TOKEN=... (gerar imagens automáticas via FLUX 1.1 Pro)
    ```
+
+   `REPLICATE_API_TOKEN` liga o pipeline automático de imagens. No
+   editor de cada dia há "Gerar imagem automática" que chama a Claude
+   para o prompt, FLUX 1.1 Pro para a imagem, e faz upload directo
+   para o Supabase Storage. Em /admin/campanha há três botões de
+   lote (1-10, 11-20, 21-30) para correr os 30 dias.
 
    `ADMIN_EMAIL` e `ADMIN_PASSWORD` ligam um bypass directo do admin.
    Ao submeter estas credenciais em /entrar, a app põe um cookie

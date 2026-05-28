@@ -110,6 +110,33 @@ export default async function CampanhaListaPage() {
         />
       </div>
 
+      <div className="mt-6">
+        <h3 className="font-sans text-xs uppercase tracking-[0.2em] text-oliva mb-3">
+          Imagens automáticas (Replicate / FLUX 1.1 Pro)
+        </h3>
+        <p className="text-xs text-castanho/70 mb-3 max-w-leitura">
+          Três lotes de 10 dias para caber no tempo de função da Vercel.
+          Corre os três em sequência. Cada lote demora ~40s.
+        </p>
+        <div className="flex flex-wrap gap-3">
+          <BotaoSeed
+            url="/api/admin/campanha/imagens-replicate?inicio=1&fim=10&slot=manha"
+            titulo="Imagens, dias 1-10"
+            descricao="Gera as 10 primeiras imagens da manhã."
+          />
+          <BotaoSeed
+            url="/api/admin/campanha/imagens-replicate?inicio=11&fim=20&slot=manha"
+            titulo="Imagens, dias 11-20"
+            descricao="Gera as 10 imagens do meio."
+          />
+          <BotaoSeed
+            url="/api/admin/campanha/imagens-replicate?inicio=21&fim=30&slot=manha"
+            titulo="Imagens, dias 21-30"
+            descricao="Gera as últimas 10 imagens da manhã."
+          />
+        </div>
+      </div>
+
       <div className="mt-6 flex flex-wrap gap-2 text-xs">
         {(Object.keys(contagem) as Estado[]).map((e) => (
           <span

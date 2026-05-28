@@ -59,6 +59,8 @@ export function EditorPost({ post }: { post: Post }) {
   const [estadoArte, setEstadoArte] = useState<"calmo" | "a-gerar" | "ok" | "erro">("calmo");
   const [estadoMJ, setEstadoMJ] = useState<"calmo" | "a-gerar" | "ok" | "erro">("calmo");
   const [promptMJ, setPromptMJ] = useState<string | null>(null);
+  const [estadoReplicate, setEstadoReplicate] = useState<"calmo" | "a-gerar" | "ok" | "erro">("calmo");
+  const [erroReplicate, setErroReplicate] = useState<string | null>(null);
 
   function setCampo<K extends keyof typeof form>(k: K, v: (typeof form)[K]) {
     setForm({ ...form, [k]: v });
@@ -109,6 +111,35 @@ export function EditorPost({ post }: { post: Post }) {
       setEstadoMJ("ok");
     } catch {
       setEstadoMJ("erro");
+    }
+  }
+
+  async function gerarImagemReplicate() {
+    setEstadoReplicate("a-gerar");
+    setErroReplicate(null);
+    try {
+      const slot = post.slot ?? "manha";
+      const r = await fetch(
+        `/api/admin/campanha/${post.dia}/imagem-replicate?slot=${slot}`,
+        { method: "POST" }
+      );
+      const texto = await r.text();
+      let j: { ok?: boolean; url?: string; erro?: string };
+      try {
+        j = JSON.parse(texto);
+      } catch {
+        throw new Error(texto.slice(0, 200));
+      }
+      if (!r.ok || !j.url) {
+        throw new Error(j.erro ?? `erro ${r.status}`);
+      }
+      // Refresca a lista de imagens com a nova no topo.
+      setCampo("imagens", [j.url, ...form.imagens.filter((u) => u !== j.url)]);
+      setCampo("imagem_url", j.url);
+      setEstadoReplicate("ok");
+    } catch (e: unknown) {
+      setErroReplicate(e instanceof Error ? e.message : "erro");
+      setEstadoReplicate("erro");
     }
   }
 
@@ -325,6 +356,36 @@ export function EditorPost({ post }: { post: Post }) {
           )}
           {estadoMJ === "erro" && (
             <p className="text-xs text-red-700 mt-2">Erro a gerar o prompt.</p>
+          )}
+        </div>
+
+        <div className="p-4 rounded-lg border border-castanho/15 bg-creme/50">
+          <h3 className="font-sans text-xs uppercase tracking-[0.2em] text-oliva mb-3">
+            Imagem automática (Replicate)
+          </h3>
+          <p className="text-xs text-castanho/70 mb-3">
+            Gera o prompt, chama FLUX 1.1 Pro, descarrega e anexa ao post.
+            Demora 10 a 20 segundos.
+          </p>
+          <button
+            type="button"
+            onClick={gerarImagemReplicate}
+            disabled={estadoReplicate === "a-gerar"}
+            className="btn-quieto w-full disabled:opacity-60"
+          >
+            {estadoReplicate === "a-gerar"
+              ? "A gerar via Replicate..."
+              : "Gerar imagem automática"}
+          </button>
+          {estadoReplicate === "ok" && (
+            <p className="text-xs text-oliva mt-2">
+              Imagem anexada. Guarda para fixar.
+            </p>
+          )}
+          {estadoReplicate === "erro" && (
+            <p className="text-xs text-red-700 mt-2">
+              {erroReplicate ?? "erro"}
+            </p>
           )}
         </div>
 
