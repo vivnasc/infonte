@@ -115,8 +115,22 @@ export default async function CampanhaListaPage() {
           Imagens automáticas (Replicate / FLUX 1.1 Pro)
         </h3>
         <p className="text-xs text-castanho/70 mb-3 max-w-leitura">
-          Três lotes de 10 dias para caber no tempo de função da Vercel.
-          Corre os três em sequência. Cada lote demora ~40s.
+          1 imagem por dia. Faz primeiro o teste dos 3 primeiros para
+          confirmar a estética antes de gastar nos 30. Custo aproximado:
+          $0.04 por imagem.
+        </p>
+
+        <div className="mb-4">
+          <BotaoSeed
+            url="/api/admin/campanha/imagens-replicate?inicio=1&fim=3&slot=manha"
+            titulo="Testar 3 primeiros (dias 1-3)"
+            descricao="Gera só as 3 primeiras imagens. Custa ~$0.12 e demora ~30s."
+          />
+        </div>
+
+        <p className="text-xs text-castanho/60 mb-2">
+          Depois de confirmares o look, corre os três lotes de 10 em
+          sequência. Cada lote demora ~40s.
         </p>
         <div className="flex flex-wrap gap-3">
           <BotaoSeed
