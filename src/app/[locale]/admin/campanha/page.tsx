@@ -54,11 +54,12 @@ export default async function CampanhaListaPage() {
       <div>
         <h1 className="font-serif text-3xl text-castanho">campanha 30 dias</h1>
         <p className="font-serif text-terra-texto/80 mt-6 max-w-leitura">
-          Ainda não há posts em base. Corre o seed:
+          Ainda não há posts em base. Vai a{" "}
+          <Link href="/admin" className="text-ocre underline">
+            /admin
+          </Link>{" "}
+          e clica em <span className="font-medium">popular campanha</span>.
         </p>
-        <pre className="mt-4 bg-castanho/5 border border-castanho/15 rounded p-3 text-sm">
-          npm run seed:campanha
-        </pre>
       </div>
     );
   }
