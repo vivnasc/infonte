@@ -358,24 +358,23 @@ export function parseTextoImagemToSlides(
     const slides: SlideOpts[] = [];
     let imgIdx = 0;
 
-    // Capa: com imagem
+    // Regra editorial: imagem só onde faz sentido, ou seja, capa
+    // (enquadra) e CTA (fecha). Os slides internos ficam em texto puro
+    // para a mensagem ler-se sem distracção.
     slides.push({
       texto: tema, dia, tema, modo: "capa", formato: fmt,
       slideNum: 1, totalSlides: total, imagemUrl: imgPara(imgIdx++),
     });
 
-    // Slides internos: pares com imagem (cada uma diferente), ímpares sem
     numerados.forEach((line, i) => {
       const slideN = i + 2;
-      const usaImagem = slideN % 2 === 0;
       slides.push({
         texto: line.replace(/^\d+\.\s*/, ""), dia, tema, modo: "conteudo", formato: fmt,
         slideNum: slideN, totalSlides: total,
-        imagemUrl: usaImagem ? imgPara(imgIdx++) : undefined,
+        imagemUrl: undefined,
       });
     });
 
-    // CTA: com imagem
     slides.push({
       texto: "**Pára de perseguir** o que nunca foi teu.\nComeça pela etapa 1, grátis.",
       dia, tema, modo: "cta", formato: fmt,
