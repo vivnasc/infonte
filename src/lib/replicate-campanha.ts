@@ -1,6 +1,10 @@
 import { criarClienteAdmin } from "@/lib/supabase/admin";
 
-const STYLE_BASE = `editorial still life photograph, painterly contemplative atmosphere, fixed palette: deep terra #2E1D12, warm cream #F2E8DC, soft ocre #B8843D, amber gold #EBAE4A, olive #6B6B47; allowed materials: raw linen, dark walnut wood, warm terracotta ceramic, natural raffia, aged paper; allowed botanicals: dried grasses, eucalyptus, cotton branches; supports: hand-troweled warm stucco wall, worn wooden table; single oblique soft afternoon light, gentle chiaroscuro; no people, no faces, no hands, no text, no logos, no watermarks`;
+const STYLE_BASE = `editorial still life photograph, painterly contemplative atmosphere, fixed palette: deep terra #2E1D12, warm cream #F2E8DC, soft ocre #B8843D, amber gold #EBAE4A, olive #6B6B47; allowed materials: raw linen, dark walnut wood, warm terracotta ceramic, natural raffia, aged paper; allowed botanicals: dried grasses, eucalyptus, cotton branches; supports: hand-troweled warm stucco wall, worn wooden table; single oblique soft afternoon light, gentle chiaroscuro`;
+
+// Sufixo anti-pessoas. Anexado sempre, mesmo se a Claude se esquecer.
+// Repetido propositadamente para a FLUX dar mais peso.
+const SUPRESSAO = `absolutely no people, no faces, no human figures, no portraits, no bodies, no hands, no fingers, no skin, no silhouettes, no shadows of people, no text, no letters, no logos, no watermarks; pure still life only`;
 
 // Remove flags de Midjourney (--ar, --v, etc.) que o Replicate não
 // entende. O aspect ratio passa em campo separado do input.
@@ -9,6 +13,12 @@ function limparPromptParaReplicate(prompt: string): string {
     .replace(/--\w+\s+[\w:.-]+/g, "")
     .replace(/\s+/g, " ")
     .trim();
+}
+
+// Garante que o prompt final NUNCA sai sem a supressão. Vai no fim
+// para a FLUX ler em último lugar.
+function aplicarSupressao(prompt: string): string {
+  return `${prompt}, ${SUPRESSAO}`;
 }
 
 async function gerarPromptViaClaude(
@@ -34,7 +44,7 @@ ${contexto.texto}
 
 O prompt deve:
 1. Descrever uma cena contemplativa, abstracta ou simbólica que transmita a emoção do texto
-2. NÃO incluir pessoas, rostos, mãos, texto ou logótipos
+2. PROIBIDO descrever ou sugerir pessoas, rostos, mãos, corpos, figuras humanas, retratos, silhuetas ou sombras de pessoas. Apenas objectos, plantas, materiais, luz e textura. Nada que sugira presença humana directa.
 3. Usar a paleta terra/ocre/âmbar/creme
 4. Ser específico nos materiais e na luz
 5. Terminar com o estilo base abaixo
@@ -148,7 +158,7 @@ export async function gerarEUploadDia(opts: {
     tema: post.tema,
     texto: textoContexto,
   });
-  const prompt = limparPromptParaReplicate(promptCru);
+  const prompt = aplicarSupressao(limparPromptParaReplicate(promptCru));
 
   const imagemUrl = await chamarReplicate(opts.replicateToken, prompt);
   const buffer = await descarregar(imagemUrl);
