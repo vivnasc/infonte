@@ -72,9 +72,18 @@ Ao montar do zero:
    NEXT_PUBLIC_PAYPAL_CLIENT_ID=...   (depois)
    PAYPAL_CLIENT_SECRET=...           (depois)
    PAYPAL_ENV=sandbox                 (live só quando estiver tudo testado)
+   ADMIN_EMAIL=viv.saraiva@gmail.com
+   ADMIN_PASSWORD=<palavra-passe forte só tua>
    ```
 
-6. **Tornar-se admin** (depois de fazer login uma vez):
+   `ADMIN_EMAIL` e `ADMIN_PASSWORD` ligam um bypass directo do admin.
+   Ao submeter estas credenciais em /entrar, a app põe um cookie
+   assinado com `SUPABASE_SERVICE_ROLE_KEY` e redireciona para /admin,
+   sem criar conta no Supabase Auth (que é partilhado com outras apps).
+   As páginas /admin/* lêem com service-role, por isso passam por cima
+   do RLS sem precisar de sessão Supabase.
+
+6. **Tornar-se admin via Supabase** (apenas se não usares o bypass acima):
    No Supabase SQL Editor:
    ```sql
    select infonte.tornar_admin('viv.saraiva@gmail.com');
