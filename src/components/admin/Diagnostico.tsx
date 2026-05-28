@@ -73,11 +73,38 @@ function Pastilha({
       {resultado && (
         <div className="mt-2 text-[11px]">
           {resultado.ok ? (
-            <span className="text-oliva">
+            <span className="text-oliva block space-y-0.5">
               {Object.entries(resultado)
                 .filter(([k]) => k !== "ok")
-                .map(([k, v]) => `${k}: ${String(v)}`)
-                .join(" · ")}
+                .map(([k, v]) => {
+                  if (v == null) return null;
+                  if (Array.isArray(v)) {
+                    return v.length > 0 ? (
+                      <span key={k} className="block">
+                        {k}: {v.join(", ")}
+                      </span>
+                    ) : null;
+                  }
+                  if (typeof v === "object") {
+                    const entries = Object.entries(v as Record<string, unknown>);
+                    const faltam = entries.filter(([, val]) => val === false).map(([kk]) => kk);
+                    return (
+                      <span key={k} className="block">
+                        {k}:{" "}
+                        {faltam.length === 0 ? (
+                          <span className="text-oliva">todas ok</span>
+                        ) : (
+                          <span className="text-red-700">faltam {faltam.join(", ")}</span>
+                        )}
+                      </span>
+                    );
+                  }
+                  return (
+                    <span key={k} className="block">
+                      {k}: {String(v)}
+                    </span>
+                  );
+                })}
             </span>
           ) : (
             <span className="text-red-700">
@@ -97,6 +124,11 @@ function Pastilha({
 export function Diagnostico() {
   return (
     <div className="flex flex-wrap gap-3">
+      <Pastilha
+        nome="Deploy + envs"
+        url="/api/admin/auth/debug"
+        legenda="SHA do deploy actual e env vars críticas."
+      />
       <Pastilha
         nome="Claude API"
         url="/api/admin/test-claude"

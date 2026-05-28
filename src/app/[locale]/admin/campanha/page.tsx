@@ -109,6 +109,9 @@ export default async function CampanhaListaPage() {
   const totalManha = posts.filter((p) => p.slot !== "tarde").length;
   const totalTarde = posts.filter((p) => p.slot === "tarde").length;
   const comImagem = posts.filter((p) => p.imagem_url).length;
+  const semImagem = posts.length - comImagem;
+  const semTarde = 30 - totalTarde;
+  const custoImagensRestantes = (semImagem * 0.04).toFixed(2);
 
   const porSemana = [1, 2, 3, 4].map((s) => ({
     semana: s,
@@ -133,10 +136,37 @@ export default async function CampanhaListaPage() {
         </div>
       </div>
 
-      <div className="mt-6 text-xs text-castanho/60 flex flex-wrap gap-4">
-        <span>{totalManha} posts manhã</span>
-        <span>· {totalTarde} posts tarde</span>
-        <span>· {comImagem} com imagem</span>
+      <div className="mt-6 p-4 rounded-lg border border-castanho/20 bg-creme/40">
+        <div className="grid sm:grid-cols-4 gap-4 text-sm">
+          <div>
+            <div className="text-[10px] uppercase tracking-[0.2em] text-oliva">posts</div>
+            <div className="font-serif text-xl text-castanho mt-1">
+              {totalManha}<span className="text-castanho/40 text-sm"> manhã</span>
+            </div>
+            <div className="font-serif text-xl text-castanho">
+              {totalTarde}<span className="text-castanho/40 text-sm"> tarde</span>
+            </div>
+          </div>
+          <div>
+            <div className="text-[10px] uppercase tracking-[0.2em] text-oliva">imagens</div>
+            <div className="font-serif text-xl text-castanho mt-1">
+              {comImagem}<span className="text-castanho/40 text-sm">/{posts.length}</span>
+            </div>
+            <div className="text-xs text-castanho/60">{semImagem} por gerar</div>
+          </div>
+          <div>
+            <div className="text-[10px] uppercase tracking-[0.2em] text-oliva">tarde a gerar</div>
+            <div className="font-serif text-xl text-castanho mt-1">
+              {semTarde}<span className="text-castanho/40 text-sm">/30</span>
+            </div>
+            <div className="text-xs text-castanho/60">grátis (Claude)</div>
+          </div>
+          <div>
+            <div className="text-[10px] uppercase tracking-[0.2em] text-oliva">custo p/ acabar</div>
+            <div className="font-serif text-xl text-ocre mt-1">${custoImagensRestantes}</div>
+            <div className="text-xs text-castanho/60">só Replicate</div>
+          </div>
+        </div>
       </div>
 
       <Fase
