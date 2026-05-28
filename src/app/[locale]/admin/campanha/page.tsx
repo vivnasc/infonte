@@ -110,7 +110,36 @@ export default async function CampanhaListaPage() {
         />
       </div>
 
-      <div className="mt-6">
+      <div className="mt-10">
+        <h3 className="font-sans text-xs uppercase tracking-[0.2em] text-oliva mb-3">
+          Render HD via GitHub Actions (Playwright)
+        </h3>
+        <p className="text-xs text-castanho/70 mb-3 max-w-leitura">
+          Gera os PNGs dos slides em alta resolução (2160x3840) no
+          runner do GitHub, sem timeout do Vercel, e sobe directo ao
+          Supabase Storage. Cada corrida demora 2-5 minutos consoante o
+          número de dias. Acompanha o run pelo link que o botão devolve.
+        </p>
+        <div className="flex flex-wrap gap-3">
+          <BotaoSeed
+            url="/api/admin/campanha/render-submit?dias=[1,2,3]&slot=manha"
+            titulo="Render HD, teste 3 dias"
+            descricao="Testa o pipeline com os dias 1, 2 e 3 da manhã."
+          />
+          <BotaoSeed
+            url="/api/admin/campanha/render-submit?dias=all&slot=manha"
+            titulo="Render HD, 30 dias da manhã"
+            descricao="Lança render completo dos 30 dias da manhã."
+          />
+          <BotaoSeed
+            url="/api/admin/campanha/render-submit?dias=all&slot=tarde"
+            titulo="Render HD, 30 dias da tarde"
+            descricao="Lança render completo dos 30 dias da tarde."
+          />
+        </div>
+      </div>
+
+      <div className="mt-10">
         <h3 className="font-sans text-xs uppercase tracking-[0.2em] text-oliva mb-3">
           Imagens automáticas (Replicate / FLUX 1.1 Pro)
         </h3>

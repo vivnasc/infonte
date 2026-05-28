@@ -1,6 +1,12 @@
 import { chromium } from "playwright-core";
 
-const CHROME_PATH = "/opt/pw-browsers/chromium-1194/chrome-linux/chrome";
+// Caminho local para o Chromium pré-instalado, se existir. Em ambientes
+// como GitHub Actions o Playwright tem o browser instalado num path
+// default, e setamos executablePath para undefined para deixar a
+// biblioteca resolver. Pode ser sobreposto por env (PLAYWRIGHT_CHROMIUM_PATH).
+const CHROME_PATH =
+  process.env.PLAYWRIGHT_CHROMIUM_PATH ||
+  "/opt/pw-browsers/chromium-1194/chrome-linux/chrome";
 const W = 1080;
 const H_FEED = 1350;
 const H_STORY = 1920;
@@ -295,8 +301,11 @@ function inferirLayout(opts: SlideOpts): string {
 export async function renderSlides(
   slides: SlideOpts[]
 ): Promise<{ name: string; buffer: Buffer }[]> {
+  const { existsSync } = await import("node:fs");
   const browser = await chromium.launch({
-    executablePath: CHROME_PATH,
+    // Se o caminho local existir, usa-o (modo dev/Vercel custom).
+    // Caso contrário, deixa o Playwright resolver (CI/GH Actions).
+    executablePath: existsSync(CHROME_PATH) ? CHROME_PATH : undefined,
     args: ["--no-sandbox", "--disable-gpu"],
   });
   const results: { name: string; buffer: Buffer }[] = [];

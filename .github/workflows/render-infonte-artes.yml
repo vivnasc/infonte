@@ -1,0 +1,51 @@
+name: Render HD das artes Infonte
+
+on:
+  workflow_dispatch:
+    inputs:
+      dias:
+        description: 'JSON array de dias (ex: [1,2,3]) ou "all"'
+        required: false
+        default: 'all'
+        type: string
+      slot:
+        description: '"manha" (default) ou "tarde"'
+        required: false
+        default: 'manha'
+        type: string
+      job_id:
+        description: 'Identificador da pasta no Storage (ex: hd-2026-05-28)'
+        required: false
+        default: ''
+        type: string
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    env:
+      DIAS: ${{ inputs.dias }}
+      SLOT: ${{ inputs.slot }}
+      JOB_ID: ${{ inputs.job_id }}
+      SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.INFONTE_SUPABASE_SERVICE_ROLE_KEY }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Chromium for Playwright
+        run: npx playwright install chromium --with-deps
+
+      - name: Render artes HD
+        run: npx tsx scripts/render-artes-ci.ts

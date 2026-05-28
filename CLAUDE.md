@@ -84,6 +84,22 @@ Ao montar do zero:
    para o Supabase Storage. Em /admin/campanha há três botões de
    lote (1-10, 11-20, 21-30) para correr os 30 dias.
 
+   **GitHub Actions para render HD dos slides** (Playwright em CI, sem
+   o timeout do Vercel). Liga-se via:
+
+   - Vercel envs: `GITHUB_DISPATCH_TOKEN` (PAT com scope `actions:write`),
+     `GITHUB_REPO_OWNER` (vivnasc), `GITHUB_REPO_NAME` (infonte),
+     `GITHUB_DISPATCH_REF` (main).
+   - GitHub repo secrets (Settings > Secrets and variables > Actions):
+     `INFONTE_SUPABASE_SERVICE_ROLE_KEY` e `NEXT_PUBLIC_SUPABASE_URL`.
+
+   O endpoint `/api/admin/campanha/render-submit` dispara o workflow
+   `.github/workflows/render-infonte-artes.yml`, que corre
+   `scripts/render-artes-ci.ts` em Node 20 com Chromium do Playwright,
+   gera as PNGs em 2160x3840 e faz upload para
+   `infonte-assets/infonte-campanha-hd/<jobId>/`. Em /admin/campanha
+   há três botões para teste 3 dias, 30 dias da manhã, 30 dias da tarde.
+
    `ADMIN_EMAIL` e `ADMIN_PASSWORD` ligam um bypass directo do admin.
    Ao submeter estas credenciais em /entrar, a app põe um cookie
    assinado com `SUPABASE_SERVICE_ROLE_KEY` e redireciona para /admin,
