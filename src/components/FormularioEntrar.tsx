@@ -27,6 +27,21 @@ export function FormularioEntrar({
     setA(true);
     const supabase = criarClienteBrowser();
     try {
+      if (modo === "entrar") {
+        // Bypass de admin via env vars (ADMIN_EMAIL / ADMIN_PASSWORD na
+        // Vercel). Como o projeto Supabase é partilhado, não criamos
+        // conta lá só para administrar a Infonte.
+        const r = await fetch("/api/admin/entrar", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ email, password }),
+        });
+        if (r.ok) {
+          window.location.href = "/admin";
+          return;
+        }
+      }
+
       if (modo === "registar") {
         const { error } = await supabase.auth.signUp({
           email,

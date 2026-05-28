@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { criarClienteServidor } from "@/lib/supabase/server";
+import { criarClienteAdmin } from "@/lib/supabase/admin";
 import { EditorPost } from "@/components/admin/EditorPost";
 import { Link } from "@/i18n/routing";
 
@@ -15,7 +15,7 @@ export default async function EditarPostPage({
   const dia = parseInt(diaStr, 10);
   if (!Number.isFinite(dia) || dia < 1 || dia > 30) notFound();
 
-  const supabase = await criarClienteServidor();
+  const supabase = criarClienteAdmin();
 
   // Carregar todos os posts deste dia (manhã e/ou tarde)
   const { data: posts } = await supabase

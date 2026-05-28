@@ -1,4 +1,4 @@
-import { criarClienteServidor } from "@/lib/supabase/server";
+import { criarClienteAdmin } from "@/lib/supabase/admin";
 import { Link } from "@/i18n/routing";
 import { BotaoSeed } from "@/components/admin/BotaoSeed";
 
@@ -40,7 +40,7 @@ const corEstado: Record<Estado, string> = {
 };
 
 export default async function CampanhaListaPage() {
-  const supabase = await criarClienteServidor();
+  const supabase = criarClienteAdmin();
   const { data: posts } = await supabase
     .from("campanha_posts")
     .select(
