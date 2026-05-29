@@ -78,10 +78,35 @@ export async function POST() {
     }
   }
 
+  // 3. Renomear tarde para "Eco · ${manha}" em vez de "(emocional)".
+  let relabeled = 0;
+  const { data: tardes } = await sb
+    .from("campanha_posts")
+    .select("id, tema")
+    .eq("slot", "tarde");
+  for (const p of (tardes ?? []) as { id: string; tema: string }[]) {
+    const t = p.tema ?? "";
+    if (t.startsWith("Eco · ")) continue;
+    let novo = t;
+    const m = t.match(/^(.+?)\s*\(emocional\)\s*$/i);
+    if (m) novo = `Eco · ${m[1].trim()}`;
+    else if (t) novo = `Eco · ${t.trim()}`;
+    else continue;
+    const { error: e } = await sb
+      .from("campanha_posts")
+      .update({ tema: novo })
+      .eq("id", p.id);
+    if (!e) {
+      relabeled++;
+      log.push(`Tema ${t} → ${novo}`);
+    }
+  }
+
   return NextResponse.json({
     ok: true,
     apagados,
     semanaAjustada,
+    relabeled,
     log,
   });
 }

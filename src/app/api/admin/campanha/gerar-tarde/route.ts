@@ -132,7 +132,7 @@ Devolve APENAS o JSON, sem explicação.`,
       const { error } = await sb.from("campanha_posts").insert({
         dia,
         semana: Math.min(4, Math.ceil(dia / 7)),
-        tema: `${temaManha} (emocional)`,
+        tema: `Eco · ${temaManha}`,
         formato: "post-unico",
         texto_imagem: parsed.texto_imagem,
         legenda: parsed.legenda,

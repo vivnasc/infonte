@@ -2,7 +2,15 @@
 
 import { useState } from "react";
 import { DropImagens } from "./DropImagens";
-import { PreviewCarrossel } from "./PreviewCarrossel";
+import { EditorPreviewPane } from "./EditorPreviewPane";
+import { EditorSlidesNav } from "./EditorSlidesNav";
+
+type SlideInfoLista = {
+  idx: number;
+  modo: "capa" | "conteudo" | "cta";
+  layout?: string;
+  temImagem: boolean;
+};
 
 type Post = {
   id: string;
@@ -65,6 +73,8 @@ export function EditorPost({ post }: { post: Post }) {
   // Trigger para forçar refresh da pré-visualização (ao guardar, ao
   // gerar imagem nova, ou ao mudar imagens). Incrementa o contador.
   const [previewKey, setPreviewKey] = useState(0);
+  const [slidesLista, setSlidesLista] = useState<SlideInfoLista[]>([]);
+  const [slideActual, setSlideActual] = useState(1);
 
   function setCampo<K extends keyof typeof form>(k: K, v: (typeof form)[K]) {
     setForm({ ...form, [k]: v });
@@ -191,14 +201,18 @@ export function EditorPost({ post }: { post: Post }) {
   const textoCompleto = composarTextoFinal(form);
 
   return (
-    <div className="space-y-8">
-      <PreviewCarrossel
-        dia={post.dia}
-        slot={post.slot ?? "manha"}
-        refreshKey={previewKey}
-      />
-
-      <div className="grid lg:grid-cols-[1fr_320px] gap-10">
+    <div>
+      <div className="grid lg:grid-cols-[340px_1fr_320px] gap-6 items-start">
+      <div className="space-y-4 lg:sticky lg:top-4">
+        <EditorPreviewPane
+          dia={post.dia}
+          slot={post.slot ?? "manha"}
+          refreshKey={previewKey}
+          onSlidesCarregados={setSlidesLista}
+          slideActual={slideActual}
+          setSlideActual={setSlideActual}
+        />
+      </div>
       <div className="space-y-6">
         <Linha label="formato">
           <select
@@ -291,6 +305,12 @@ export function EditorPost({ post }: { post: Post }) {
       </div>
 
       <aside className="space-y-6">
+        <EditorSlidesNav
+          slides={slidesLista}
+          actual={slideActual}
+          onSelecionar={setSlideActual}
+        />
+
         <div className="estudio-card-elevado">
           <h3 className="font-sans text-xs uppercase tracking-[0.25em] text-[var(--oliva)] mb-3">
             agendar
