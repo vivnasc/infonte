@@ -22,16 +22,23 @@ const TEMAS_MANHA: Record<number, string> = {
   28: "PAGAS UMA VEZ", 29: "A ETAPA 1 É GRÁTIS", 30: "PÁRA DE PERSEGUIR",
 };
 
-export async function POST() {
+export async function POST(request: Request) {
   const admin = await exigirAdmin();
   if (!admin) return NextResponse.json({ erro: "acesso negado" }, { status: 403 });
 
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) return NextResponse.json({ erro: "ANTHROPIC_API_KEY ausente" }, { status: 500 });
 
+  // Aceitar intervalos para suportar retoma e evitar timeout do Vercel.
+  // Default = 1-30 (todos), mas é seguro chamar com 1-10, 11-20, 21-30.
+  const url = new URL(request.url);
+  const inicio = Math.max(1, parseInt(url.searchParams.get("inicio") ?? "1", 10));
+  const fim = Math.min(30, parseInt(url.searchParams.get("fim") ?? "30", 10));
+
   const sb = criarClienteAdmin();
   const log: string[] = [];
   let gerados = 0;
+  let saltados = 0;
 
   async function processarDia(dia: number): Promise<void> {
     const temaManha = TEMAS_MANHA[dia] ?? `DIA ${dia}`;
@@ -97,10 +104,18 @@ Devolve APENAS o JSON, sem explicação.`,
 
     const { data: existente } = await sb
       .from("campanha_posts")
-      .select("id")
+      .select("id, texto_imagem")
       .eq("dia", dia)
       .eq("slot", "tarde")
       .maybeSingle();
+
+    // Idempotência: se já existe com texto, salta (não chama a Claude
+    // por nada). Útil para retomar lotes sem re-pagar tokens.
+    if (existente && existente.texto_imagem?.trim()) {
+      saltados++;
+      log.push(`Dia ${dia}: já existia, saltado`);
+      return;
+    }
 
     if (existente) {
       await sb.from("campanha_posts").update({
@@ -108,6 +123,7 @@ Devolve APENAS o JSON, sem explicação.`,
         legenda: parsed.legenda,
         pergunta: parsed.pergunta,
       }).eq("id", existente.id);
+      gerados++;
       log.push(`Dia ${dia}: atualizado`);
     } else {
       const { error } = await sb.from("campanha_posts").insert({
@@ -131,10 +147,11 @@ Devolve APENAS o JSON, sem explicação.`,
     }
   }
 
-  // Processar em lotes paralelos para caber no maxDuration do Vercel
-  // (30 chamadas sequenciais à Claude ultrapassam fácil os 60s).
-  const CONCORRENCIA = 5;
-  const dias = Array.from({ length: 30 }, (_, i) => i + 1);
+  // Processar em lotes paralelos. Concorrência alta + intervalo de 1-10
+  // ou 11-20 ou 21-30 evita o timeout do Vercel.
+  const CONCORRENCIA = 10;
+  const dias: number[] = [];
+  for (let d = inicio; d <= fim; d++) dias.push(d);
   for (let i = 0; i < dias.length; i += CONCORRENCIA) {
     const lote = dias.slice(i, i + CONCORRENCIA);
     await Promise.all(lote.map((d) => processarDia(d).catch((e) => {
@@ -142,5 +159,13 @@ Devolve APENAS o JSON, sem explicação.`,
     })));
   }
 
-  return NextResponse.json({ ok: true, gerados, log });
+  return NextResponse.json({
+    ok: true,
+    inicio,
+    fim,
+    gerados,
+    saltados,
+    total: dias.length,
+    log,
+  });
 }

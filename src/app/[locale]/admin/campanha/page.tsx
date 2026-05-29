@@ -5,6 +5,7 @@ import { Diagnostico } from "@/components/admin/Diagnostico";
 import { BotaoBulkImagens } from "@/components/admin/BotaoBulkImagens";
 import { CardRetoma } from "@/components/admin/CardRetoma";
 import { BotaoSyncRender } from "@/components/admin/BotaoSyncRender";
+import { ProduzirTudo } from "@/components/admin/ProduzirTudo";
 
 type Estado = "rascunho" | "rendering" | "failed" | "pronto" | "agendado" | "publicado";
 
@@ -151,19 +152,33 @@ export default async function CampanhaListaPage() {
         </div>
       </div>
 
+      <div className="mt-10">
+        <ProduzirTudo />
+      </div>
+
       <Fase numero={0} titulo="Diagnóstico" subtitulo="Testa as integrações antes de produzir. Faz isto sempre primeiro.">
         <Diagnostico />
       </Fase>
 
-      <Fase numero={1} titulo="Conteúdo" subtitulo="Formatar bold nas artes e gerar os posts emocionais da tarde via Claude. Idempotente." custo="grátis (texto)">
-        <div className="flex flex-wrap gap-3">
-          <BotaoSeed url="/api/admin/campanha/formatar-bold" titulo="Aplicar bold aos 30 posts" descricao="Mete **negrito** nas palavras-chave do texto das artes." />
-          <BotaoSeed url="/api/admin/campanha/gerar-tarde" titulo="Gerar 30 posts da tarde (Claude)" descricao="Posts emocionais das 13h, par emocional do didáctico das 10h." />
+      <Fase numero={1} titulo="Conteúdo" subtitulo="Bold nas artes + posts emocionais da tarde (Claude). Idempotente: salta dias que já têm conteúdo." custo="grátis (texto)">
+        <div className="space-y-4">
+          <div>
+            <div className="text-[10px] uppercase tracking-[0.25em] text-[var(--texto-mudo)] mb-2">bold das artes</div>
+            <BotaoSeed url="/api/admin/campanha/formatar-bold" titulo="Aplicar bold aos 30 posts" descricao="Mete **negrito** nas palavras-chave do texto das artes." />
+          </div>
+          <div>
+            <div className="text-[10px] uppercase tracking-[0.25em] text-[var(--texto-mudo)] mb-2">posts da tarde (3 lotes para caber no timeout)</div>
+            <div className="flex flex-wrap gap-3">
+              <BotaoSeed url="/api/admin/campanha/gerar-tarde?inicio=1&fim=10" titulo="Tarde, dias 1-10" descricao="10 posts emocionais via Claude." />
+              <BotaoSeed url="/api/admin/campanha/gerar-tarde?inicio=11&fim=20" titulo="Tarde, dias 11-20" descricao="10 posts emocionais via Claude." />
+              <BotaoSeed url="/api/admin/campanha/gerar-tarde?inicio=21&fim=30" titulo="Tarde, dias 21-30" descricao="10 posts emocionais via Claude." />
+            </div>
+          </div>
         </div>
         <p className="text-[11px] text-[var(--texto-mudo)] mt-3 max-w-leitura">
           Menção do autor é injectada automaticamente no CSV se a env
           <code className="text-[var(--ambar)] mx-1">CAPTION_AUTHOR_TAG</code>
-          estiver definida. Vê o estado actual no Diagnóstico → Deploy + envs.
+          estiver definida.
         </p>
       </Fase>
 

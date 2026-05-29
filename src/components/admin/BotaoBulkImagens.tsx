@@ -170,6 +170,25 @@ export function BotaoBulkImagens({ inicio, fim, slot, titulo, defaultStrategy }:
               {resposta.detalhe && <div className="mt-1 opacity-70">{resposta.detalhe}</div>}
             </div>
           )}
+
+          {estado === "ok" && (
+            <div className="mt-2 flex flex-wrap gap-2 text-[var(--ambar)]">
+              <span className="text-[var(--texto-mudo)]">ver →</span>
+              {Array.from({ length: fim - inicio + 1 }, (_, i) => inicio + i).slice(0, 6).map((d) => (
+                <a
+                  key={d}
+                  href={`/admin/campanha/${d}?slot=${slot}`}
+                  className="hover:underline"
+                >
+                  dia {d}
+                </a>
+              ))}
+              <a href="/admin/biblioteca" className="hover:underline text-[var(--ambar-claro)]">
+                · biblioteca completa
+              </a>
+            </div>
+          )}
+
           {resposta.log && resposta.log.length > 0 && (
             <details className="mt-2">
               <summary className="cursor-pointer text-[var(--texto-mudo)]">
