@@ -16,7 +16,7 @@ export async function GET() {
   const sb = criarClienteAdmin();
   const { data: posts, error } = await sb
     .from("campanha_posts")
-    .select("id, dia, semana, slot, texto_imagem, criada_em");
+    .select("id, dia, semana, slot, texto_imagem, criado_em");
 
   if (error) return NextResponse.json({ erro: error.message }, { status: 500 });
 

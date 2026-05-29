@@ -7,7 +7,7 @@ export const runtime = "nodejs";
 // POST sem body. Faz duas correcções:
 //
 // 1) Duplicados: para cada (dia, slot) com mais de uma linha, mantém
-//    a mais antiga (criada_em mais cedo) e APAGA as outras. A mais
+//    a mais antiga (criado_em mais cedo) e APAGA as outras. A mais
 //    antiga é, em regra, a original do seed.
 // 2) Semana errada: actualiza p.semana para Math.ceil(p.dia/7).
 //
@@ -19,7 +19,7 @@ export async function POST() {
   const sb = criarClienteAdmin();
   const { data: posts, error } = await sb
     .from("campanha_posts")
-    .select("id, dia, semana, slot, criada_em");
+    .select("id, dia, semana, slot, criado_em");
 
   if (error) return NextResponse.json({ erro: error.message }, { status: 500 });
 
@@ -29,7 +29,7 @@ export async function POST() {
   let semanaAjustada = 0;
 
   // 1. Duplicados
-  type Linha = { id: string; dia: number; semana: number | null; slot: string | null; criada_em: string | null };
+  type Linha = { id: string; dia: number; semana: number | null; slot: string | null; criado_em: string | null };
   const porChave = new Map<string, Linha[]>();
   for (const p of lista as Linha[]) {
     const slot = p.slot ?? "manha";
@@ -42,8 +42,8 @@ export async function POST() {
   for (const [k, arr] of porChave.entries()) {
     if (arr.length <= 1) continue;
     arr.sort((a, b) => {
-      const ta = a.criada_em ? new Date(a.criada_em).getTime() : 0;
-      const tb = b.criada_em ? new Date(b.criada_em).getTime() : 0;
+      const ta = a.criado_em ? new Date(a.criado_em).getTime() : 0;
+      const tb = b.criado_em ? new Date(b.criado_em).getTime() : 0;
       return ta - tb;
     });
     const [manter, ...remover] = arr;
