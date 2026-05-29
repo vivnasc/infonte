@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Link } from "@/i18n/routing";
+import { PreviewSemana } from "./PreviewSemana";
 
 // Modo guiado: leva a Vivianne, passo a passo, do estado actual até
 // "CSV pronto para o Metricool". Cada passo tem 3 estados visíveis:
@@ -428,6 +429,11 @@ export function ModoGuiado() {
                 </button>
               ))}
             </div>
+
+            <div className="mb-3">
+              <PreviewSemana semana={s4semana} slot="manha" />
+            </div>
+
             <div className="flex flex-wrap gap-2">
               <BlocoAcao
                 estado={s4}
