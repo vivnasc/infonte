@@ -40,7 +40,7 @@ const ROTULO_STRATEGY: Record<Strategy, string> = {
 };
 
 export function BotaoBulkImagens({ inicio, fim, slot, titulo, defaultStrategy }: Props) {
-  const [strategy, setStrategy] = useState<Strategy>(defaultStrategy ?? "always-new");
+  const [strategy, setStrategy] = useState<Strategy>(defaultStrategy ?? "prefer-existing");
   const [estimativa, setEstimativa] = useState<Estimativa | null>(null);
   const [estado, setEstado] = useState<"calmo" | "a-correr" | "ok" | "erro">("calmo");
   const [resposta, setResposta] = useState<Resposta | null>(null);

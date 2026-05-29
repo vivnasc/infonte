@@ -192,9 +192,18 @@ export default async function CampanhaListaPage() {
           <div>
             <div className="text-[10px] uppercase tracking-[0.25em] text-[var(--texto-mudo)] mb-2">lotes completos</div>
             <div className="flex flex-wrap gap-3">
-              <BotaoBulkImagens inicio={1} fim={10} slot="manha" titulo="Dias 1-10" />
-              <BotaoBulkImagens inicio={11} fim={20} slot="manha" titulo="Dias 11-20" />
-              <BotaoBulkImagens inicio={21} fim={30} slot="manha" titulo="Dias 21-30" />
+              <BotaoBulkImagens inicio={1} fim={5} slot="manha" titulo="Manhã 1-5" />
+              <BotaoBulkImagens inicio={6} fim={10} slot="manha" titulo="Manhã 6-10" />
+              <BotaoBulkImagens inicio={11} fim={15} slot="manha" titulo="Manhã 11-15" />
+              <BotaoBulkImagens inicio={16} fim={20} slot="manha" titulo="Manhã 16-20" />
+              <BotaoBulkImagens inicio={21} fim={25} slot="manha" titulo="Manhã 21-25" />
+              <BotaoBulkImagens inicio={26} fim={30} slot="manha" titulo="Manhã 26-30" />
+              <BotaoBulkImagens inicio={1} fim={5} slot="tarde" titulo="Tarde 1-5" />
+              <BotaoBulkImagens inicio={6} fim={10} slot="tarde" titulo="Tarde 6-10" />
+              <BotaoBulkImagens inicio={11} fim={15} slot="tarde" titulo="Tarde 11-15" />
+              <BotaoBulkImagens inicio={16} fim={20} slot="tarde" titulo="Tarde 16-20" />
+              <BotaoBulkImagens inicio={21} fim={25} slot="tarde" titulo="Tarde 21-25" />
+              <BotaoBulkImagens inicio={26} fim={30} slot="tarde" titulo="Tarde 26-30" />
             </div>
           </div>
         </div>
