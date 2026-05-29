@@ -25,29 +25,40 @@ const PROMPT_MANHA = (texto: string, legenda: string) => `És a Vivianne dos San
 Legenda completa do post:
 "${legenda}"
 
-Expande esta ideia num carrossel de 5 slides para Instagram. Cada slide é UMA frase curta (1-2 linhas), numerada (1. 2. 3. 4. 5.).
+Expande esta ideia num carrossel de 10 slides para Instagram. Cada slide é UMA frase curta (1-2 linhas), numerada (1. 2. 3. ... 10.).
 
-Estrutura:
-- Slide 1: hook impactante (o statement actual ou variação muito próxima)
-- Slide 2: contexto / observação concreta (onde isto aparece na vida da mulher)
-- Slide 3: o porquê (a razão por trás, vai mais fundo)
-- Slide 4: a consequência (o custo de não ver isto, ou o ganho de ver)
-- Slide 5: convite à reflexão ou frase-âncora (não CTA de venda)
+Estrutura sugerida (mas não copies à letra, varia):
+- Slide 1: hook impactante (o statement actual ou variação próxima)
+- Slide 2: reconhecimento (onde isto aparece concretamente na vida dela)
+- Slide 3: quebra (uma contradição inesperada, o que ninguém diz)
+- Slide 4: o porquê profundo (camada 1)
+- Slide 5: o que está por trás (camada 2, mais fundo)
+- Slide 6: cena concreta (uma situação real e curta)
+- Slide 7: a consequência (o que custa não ver)
+- Slide 8: o que abre quando se vê (o ganho)
+- Slide 9: a pergunta que para o scroll
+- Slide 10: âncora / verdade que fica (não CTA de venda)
 
 Regras de voz (não negociáveis):
 - pt-PT, segunda pessoa (tu), íntima
 - Sem travessões longos
-- Sem guru: NUNCA usar "universo", "manifesta", "mindset", "abundância" sozinha, "energia", "vibração", "frequência", "alma", "cura", "luz", "alinhamento"
+- Sem guru: NUNCA "universo", "manifesta", "mindset", "abundância" sozinha, "energia", "vibração", "frequência", "alma", "cura", "luz", "alinhamento"
 - Sem coach: "abraça-te", "ama-te", "tu és luz"
 - Sem inglês de marketing: "hustle", "growth", "mindset"
+- Frases curtas. Verbos fortes. Concreto sobre abstracto.
 - Tom: quem se bastou a falar para quem persegue. Calma com autoridade.
 
-Devolve APENAS as 5 linhas, no formato:
-1. [primeira linha]
-2. [segunda linha]
-3. [terceira linha]
-4. [quarta linha]
-5. [quinta linha]
+Devolve APENAS as 10 linhas numeradas, no formato:
+1. [linha]
+2. [linha]
+3. [linha]
+4. [linha]
+5. [linha]
+6. [linha]
+7. [linha]
+8. [linha]
+9. [linha]
+10. [linha]
 
 Nada mais. Sem prefácio, sem aspas, sem explicação.`;
 
@@ -56,14 +67,19 @@ const PROMPT_TARDE = (texto: string, tema: string) => `És a Vivianne dos Santos
 Tema: "${tema}"
 Frase única actual na arte: "${texto}"
 
-Expande em 5 slides numerados que aprofundam o reconhecimento. A tarde NÃO ensina, RECONHECE. Cada slide intensifica o sentir, sem soluções.
+Expande em 10 slides numerados que aprofundam o reconhecimento emocional. A tarde NÃO ensina, RECONHECE. Cada slide intensifica o sentir, sem soluções, sem conselho.
 
-Estrutura:
+Estrutura sugerida (varia, não copies à letra):
 - Slide 1: o feeling raw (a frase actual ou eco próximo)
-- Slide 2: o gesto concreto (onde isto se manifesta no corpo ou no dia)
-- Slide 3: o que está por trás daquele feeling
-- Slide 4: a verdade nua que custa admitir
-- Slide 5: o silêncio que fica (frase que para o scroll, não conclui)
+- Slide 2: onde aparece no corpo (peso no peito, aperto na garganta, o que for)
+- Slide 3: onde aparece no dia (que momento, que gesto)
+- Slide 4: o que está por trás (camada 1)
+- Slide 5: mais fundo (camada 2)
+- Slide 6: a verdade que custa admitir
+- Slide 7: o peso de carregar isto sozinha
+- Slide 8: o que se sente quando se nomeia (alívio mínimo, não solução)
+- Slide 9: a frase que para o scroll
+- Slide 10: o silêncio depois (frase que NÃO conclui, deixa em aberto)
 
 Cada slide UMA frase curta (1-2 linhas).
 
@@ -74,12 +90,17 @@ Regras de voz (não negociáveis):
 - Sem coach: "abraça-te", "ama-te", "tu mereces tudo"
 - Tom: quem sente isto a sussurrar para quem também sente.
 
-Devolve APENAS:
-1. [primeira linha]
-2. [segunda linha]
-3. [terceira linha]
-4. [quarta linha]
-5. [quinta linha]
+Devolve APENAS as 10 linhas numeradas:
+1. [linha]
+2. [linha]
+3. [linha]
+4. [linha]
+5. [linha]
+6. [linha]
+7. [linha]
+8. [linha]
+9. [linha]
+10. [linha]
 
 Sem prefácio, sem aspas.`;
 
@@ -109,7 +130,7 @@ async function expandirComClaude(
     },
     body: JSON.stringify({
       model: "claude-sonnet-4-6",
-      max_tokens: 800,
+      max_tokens: 1500,
       messages: [{ role: "user", content: prompt }],
     }),
   });
@@ -117,10 +138,10 @@ async function expandirComClaude(
   const j = await r.json();
   const out = j.content?.[0]?.text?.trim();
   if (!out) return null;
-  // Verificar que tem pelo menos 5 linhas numeradas
+  // Verificar que tem pelo menos 10 linhas numeradas
   const lines = out.split("\n").filter((l: string) => /^\d+\.\s+.+/.test(l.trim()));
-  if (lines.length < 5) return null;
-  return lines.slice(0, 5).join("\n");
+  if (lines.length < 10) return null;
+  return lines.slice(0, 10).join("\n");
 }
 
 export async function POST(request: Request) {
