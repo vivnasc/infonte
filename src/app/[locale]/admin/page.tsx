@@ -3,6 +3,7 @@ import { BotaoSeed } from "@/components/admin/BotaoSeed";
 import { BotaoSyncRender } from "@/components/admin/BotaoSyncRender";
 import { BotaoRenderSemana } from "@/components/admin/BotaoRenderSemana";
 import { BotaoResetRendering } from "@/components/admin/BotaoResetRendering";
+import { WorkflowsRender } from "@/components/admin/WorkflowsRender";
 import { ModoGuiado } from "@/components/admin/ModoGuiado";
 import { criarClienteAdmin } from "@/lib/supabase/admin";
 
@@ -253,7 +254,8 @@ export default async function PainelPage() {
           </table>
         </div>
 
-        <div className="mt-4">
+        <div className="mt-4 grid lg:grid-cols-[1fr_1fr] gap-4 items-start">
+          <WorkflowsRender />
           <BotaoSyncRender />
         </div>
       </section>
