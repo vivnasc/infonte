@@ -156,6 +156,7 @@ export default async function CampanhaListaPage() {
         <div className="flex flex-wrap gap-3">
           <BotaoSeed url="/api/admin/campanha/formatar-bold" titulo="Aplicar bold aos 30 posts" descricao="Mete **negrito** nas palavras-chave do texto das artes." />
           <BotaoSeed url="/api/admin/campanha/gerar-tarde" titulo="Gerar 30 posts da tarde (Claude)" descricao="Posts emocionais das 13h, par emocional do didáctico das 10h." />
+          <BotaoSeed url="/api/admin/campanha/taguear" titulo="Tagar @vivianne.dos.santos" descricao="Acrescenta a menção ao fim de todas as 60 legendas. Idempotente, não duplica." />
         </div>
       </Fase>
 
