@@ -298,8 +298,8 @@ export function ModoGuiado() {
         bloqueado={!passo2Feito}
         sumario={
           passo3Feito
-            ? `✓ 30/30 com imagem`
-            : `${30 - estado.semImagem}/30 com imagem · ${estado.semImagem} por gerar`
+            ? `✓ 60/60 com imagem (manhã + tarde)`
+            : `manhã ${30 - estado.semImagemManha}/30 · tarde ${30 - estado.semImagemTarde}/30 · ${estado.semImagemManha + estado.semImagemTarde} por gerar`
         }
       >
         {passo2Feito && (
@@ -374,7 +374,7 @@ export function ModoGuiado() {
                 textoOk={msg.s3manha}
                 textoErro={msg.s3manhaerr}
                 exec={async () => {
-                  setS3img("a-correr");
+                  setS3manha("a-correr");
                   const lotes = ["1&fim=10", "11&fim=20", "21&fim=30"];
                   let totalGerados = 0;
                   let totalReusados = 0;
@@ -384,14 +384,14 @@ export function ModoGuiado() {
                       { method: "POST" }
                     );
                     if (!ok) {
-                      setS3img("erro");
+                      setS3manha("erro");
                       setMsg((m) => ({ ...m, s3manhaerr: String(json.erro ?? "erro") }));
                       return;
                     }
                     totalGerados += Number(json.gerados ?? 0);
                     totalReusados += Number(json.reusados ?? 0);
                   }
-                  setS3img("ok");
+                  setS3manha("ok");
                   setMsg((m) => ({
                     ...m,
                     s3manha: `${totalGerados} gerados · ${totalReusados} reusados`,
