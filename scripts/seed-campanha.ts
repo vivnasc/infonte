@@ -36,21 +36,31 @@ function detectarFormato(raw: string): string | null {
   return m[1].trim();
 }
 
+function limparSeparadores(s: string | null): string | null {
+  if (!s) return s;
+  const out = s
+    .split("\n")
+    .filter((linha) => !/^[\s─━_*\-]+$/.test(linha))
+    .join("\n")
+    .trim();
+  return out || null;
+}
+
 function extrairBloco(raw: string, etiqueta: string): string | null {
-  // Apanha um bloco que começa em "Etiqueta:" e vai até à próxima etiqueta conhecida ou fim.
-  // Aceita também "Etiqueta (qualquer coisa):" — por exemplo a markdown
-  // tem "Slides (texto sobre fundo terra):" e isso deve ser tratado
-  // como "Slides:".
   const etiquetas = ["Slides:", "Texto na imagem:", "Legenda:", "Pergunta:", "Formato:"];
   const etBase = etiqueta.replace(/:$/, "");
   const idx = raw.search(
     new RegExp(
-      `^${etBase}\\s*$|^${etBase}\\s|^${etBase}\\s*\\([^)]*\\)\\s*:`,
+      `^${etBase}:\\s*$|^${etBase}:\\s|^${etBase}\\s*\\([^)]*\\)\\s*:`,
       "m"
     )
   );
   if (idx < 0) return null;
-  const inicio = raw.indexOf("\n", idx) + 1;
+  const linhaFim = raw.indexOf("\n", idx);
+  const linha = raw.slice(idx, linhaFim < 0 ? raw.length : linhaFim);
+  const inlineMatch = linha.match(new RegExp(`^${etBase}[^:]*:\\s*(.*)$`));
+  const inlineContent = inlineMatch ? inlineMatch[1].trim() : "";
+  const inicio = linhaFim < 0 ? raw.length : linhaFim + 1;
   let fim = raw.length;
   for (const e of etiquetas) {
     if (e === etiqueta) continue;
@@ -65,7 +75,11 @@ function extrairBloco(raw: string, etiqueta: string): string | null {
       if (pos < fim) fim = pos;
     }
   }
-  return raw.slice(inicio, fim).trim();
+  const rest = raw.slice(inicio, fim).trim();
+  const combined = inlineContent
+    ? (rest ? `${inlineContent}\n${rest}` : inlineContent)
+    : rest || null;
+  return limparSeparadores(combined);
 }
 
 function parsePosts(raw: string, semana: number): Post[] {

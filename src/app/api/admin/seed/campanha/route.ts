@@ -32,42 +32,58 @@ function detectarFormato(raw: string): string | null {
   return m[1].trim();
 }
 
+function limparSeparadores(s: string | null): string | null {
+  if (!s) return s;
+  const out = s
+    .split("\n")
+    .filter((linha) => !/^[\s─━_*\-]+$/.test(linha))
+    .join("\n")
+    .trim();
+  return out || null;
+}
+
 function extrairBloco(raw: string, etiqueta: string): string | null {
-  // Apanha um bloco que começa em "Etiqueta:" e vai até à próxima etiqueta
-  // conhecida ou fim. Aceita também "Etiqueta (qualquer coisa):" — o
-  // markdown da Vivianne tem "Slides (texto sobre fundo terra):" e isso
-  // tem de ser tratado como "Slides:".
-  const etiquetas = [
-    "Slides:",
-    "Texto na imagem:",
-    "Legenda:",
-    "Pergunta:",
-    "Formato:",
-  ];
+  // Aceita 3 formatos para a etiqueta:
+  //   ^Legenda:$            (sozinha na linha, conteúdo nas seguintes)
+  //   ^Legenda: corpo       (etiqueta + colon + conteúdo inline)
+  //   ^Slides (texto):      (com parêntesis antes do colon)
+  // Devolve o conteúdo até à próxima etiqueta conhecida ou fim do raw,
+  // com separadores tipo "────" removidos.
+  const etiquetas = ["Slides:", "Texto na imagem:", "Legenda:", "Pergunta:", "Formato:"];
   const etBase = etiqueta.replace(/:$/, "");
   const idx = raw.search(
     new RegExp(
-      `^${etBase}\\s*$|^${etBase}\\s|^${etBase}\\s*\\([^)]*\\)\\s*:`,
+      `^${etBase}:\\s*$|^${etBase}:\\s|^${etBase}\\s*\\([^)]*\\)\\s*:`,
       "m"
     )
   );
   if (idx < 0) return null;
-  const inicio = raw.indexOf("\n", idx) + 1;
+
+  // Conteúdo inline na mesma linha após o colon, se houver
+  const linhaFim = raw.indexOf("\n", idx);
+  const linha = raw.slice(idx, linhaFim < 0 ? raw.length : linhaFim);
+  const inlineMatch = linha.match(new RegExp(`^${etBase}[^:]*:\\s*(.*)$`));
+  const inlineContent = inlineMatch ? inlineMatch[1].trim() : "";
+
+  // Conteúdo nas linhas seguintes até à próxima etiqueta
+  const inicio = linhaFim < 0 ? raw.length : linhaFim + 1;
   let fim = raw.length;
   for (const e of etiquetas) {
     if (e === etiqueta) continue;
     const eBase = e.replace(/:$/, "");
-    const re = new RegExp(
-      `^${eBase}:|^${eBase}\\s*\\([^)]*\\)\\s*:`,
-      "m"
-    );
+    const re = new RegExp(`^${eBase}:|^${eBase}\\s*\\([^)]*\\)\\s*:`, "m");
     const m = re.exec(raw.slice(inicio));
     if (m && m.index !== undefined) {
       const pos = inicio + m.index;
       if (pos < fim) fim = pos;
     }
   }
-  return raw.slice(inicio, fim).trim();
+  const rest = raw.slice(inicio, fim).trim();
+
+  const combined = inlineContent
+    ? (rest ? `${inlineContent}\n${rest}` : inlineContent)
+    : rest || null;
+  return limparSeparadores(combined);
 }
 
 function parsePosts(raw: string, semana: number): Post[] {
