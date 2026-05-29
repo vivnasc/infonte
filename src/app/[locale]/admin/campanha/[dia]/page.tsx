@@ -34,13 +34,13 @@ export default async function EditarPostPage({
     <div>
       <div className="flex items-center justify-between">
         <div>
-          <Link href="/admin/campanha" className="text-sm text-castanho/60 hover:text-ocre">
-            voltar à lista
+          <Link href="/admin/campanha" className="text-xs uppercase tracking-[0.25em] text-[var(--texto-mudo)] hover:text-[var(--ambar)]">
+            ← voltar à lista
           </Link>
-          <h1 className="font-serif text-3xl text-castanho mt-2">
+          <h1 className="estudio-titulo text-3xl mt-2">
             dia {post.dia}, {post.tema}
           </h1>
-          <p className="text-sm text-oliva mt-1">
+          <p className="text-sm text-[var(--texto-suave)] mt-1">
             semana {post.semana} · {post.formato ?? "sem formato"}
             {post.slot === "tarde" ? " · 13h emocional" : " · 10h"}
           </p>
@@ -55,8 +55,8 @@ export default async function EditarPostPage({
               href={`/admin/campanha/${dia}?slot=${p.slot ?? "manha"}`}
               className={`px-4 py-2 rounded-full text-sm border transition-colors ${
                 (p.slot ?? "manha") === (post.slot ?? "manha")
-                  ? "border-ocre bg-ocre/10 text-castanho"
-                  : "border-castanho/20 text-castanho/60 hover:border-castanho/40"
+                  ? "border-[var(--ambar)] bg-[var(--ambar)]/10 text-[var(--ambar-claro)]"
+                  : "border-[var(--borda)] text-[var(--texto-suave)] hover:border-[var(--borda-forte)]"
               }`}
             >
               {p.slot === "tarde" ? "13h emocional" : "10h principal"}

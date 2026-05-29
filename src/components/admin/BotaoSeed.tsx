@@ -53,20 +53,20 @@ export function BotaoSeed({
   }
 
   return (
-    <div className="p-5 rounded-lg border border-castanho/20 bg-creme/40">
-      <div className="font-serif text-castanho">{titulo}</div>
-      <p className="text-xs text-castanho/70 mt-1">{descricao}</p>
+    <div className="estudio-card-elevado max-w-md">
+      <div className="font-serif text-[15px]">{titulo}</div>
+      <p className="text-xs text-[var(--texto-suave)] mt-1">{descricao}</p>
       <button
         onClick={correr}
         disabled={estado === "a-correr"}
-        className="btn-ocre mt-4 disabled:opacity-60"
+        className="estudio-btn estudio-btn-primario mt-3"
       >
         {estado === "a-correr" ? "a correr..." : "correr"}
       </button>
       {resposta && (
-        <div className="mt-4 text-xs">
+        <div className="mt-3 text-xs">
           {estado === "ok" ? (
-            <div className="text-oliva">
+            <div className="text-[var(--verde)]">
               feito.{" "}
               {resposta.total != null && <span>total: {resposta.total}.</span>}{" "}
               {resposta.inseridos != null && (
@@ -77,7 +77,7 @@ export function BotaoSeed({
               )}
             </div>
           ) : (
-            <div className="text-red-800">
+            <div className="text-[var(--vermelho)]">
               erro: {resposta.erro ?? "desconhecido"}
               {resposta.detalhe && (
                 <div className="mt-1 opacity-70">{resposta.detalhe}</div>
@@ -86,10 +86,10 @@ export function BotaoSeed({
           )}
           {resposta.log && resposta.log.length > 0 && (
             <details className="mt-2">
-              <summary className="cursor-pointer text-castanho/60">
+              <summary className="cursor-pointer text-[var(--texto-mudo)]">
                 log ({resposta.log.length} linhas)
               </summary>
-              <pre className="mt-2 whitespace-pre-wrap text-[10px] text-castanho/70">
+              <pre className="mt-2 whitespace-pre-wrap text-[10px] text-[var(--texto-suave)] break-all">
                 {resposta.log.join("\n")}
               </pre>
             </details>

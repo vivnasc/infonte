@@ -44,21 +44,21 @@ function Pastilha({
     }
   }
 
-  const cor =
+  const corBorda =
     estado === "ok"
-      ? "bg-oliva/20 text-oliva border-oliva/30"
+      ? "border-[var(--verde)]/50"
       : estado === "erro"
-      ? "bg-red-50 text-red-800 border-red-200"
-      : "bg-creme border-castanho/20 text-castanho/80";
+      ? "border-[var(--vermelho)]/50"
+      : "border-[var(--borda)]";
 
   return (
-    <div className={`flex-1 min-w-[200px] p-3 rounded-lg border ${cor}`}>
+    <div className={`flex-1 min-w-[220px] estudio-card-elevado border ${corBorda}`}>
       <div className="flex items-center justify-between gap-2">
         <span className="font-serif text-sm">{nome}</span>
         <button
           onClick={testar}
           disabled={estado === "a-testar"}
-          className="text-xs px-2 py-1 rounded border border-current/30 hover:bg-current/10 disabled:opacity-50"
+          className="text-[11px] px-2 py-1 rounded border border-[var(--borda-forte)] hover:bg-[var(--ambar)]/10 disabled:opacity-50"
         >
           {estado === "a-testar"
             ? "a testar..."
@@ -69,11 +69,11 @@ function Pastilha({
             : "testar"}
         </button>
       </div>
-      <p className="text-[11px] text-castanho/60 mt-1">{legenda}</p>
+      <p className="text-[11px] text-[var(--texto-suave)] mt-1">{legenda}</p>
       {resultado && (
         <div className="mt-2 text-[11px]">
           {resultado.ok ? (
-            <span className="text-oliva block space-y-0.5">
+            <span className="text-[var(--verde)] block space-y-0.5">
               {Object.entries(resultado)
                 .filter(([k]) => k !== "ok")
                 .map(([k, v]) => {
@@ -92,9 +92,9 @@ function Pastilha({
                       <span key={k} className="block">
                         {k}:{" "}
                         {faltam.length === 0 ? (
-                          <span className="text-oliva">todas ok</span>
+                          <span className="text-[var(--verde)]">todas ok</span>
                         ) : (
-                          <span className="text-red-700">faltam {faltam.join(", ")}</span>
+                          <span className="text-[var(--vermelho)]">faltam {faltam.join(", ")}</span>
                         )}
                       </span>
                     );
@@ -107,7 +107,7 @@ function Pastilha({
                 })}
             </span>
           ) : (
-            <span className="text-red-700">
+            <span className="text-[var(--vermelho)]">
               {resultado.erro}
               {resultado.dica && <span className="block opacity-80">↳ {resultado.dica}</span>}
               {resultado.detalhe && (

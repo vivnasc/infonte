@@ -26,45 +26,45 @@ export default async function AdminHome() {
 
   return (
     <div>
-      <h1 className="font-serif text-3xl text-castanho">administração</h1>
-      <p className="font-serif text-terra-texto/80 mt-4 max-w-leitura">
-        Produção e empacotamento de conteúdo. Tudo a partir daqui, sem terminal.
+      <div className="text-[10px] uppercase tracking-[0.3em] text-[var(--texto-mudo)]">
+        painel
+      </div>
+      <h1 className="estudio-titulo text-3xl mt-1">administração</h1>
+      <p className="text-[var(--texto-suave)] text-sm mt-3 max-w-leitura">
+        Produção e empacotamento de conteúdo da Infonte. Tudo a partir daqui,
+        sem terminal.
       </p>
 
       <section className="mt-10 grid sm:grid-cols-2 gap-4">
         <Link
           href="/admin/campanha"
-          className="block p-6 rounded-lg border border-castanho/20 hover:border-ocre transition-colors"
+          className="estudio-card hover:border-[var(--ambar)]/40 transition-colors block"
         >
-          <div className="font-sans text-xs uppercase tracking-[0.25em] text-oliva">
+          <div className="text-[10px] uppercase tracking-[0.25em] text-[var(--oliva)]">
             redes sociais
           </div>
-          <div className="font-serif text-xl text-castanho mt-2">
-            campanha 30 dias
-          </div>
-          <div className="text-sm text-castanho/70 mt-2">
-            Editar legendas, agendar e exportar para o Metricool.{" "}
+          <div className="font-serif text-xl mt-2">campanha 30 dias</div>
+          <div className="text-sm text-[var(--texto-suave)] mt-2">
+            Editar legendas, gerar imagens, render HD, exportar para Metricool.{" "}
             {nPosts != null && (
-              <span className="text-oliva">
-                ({nPosts} {nPosts === 1 ? "post" : "posts"} em base)
+              <span className="text-[var(--ambar)]">
+                ({nPosts} {nPosts === 1 ? "post" : "posts"})
               </span>
             )}
           </div>
         </Link>
 
-        <div className="block p-6 rounded-lg border border-castanho/20">
-          <div className="font-sans text-xs uppercase tracking-[0.25em] text-oliva">
+        <div className="estudio-card">
+          <div className="text-[10px] uppercase tracking-[0.25em] text-[var(--oliva)]">
             percurso
           </div>
-          <div className="font-serif text-xl text-castanho mt-2">
-            7 etapas em base
-          </div>
-          <div className="text-sm text-castanho/70 mt-2">
+          <div className="font-serif text-xl mt-2">7 etapas em base</div>
+          <div className="text-sm text-[var(--texto-suave)] mt-2">
             {nEtapas != null && (
               <span>
                 {nEtapas} de 7 etapas populadas.{" "}
                 {nEtapas < 7 && (
-                  <span className="text-ocre">faltam carregar.</span>
+                  <span className="text-[var(--ambar)]">faltam carregar.</span>
                 )}
               </span>
             )}
@@ -73,10 +73,10 @@ export default async function AdminHome() {
       </section>
 
       <section className="mt-16">
-        <h2 className="font-serif text-xl text-castanho border-b border-castanho/15 pb-2">
+        <h2 className="estudio-titulo text-xl border-b border-[var(--borda)] pb-2">
           configuração inicial
         </h2>
-        <p className="text-sm text-castanho/70 mt-4 max-w-leitura">
+        <p className="text-sm text-[var(--texto-suave)] mt-4 max-w-leitura">
           Estes botões carregam o conteúdo do repositório (ficheiros markdown)
           para a base de dados. Idempotentes, podes correr quantas vezes
           quiseres, atualizam só os campos editoriais sem mexer em

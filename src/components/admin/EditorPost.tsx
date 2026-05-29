@@ -238,7 +238,7 @@ export function EditorPost({ post }: { post: Post }) {
           <button
             type="button"
             onClick={() => setCampo("hashtags", HASHTAGS_SUGERIDAS)}
-            className="text-xs text-ocre hover:underline mt-1"
+            className="text-xs text-[var(--ambar)] hover:underline mt-1"
           >
             usar conjunto base
           </button>
@@ -277,12 +277,12 @@ export function EditorPost({ post }: { post: Post }) {
       </div>
 
       <aside className="space-y-6">
-        <div className="p-4 rounded-lg border border-castanho/15 bg-creme/50">
-          <h3 className="font-sans text-xs uppercase tracking-[0.2em] text-oliva mb-3">
+        <div className="estudio-card-elevado">
+          <h3 className="font-sans text-xs uppercase tracking-[0.25em] text-[var(--oliva)] mb-3">
             agendar
           </h3>
           <label className="block text-sm">
-            <span className="block text-xs text-castanho/70 mb-1">redes</span>
+            <span className="block text-xs text-[var(--texto-suave)] mb-1">redes</span>
             <div className="flex flex-wrap gap-2">
               {REDES_DISPONIVEIS.map((r) => (
                 <button
@@ -291,8 +291,8 @@ export function EditorPost({ post }: { post: Post }) {
                   onClick={() => alternarRede(r)}
                   className={`px-3 py-1 rounded-full text-xs border transition-colors ${
                     form.redes.includes(r)
-                      ? "border-ocre bg-ocre/10 text-castanho"
-                      : "border-castanho/20 text-castanho/60 hover:border-castanho/40"
+                      ? "border-[var(--ambar)] bg-[var(--ambar)]/10 text-[var(--ambar-claro)]"
+                      : "border-[var(--borda)] text-[var(--texto-suave)] hover:border-[var(--borda-forte)]"
                   }`}
                 >
                   {r}
@@ -302,7 +302,7 @@ export function EditorPost({ post }: { post: Post }) {
           </label>
 
           <label className="block text-sm mt-4">
-            <span className="block text-xs text-castanho/70 mb-1">
+            <span className="block text-xs text-[var(--texto-suave)] mb-1">
               data e hora
             </span>
             <input
@@ -314,7 +314,7 @@ export function EditorPost({ post }: { post: Post }) {
           </label>
 
           <label className="block text-sm mt-4">
-            <span className="block text-xs text-castanho/70 mb-1">estado</span>
+            <span className="block text-xs text-[var(--texto-suave)] mb-1">estado</span>
             <select
               value={form.estado}
               onChange={(e) => setCampo("estado", e.target.value)}
@@ -328,42 +328,42 @@ export function EditorPost({ post }: { post: Post }) {
           </label>
         </div>
 
-        <div className="p-4 rounded-lg border border-castanho/15 bg-creme/50">
-          <h3 className="font-sans text-xs uppercase tracking-[0.2em] text-oliva mb-3">
+        <div className="estudio-card-elevado">
+          <h3 className="font-sans text-xs uppercase tracking-[0.25em] text-[var(--oliva)] mb-3">
             Prompt Midjourney
           </h3>
           <button
             type="button"
             onClick={gerarPromptMJ}
             disabled={estadoMJ === "a-gerar"}
-            className="btn-quieto w-full disabled:opacity-60 text-sm"
+            className="estudio-btn w-full text-sm"
           >
             {estadoMJ === "a-gerar" ? "A gerar via Claude..." : "Gerar prompt MJ"}
           </button>
           {promptMJ && (
             <div className="mt-3">
-              <pre className="whitespace-pre-wrap text-xs text-terra-texto/80 bg-creme-fundo/50 p-3 rounded border border-castanho/10 max-h-40 overflow-y-auto">
+              <pre className="whitespace-pre-wrap text-xs text-[var(--texto-suave)] bg-black/30 p-3 rounded border border-[var(--borda)] max-h-40 overflow-y-auto">
                 {promptMJ}
               </pre>
               <button
                 type="button"
                 onClick={() => navigator.clipboard.writeText(promptMJ)}
-                className="text-xs text-ocre hover:underline mt-2"
+                className="text-xs text-[var(--ambar)] hover:underline mt-2"
               >
                 Copiar prompt
               </button>
             </div>
           )}
           {estadoMJ === "erro" && (
-            <p className="text-xs text-red-700 mt-2">Erro a gerar o prompt.</p>
+            <p className="text-xs text-[var(--vermelho)] mt-2">Erro a gerar o prompt.</p>
           )}
         </div>
 
-        <div className="p-4 rounded-lg border border-castanho/15 bg-creme/50">
-          <h3 className="font-sans text-xs uppercase tracking-[0.2em] text-oliva mb-3">
+        <div className="estudio-card-elevado">
+          <h3 className="font-sans text-xs uppercase tracking-[0.25em] text-[var(--oliva)] mb-3">
             Imagem automática (Replicate)
           </h3>
-          <p className="text-xs text-castanho/70 mb-3">
+          <p className="text-xs text-[var(--texto-suave)] mb-3">
             Gera o prompt, chama FLUX 1.1 Pro, descarrega e anexa ao post.
             Demora 10 a 20 segundos.
           </p>
@@ -371,71 +371,71 @@ export function EditorPost({ post }: { post: Post }) {
             type="button"
             onClick={gerarImagemReplicate}
             disabled={estadoReplicate === "a-gerar"}
-            className="btn-quieto w-full disabled:opacity-60"
+            className="estudio-btn w-full"
           >
             {estadoReplicate === "a-gerar"
               ? "A gerar via Replicate..."
               : "Gerar imagem automática"}
           </button>
           {estadoReplicate === "ok" && (
-            <p className="text-xs text-oliva mt-2">
+            <p className="text-xs text-[var(--verde)] mt-2">
               Imagem anexada. Guarda para fixar.
             </p>
           )}
           {estadoReplicate === "erro" && (
-            <p className="text-xs text-red-700 mt-2">
+            <p className="text-xs text-[var(--vermelho)] mt-2">
               {erroReplicate ?? "erro"}
             </p>
           )}
         </div>
 
-        <div className="p-4 rounded-lg border border-castanho/15 bg-creme/50">
-          <h3 className="font-sans text-xs uppercase tracking-[0.2em] text-oliva mb-3">
+        <div className="estudio-card-elevado">
+          <h3 className="font-sans text-xs uppercase tracking-[0.25em] text-[var(--oliva)] mb-3">
             Gerar arte PNG
           </h3>
-          <p className="text-xs text-castanho/70 mb-3">
+          <p className="text-xs text-[var(--texto-suave)] mb-3">
             Gera PNG a partir do texto da imagem, com a paleta terra da Infonte.
           </p>
           <button
             type="button"
             onClick={gerarArte}
             disabled={estadoArte === "a-gerar" || !form.texto_imagem.trim()}
-            className="btn-quieto w-full disabled:opacity-60"
+            className="estudio-btn w-full"
           >
             {estadoArte === "a-gerar" ? "A gerar..." : "Gerar arte PNG"}
           </button>
           {estadoArte === "ok" && (
-            <p className="text-xs text-oliva mt-2">Arte gerada. Faz download ou vê no link acima.</p>
+            <p className="text-xs text-[var(--verde)] mt-2">Arte gerada. Faz download ou vê no link acima.</p>
           )}
           {estadoArte === "erro" && (
-            <p className="text-xs text-red-700 mt-2">Erro a gerar a arte.</p>
+            <p className="text-xs text-[var(--vermelho)] mt-2">Erro a gerar a arte.</p>
           )}
         </div>
 
-        <div className="p-4 rounded-lg border border-castanho/15 bg-creme/50">
-          <h3 className="font-sans text-xs uppercase tracking-[0.2em] text-oliva mb-3">
+        <div className="estudio-card-elevado">
+          <h3 className="font-sans text-xs uppercase tracking-[0.25em] text-[var(--oliva)] mb-3">
             Pré-visualização da legenda
           </h3>
-          <pre className="whitespace-pre-wrap font-serif text-sm text-terra-texto/90 leading-relaxed">
+          <pre className="whitespace-pre-wrap font-serif text-sm text-[var(--texto)] leading-relaxed">
             {textoCompleto || "(vazio)"}
           </pre>
           <button
             type="button"
             onClick={() => navigator.clipboard.writeText(textoCompleto)}
-            className="text-xs text-ocre hover:underline mt-3"
+            className="text-xs text-[var(--ambar)] hover:underline mt-3"
           >
             copiar
           </button>
         </div>
 
         <div className="sticky bottom-4">
-          <button onClick={guardar} className="btn-ocre w-full" disabled={estado === "a-guardar"}>
+          <button onClick={guardar} className="estudio-btn estudio-btn-primario w-full" disabled={estado === "a-guardar"}>
             {estado === "a-guardar" ? "a guardar..." : "guardar"}
           </button>
           {mensagem && (
             <p
               className={`text-xs mt-2 text-center ${
-                estado === "erro" ? "text-red-700" : "text-oliva"
+                estado === "erro" ? "text-[var(--vermelho)]" : "text-[var(--verde)]"
               }`}
             >
               {mensagem}
@@ -448,16 +448,19 @@ export function EditorPost({ post }: { post: Post }) {
         .input {
           width: 100%;
           padding: 0.6rem 0.75rem;
-          border: 1px solid rgba(92,61,36,0.25);
+          border: 1px solid var(--borda, rgba(235,174,74,0.18));
           border-radius: 0.4rem;
-          background: rgba(255,253,248,0.6);
+          background: rgba(0,0,0,0.25);
+          color: var(--texto, #f2e8dc);
           font-size: 0.95rem;
+          font-family: inherit;
         }
         .input:focus {
           outline: none;
-          border-color: #B8843D;
-          background: rgba(255,253,248,0.95);
+          border-color: var(--ambar, #EBAE4A);
+          background: rgba(0,0,0,0.35);
         }
+        .input::placeholder { color: var(--texto-mudo, rgba(242,232,220,0.4)); }
       `}</style>
     </div>
   );
@@ -466,7 +469,7 @@ export function EditorPost({ post }: { post: Post }) {
 function Linha({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <label className="block">
-      <span className="block text-xs uppercase tracking-[0.2em] text-oliva mb-2">
+      <span className="block text-xs uppercase tracking-[0.25em] text-[var(--oliva)] mb-2">
         {label}
       </span>
       {children}
