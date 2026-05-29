@@ -4,7 +4,7 @@ import { BotaoSyncRender } from "@/components/admin/BotaoSyncRender";
 import { BotaoRenderSemana } from "@/components/admin/BotaoRenderSemana";
 import { BotaoResetRendering } from "@/components/admin/BotaoResetRendering";
 import { WorkflowsRender } from "@/components/admin/WorkflowsRender";
-import { ModoGuiado } from "@/components/admin/ModoGuiado";
+import { AgendarTudo } from "@/components/admin/AgendarTudo";
 import { criarClienteAdmin } from "@/lib/supabase/admin";
 
 type EstadoRaw = string | null;
@@ -163,8 +163,8 @@ export default async function PainelPage() {
       </div>
       <h1 className="estudio-titulo text-3xl mt-1">painel de produção</h1>
       <p className="text-[var(--texto-suave)] text-sm mt-2 max-w-leitura">
-        Em cima tens o modo guiado, passo a passo, do início ao Metricool.
-        Em baixo tens a vista panorâmica (funil, cobertura por semana).
+        Estado da campanha + atalhos. Edição por dia em Campanha 30 dias.
+        Pré-visualização total em Pré-visualizar tudo.
       </p>
 
       {funil.rendering > 0 && (
@@ -172,10 +172,6 @@ export default async function PainelPage() {
           <BotaoResetRendering rendering={funil.rendering} />
         </div>
       )}
-
-      <div className="mt-8">
-        <ModoGuiado />
-      </div>
 
       {acao && (
         <div
