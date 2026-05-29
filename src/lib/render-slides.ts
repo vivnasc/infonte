@@ -463,34 +463,29 @@ export function parseTextoImagemToSlides(
 
   const numerados = textoImagem.match(/^\d+\.\s*.+$/gm);
   if (numerados && numerados.length >= 2) {
-    const total = numerados.length + 2;
+    // Sem capa fake nem CTA hardcoded. Os slides são exactamente os
+    // que estão no brief da Vivianne (ex: 5 para dia 1 MANIFESTO).
+    // Primeiro vira "capa" (estilo capa/foto-cheia), último vira "cta"
+    // (estilo CTA com gota), meio é "conteudo". Tudo o conteúdo vem
+    // do brief, nada inventado.
+    const total = numerados.length;
     const slides: SlideOpts[] = [];
-    let imgIdx = 0;
-
-    // A regra de qual slide leva imagem é dada pelo pool: se o pool
-    // tiver tantas imagens como slides, todos levam (Claude/MJ produziu
-    // uma por slide). Se tiver menos (caso comum: 1 imagem do Replicate),
-    // o ritmo é capa com imagem e internos a alternar imagem/texto,
-    // CTA fecha com imagem.
-    slides.push({
-      texto: tema, dia, tema, modo: "capa", formato: fmt,
-      slideNum: 1, totalSlides: total, imagemUrl: imgPara(imgIdx++),
-    });
 
     numerados.forEach((line, i) => {
-      const slideN = i + 2;
-      const podeImagem = pool.length >= total || slideN % 2 === 0;
+      const slideN = i + 1;
+      const modo: "capa" | "conteudo" | "cta" =
+        slideN === 1 ? "capa" : slideN === total ? "cta" : "conteudo";
+      const podeImagem = pool.length >= total || slideN % 2 !== 0;
       slides.push({
-        texto: line.replace(/^\d+\.\s*/, ""), dia, tema, modo: "conteudo", formato: fmt,
-        slideNum: slideN, totalSlides: total,
-        imagemUrl: podeImagem ? imgPara(imgIdx++) : undefined,
+        texto: line.replace(/^\d+\.\s*/, ""),
+        dia,
+        tema,
+        modo,
+        formato: fmt,
+        slideNum: slideN,
+        totalSlides: total,
+        imagemUrl: podeImagem ? pool[(slideN - 1) % Math.max(1, pool.length)] : undefined,
       });
-    });
-
-    slides.push({
-      texto: "**Pára de perseguir** o que nunca foi teu.\nComeça pela etapa 1, grátis.",
-      dia, tema, modo: "cta", formato: fmt,
-      slideNum: total, totalSlides: total, imagemUrl: imgPara(imgIdx),
     });
 
     return slides;
