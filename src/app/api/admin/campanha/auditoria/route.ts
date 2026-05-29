@@ -16,14 +16,14 @@ export async function GET() {
   const sb = criarClienteAdmin();
   const { data: posts, error } = await sb
     .from("campanha_posts")
-    .select("id, dia, semana, slot, texto_imagem, criado_em");
+    .select("id, dia, semana, slot, texto_imagem, tema, criado_em");
 
   if (error) return NextResponse.json({ erro: error.message }, { status: 500 });
 
   const lista = posts ?? [];
 
   // Indexar por (dia, slot)
-  type Linha = { id: string; dia: number; semana: number | null; slot: string | null; texto_imagem: string | null };
+  type Linha = { id: string; dia: number; semana: number | null; slot: string | null; texto_imagem: string | null; tema: string | null };
   const porChave = new Map<string, Linha[]>();
   for (const p of lista as Linha[]) {
     const slot = p.slot ?? "manha";
@@ -74,6 +74,17 @@ export async function GET() {
     }
   }
 
+  // Tarde com etiqueta antiga "(emocional)" — visualmente parece
+  // duplicação do manhã. Deve ser "Eco · ${manha}".
+  type LinhaTema = Linha & { tema?: string | null };
+  const tardeMalRotulada: Array<{ id: string; dia: number; tema: string }> = [];
+  for (const p of lista as LinhaTema[]) {
+    if (p.slot !== "tarde") continue;
+    const t = (p.tema as string) ?? "";
+    if (t.startsWith("Eco · ")) continue;
+    if (t) tardeMalRotulada.push({ id: p.id, dia: p.dia, tema: t });
+  }
+
   const porSlot = {
     manha: lista.filter((p) => (p.slot ?? "manha") === "manha").length,
     tarde: lista.filter((p) => p.slot === "tarde").length,
@@ -98,6 +109,7 @@ export async function GET() {
       tardeEmFalta,
       semanaErrada,
       semTexto,
+      tardeMalRotulada,
     },
     contagens: {
       duplicados: duplicados.length,
@@ -105,6 +117,7 @@ export async function GET() {
       tardeEmFalta: tardeEmFalta.length,
       semanaErrada: semanaErrada.length,
       semTexto: semTexto.length,
+      tardeMalRotulada: tardeMalRotulada.length,
     },
   });
 }

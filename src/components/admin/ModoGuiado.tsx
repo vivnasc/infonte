@@ -25,6 +25,7 @@ type EstadoCampanha = {
   agendados: number;
   duplicados: number;
   semanaErrada: number;
+  tardeMalRotulada: number;
 };
 
 type Passo = {
@@ -56,6 +57,7 @@ async function lerEstado(): Promise<EstadoCampanha> {
     agendados: 0,
     duplicados: aud.contagens?.duplicados ?? 0,
     semanaErrada: aud.contagens?.semanaErrada ?? 0,
+    tardeMalRotulada: aud.contagens?.tardeMalRotulada ?? 0,
   };
 }
 
@@ -150,7 +152,11 @@ export function ModoGuiado() {
   }
 
   // Lógica de "feito"
-  const passo1Feito = estado.total > 0 && estado.duplicados === 0 && estado.semanaErrada === 0;
+  const passo1Feito =
+    estado.total > 0 &&
+    estado.duplicados === 0 &&
+    estado.semanaErrada === 0 &&
+    estado.tardeMalRotulada === 0;
   const passo2Feito = estado.tarde >= 30;
   const passo3ManhaFeito = estado.semImagemManha === 0;
   const passo3TardeFeito = estado.semImagemTarde === 0;
@@ -191,8 +197,8 @@ export function ModoGuiado() {
         activo={!passo1Feito}
         sumario={
           passo1Feito
-            ? "✓ base limpa, sem duplicados nem semanas erradas"
-            : `${estado.duplicados} duplicados · ${estado.semanaErrada} semanas erradas`
+            ? "✓ base limpa, sem duplicados, semanas erradas ou tarde mal rotulada"
+            : `${estado.duplicados} duplicados · ${estado.semanaErrada} semanas erradas · ${estado.tardeMalRotulada} tarde com etiqueta antiga`
         }
       >
         {!passo1Feito && (
