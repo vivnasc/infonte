@@ -451,7 +451,16 @@ export function ModoGuiado() {
                 textoErro={msg.s3tardeerr}
                 exec={async () => {
                   setS3tardeImg("a-correr");
-                  const lotes = ["1&fim=10", "11&fim=20", "21&fim=30"];
+                  // 6 lotes de 5 para caber bem no maxDuration do Vercel
+                  // sem 504. Tarde é sempre nova → 30 chamadas Replicate.
+                  const lotes = [
+                    "1&fim=5",
+                    "6&fim=10",
+                    "11&fim=15",
+                    "16&fim=20",
+                    "21&fim=25",
+                    "26&fim=30",
+                  ];
                   let totalGerados = 0;
                   let totalReusados = 0;
                   for (const l of lotes) {

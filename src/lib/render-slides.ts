@@ -496,6 +496,40 @@ export function parseTextoImagemToSlides(
     return slides;
   }
 
-  // Post único
-  return [{ texto: textoImagem.trim(), dia, tema, modo: "capa", formato: fmt, imagemUrl: imgPara(0) }];
+  // Post único vira mini-carrossel de 3 slides: capa (tema) + corpo
+  // (statement) + cta (fecho). Garante que TODOS os posts são
+  // carrosséis no Instagram, não estáticos.
+  return [
+    {
+      texto: tema,
+      dia,
+      tema,
+      modo: "capa",
+      formato: fmt,
+      slideNum: 1,
+      totalSlides: 3,
+      imagemUrl: imgPara(0),
+    },
+    {
+      texto: textoImagem.trim(),
+      dia,
+      tema,
+      modo: "conteudo",
+      formato: fmt,
+      slideNum: 2,
+      totalSlides: 3,
+      imagemUrl: undefined,
+    },
+    {
+      texto:
+        "**Pára de perseguir** o que nunca foi teu.\nComeça pela etapa 1, grátis.",
+      dia,
+      tema,
+      modo: "cta",
+      formato: fmt,
+      slideNum: 3,
+      totalSlides: 3,
+      imagemUrl: imgPara(0),
+    },
+  ];
 }

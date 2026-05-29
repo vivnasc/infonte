@@ -37,15 +37,28 @@ function detectarFormato(raw: string): string | null {
 }
 
 function extrairBloco(raw: string, etiqueta: string): string | null {
-  // Apanha um bloco que começa em "Etiqueta:" e vai até à próxima etiqueta conhecida ou fim
+  // Apanha um bloco que começa em "Etiqueta:" e vai até à próxima etiqueta conhecida ou fim.
+  // Aceita também "Etiqueta (qualquer coisa):" — por exemplo a markdown
+  // tem "Slides (texto sobre fundo terra):" e isso deve ser tratado
+  // como "Slides:".
   const etiquetas = ["Slides:", "Texto na imagem:", "Legenda:", "Pergunta:", "Formato:"];
-  const idx = raw.search(new RegExp(`^${etiqueta}\\s*$|^${etiqueta}\\s`, "m"));
+  const etBase = etiqueta.replace(/:$/, "");
+  const idx = raw.search(
+    new RegExp(
+      `^${etBase}\\s*$|^${etBase}\\s|^${etBase}\\s*\\([^)]*\\)\\s*:`,
+      "m"
+    )
+  );
   if (idx < 0) return null;
   const inicio = raw.indexOf("\n", idx) + 1;
   let fim = raw.length;
   for (const e of etiquetas) {
     if (e === etiqueta) continue;
-    const re = new RegExp(`^${e.replace(":", "\\:")}`, "m");
+    const eBase = e.replace(/:$/, "");
+    const re = new RegExp(
+      `^${eBase}:|^${eBase}\\s*\\([^)]*\\)\\s*:`,
+      "m"
+    );
     const m = re.exec(raw.slice(inicio));
     if (m && m.index !== undefined) {
       const pos = inicio + m.index;
