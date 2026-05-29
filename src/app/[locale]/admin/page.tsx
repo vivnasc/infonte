@@ -2,6 +2,7 @@ import { Link } from "@/i18n/routing";
 import { BotaoSeed } from "@/components/admin/BotaoSeed";
 import { BotaoSyncRender } from "@/components/admin/BotaoSyncRender";
 import { BotaoRenderSemana } from "@/components/admin/BotaoRenderSemana";
+import { ModoGuiado } from "@/components/admin/ModoGuiado";
 import { criarClienteAdmin } from "@/lib/supabase/admin";
 
 type EstadoRaw = string | null;
@@ -156,21 +157,26 @@ export default async function PainelPage() {
   return (
     <div>
       <div className="text-[10px] uppercase tracking-[0.3em] text-[var(--texto-mudo)]">
-        painel
+        infonte estúdio
       </div>
-      <h1 className="estudio-titulo text-3xl mt-1">ponto de situação</h1>
-      <p className="text-[var(--texto-suave)] text-sm mt-2">
-        Produção e empacotamento de conteúdo da Infonte. Tudo a partir daqui.
+      <h1 className="estudio-titulo text-3xl mt-1">painel de produção</h1>
+      <p className="text-[var(--texto-suave)] text-sm mt-2 max-w-leitura">
+        Em cima tens o modo guiado, passo a passo, do início ao Metricool.
+        Em baixo tens a vista panorâmica (funil, cobertura por semana).
       </p>
+
+      <div className="mt-8">
+        <ModoGuiado />
+      </div>
 
       {acao && (
         <div
-          className="estudio-card mt-8 flex flex-wrap items-center gap-6 justify-between"
+          className="estudio-card mt-10 flex flex-wrap items-center gap-6 justify-between"
           style={{ borderColor: "var(--ambar)", borderWidth: 1 }}
         >
           <div>
             <div className="text-[10px] uppercase tracking-[0.25em] text-[var(--ambar)]">
-              próxima acção
+              próxima acção sugerida
             </div>
             <div className="font-serif text-xl mt-1">{acao.titulo}</div>
             <div className="text-sm text-[var(--texto-suave)] mt-1">{acao.descricao}</div>

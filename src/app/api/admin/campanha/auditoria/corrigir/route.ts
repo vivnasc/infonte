@@ -1,0 +1,86 @@
+import { NextResponse } from "next/server";
+import { exigirAdmin } from "@/lib/admin";
+import { criarClienteAdmin } from "@/lib/supabase/admin";
+
+export const runtime = "nodejs";
+
+// POST sem body. Faz duas correcções:
+//
+// 1) Duplicados: para cada (dia, slot) com mais de uma linha, mantém
+//    a mais antiga (criada_em mais cedo) e APAGA as outras. A mais
+//    antiga é, em regra, a original do seed.
+// 2) Semana errada: actualiza p.semana para Math.ceil(p.dia/7).
+//
+// Não toca em estado/agendamentos. Idempotente.
+export async function POST() {
+  const admin = await exigirAdmin();
+  if (!admin) return NextResponse.json({ erro: "acesso negado" }, { status: 403 });
+
+  const sb = criarClienteAdmin();
+  const { data: posts, error } = await sb
+    .from("campanha_posts")
+    .select("id, dia, semana, slot, criada_em");
+
+  if (error) return NextResponse.json({ erro: error.message }, { status: 500 });
+
+  const lista = posts ?? [];
+  const log: string[] = [];
+  let apagados = 0;
+  let semanaAjustada = 0;
+
+  // 1. Duplicados
+  type Linha = { id: string; dia: number; semana: number | null; slot: string | null; criada_em: string | null };
+  const porChave = new Map<string, Linha[]>();
+  for (const p of lista as Linha[]) {
+    const slot = p.slot ?? "manha";
+    const k = `${p.dia}-${slot}`;
+    const arr = porChave.get(k) ?? [];
+    arr.push(p);
+    porChave.set(k, arr);
+  }
+
+  for (const [k, arr] of porChave.entries()) {
+    if (arr.length <= 1) continue;
+    arr.sort((a, b) => {
+      const ta = a.criada_em ? new Date(a.criada_em).getTime() : 0;
+      const tb = b.criada_em ? new Date(b.criada_em).getTime() : 0;
+      return ta - tb;
+    });
+    const [manter, ...remover] = arr;
+    const idsRemover = remover.map((r) => r.id);
+    const { error: errDel } = await sb
+      .from("campanha_posts")
+      .delete()
+      .in("id", idsRemover);
+    if (errDel) {
+      log.push(`${k}: erro a apagar ${idsRemover.length} duplicados: ${errDel.message}`);
+    } else {
+      apagados += idsRemover.length;
+      log.push(`${k}: mantido ${manter.id}, apagados ${idsRemover.length}`);
+    }
+  }
+
+  // 2. Semana errada
+  for (const p of lista as Linha[]) {
+    const correcta = Math.ceil(p.dia / 7);
+    if (p.semana !== correcta) {
+      const { error: errUp } = await sb
+        .from("campanha_posts")
+        .update({ semana: correcta })
+        .eq("id", p.id);
+      if (errUp) {
+        log.push(`Dia ${p.dia}: erro a corrigir semana ${p.semana} → ${correcta}: ${errUp.message}`);
+      } else {
+        semanaAjustada++;
+        log.push(`Dia ${p.dia}: semana ${p.semana} → ${correcta}`);
+      }
+    }
+  }
+
+  return NextResponse.json({
+    ok: true,
+    apagados,
+    semanaAjustada,
+    log,
+  });
+}
