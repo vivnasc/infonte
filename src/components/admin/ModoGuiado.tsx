@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "@/i18n/routing";
 import { PreviewSemana } from "./PreviewSemana";
+import { AgendarTudo } from "./AgendarTudo";
 
 // Modo guiado: leva a Vivianne, passo a passo, do estado actual até
 // "CSV pronto para o Metricool". Cada passo tem 3 estados visíveis:
@@ -491,68 +492,61 @@ export function ModoGuiado() {
       )}
 
       {tabActivo === 4 && (
-      /* PASSO 4: render HD por semana */
+      /* PASSO 4: render HD em 2 cliques */
       <PassoCard
         n={4}
-        titulo="Render HD, semana a semana"
-        descricao="Lança o render de uma semana de cada vez (7 dias × 2 slots = 14 PNGs). Permite distribuir o trabalho ao longo do tempo."
+        titulo="Render HD"
+        descricao="Dois cliques. Cada workflow gera os PNGs HD dos 30 dias num só job (manhã ou tarde). 5-10 minutos cada, podem correr em paralelo no GitHub Actions."
         activo={passo3Feito}
         bloqueado={!passo3Feito}
-        sumario="acompanha o run pelo link no GitHub"
+        sumario="quando os 2 workflows terminarem, vês cá os PNGs em /admin/preview-tudo → modo 'depois'"
       >
         {passo3Feito && (
           <>
-            <div className="flex flex-wrap items-center gap-2 mb-2">
-              <span className="text-xs text-[var(--texto-suave)]">semana</span>
-              {[1, 2, 3, 4, 5].map((s) => (
-                <button
-                  key={s}
-                  onClick={() => setS4semana(s)}
-                  className={`px-3 py-1 rounded-full text-xs border ${
-                    s === s4semana
-                      ? "border-[var(--ambar)] bg-[var(--ambar)]/10 text-[var(--ambar-claro)]"
-                      : "border-[var(--borda)] text-[var(--texto-suave)]"
-                  }`}
-                >
-                  {s}
-                </button>
-              ))}
-            </div>
-
-            <div className="mb-3">
-              <PreviewSemana semana={s4semana} slot="manha" />
-            </div>
-
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-3">
               <BlocoAcao
                 estado={s4}
-                rotulo={`4.1 — render semana ${s4semana} manhã`}
+                rotulo="render HD, 30 manhã"
                 textoOk={msg.s4}
                 textoErro={msg.s4err}
                 exec={async () => {
                   setS4("a-correr");
                   const { ok, json } = await call(
-                    `/api/admin/campanha/render-submit?semana=${s4semana}&slot=manha`,
+                    `/api/admin/campanha/render-submit?dias=all&slot=manha`,
                     { method: "POST" }
                   );
                   if (ok) {
                     setS4("ok");
-                    setMsg((m) => ({ ...m, s4: `dispatch ok, jobId ${json.jobId}` }));
+                    setMsg((m) => ({ ...m, s4: `lançado, jobId ${json.jobId}` }));
                   } else {
                     setS4("erro");
                     setMsg((m) => ({ ...m, s4err: String(json.erro ?? "erro") }));
                   }
                 }}
               />
+              <BlocoAcao
+                estado={s3tardeImg === "ok" ? "calmo" : "calmo"}
+                rotulo="render HD, 30 tarde"
+                textoOk={msg.s4tarde}
+                textoErro={msg.s4tardeerr}
+                exec={async () => {
+                  setMsg((m) => ({ ...m, s4tarde: "a lançar..." }));
+                  const { ok, json } = await call(
+                    `/api/admin/campanha/render-submit?dias=all&slot=tarde`,
+                    { method: "POST" }
+                  );
+                  if (ok) {
+                    setMsg((m) => ({ ...m, s4tarde: `lançado, jobId ${json.jobId}` }));
+                  } else {
+                    setMsg((m) => ({ ...m, s4tardeerr: String(json.erro ?? "erro") }));
+                  }
+                }}
+              />
             </div>
-            <div className="text-xs text-[var(--texto-suave)] mt-3">
-              Quando o workflow terminar (2-5 min), volta cá e clica{" "}
-              <Link href="/admin" className="text-[var(--ambar)]">
-                sincronizar
-              </Link>{" "}
-              no painel. Os dias passam de <em>rendering</em> para{" "}
-              <em>rendered</em>.
-            </div>
+            <p className="text-xs text-[var(--texto-suave)] mt-4 max-w-leitura">
+              Acompanha os workflows na tabela em baixo do painel
+              (auto-actualiza). Quando ficam verdes, vai ao Passo 5.
+            </p>
           </>
         )}
       </PassoCard>
@@ -562,22 +556,31 @@ export function ModoGuiado() {
       /* PASSO 5: agendar + exportar */
       <PassoCard
         n={5}
-        titulo="Agendar datas e exportar CSV"
-        descricao="Abre cada dia, define data + hora + redes, muda para 'agendado', guarda. Depois exporta o CSV e importa no Metricool."
+        titulo="Agendar tudo + exportar CSV"
+        descricao="1) Escolhe a data do dia 1, agenda os 60 posts de uma vez. 2) Baixa o CSV e importa no Metricool. Fim."
         activo={passo3Feito}
         bloqueado={!passo3Feito}
       >
         {passo3Feito && (
-          <div className="flex flex-wrap gap-3">
-            <Link href="/admin/campanha" className="estudio-btn">
-              abrir lista de dias →
-            </Link>
-            <a href="/api/admin/campanha/exportar.csv" className="estudio-btn estudio-btn-primario">
-              CSV Metricool
-            </a>
-            <a href="/api/admin/campanha/exportar.csv?modo=por-rede" className="estudio-btn">
-              CSV por rede
-            </a>
+          <div className="space-y-4">
+            <AgendarTudo />
+            <div className="estudio-card-elevado">
+              <div className="text-[10px] uppercase tracking-[0.25em] text-[var(--oliva)] mb-3">
+                exportar para Metricool
+              </div>
+              <div className="flex flex-wrap gap-3">
+                <a href="/api/admin/campanha/exportar.csv" className="estudio-btn estudio-btn-primario">
+                  CSV Metricool (tudo)
+                </a>
+                <a href="/api/admin/campanha/exportar.csv?modo=por-rede" className="estudio-btn">
+                  CSV por rede
+                </a>
+              </div>
+              <p className="text-xs text-[var(--texto-suave)] mt-3">
+                A menção <code className="text-[var(--ambar)]">@vivianne.dos.santos</code>
+                vai injectada antes das hashtags se a env CAPTION_AUTHOR_TAG estiver definida.
+              </p>
+            </div>
           </div>
         )}
       </PassoCard>
