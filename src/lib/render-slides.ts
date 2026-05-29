@@ -41,26 +41,25 @@ const GOTA_SVG = `<svg width="48" height="48" viewBox="0 0 512 512"><path d="M25
 const GOTA_ICON = (size: number, cor: string = AMBAR, fill: string = AMBAR_CLARO) =>
   `<svg width="${size}" height="${size}" viewBox="0 0 512 512"><path d="M256 116 C198 218 166 282 166 334 A90 90 0 0 0 346 334 C346 282 314 218 256 116 Z" fill="none" stroke="${cor}" stroke-width="20" stroke-linejoin="round"/><circle cx="256" cy="338" r="34" fill="${fill}"/></svg>`;
 
-// Marca: gota 36px + "infonte" em 24px, sempre bem visível
+// Marca: gota 28px + "infonte" em 20px, estilo FreeMe (discreta no
+// canto, sem tirar peso ao conteúdo).
 function marca(light: boolean): string {
   const cor = light ? OCRE_FORTE : AMBAR;
-  const textCor = light ? CASTANHO : CREME;
+  const textCor = light ? CASTANHO : "rgba(242,232,220,0.92)";
   const fill = light ? OCRE : AMBAR_CLARO;
-  return `<div style="display:flex;align-items:center;gap:12px;">
-    ${GOTA_ICON(36, cor, fill)}
-    <span style="font-family:'EB Garamond',serif;font-size:24px;color:${textCor};letter-spacing:0.02em;font-style:italic;">infonte</span>
+  return `<div style="display:flex;align-items:center;gap:8px;">
+    ${GOTA_ICON(28, cor, fill)}
+    <span style="font-family:'EB Garamond',serif;font-size:20px;color:${textCor};letter-spacing:0.01em;font-style:italic;">infonte</span>
   </div>`;
 }
 
-// Crédito inferior: © viviannedossantos (como o FreeMe)
+// Crédito inferior: handle @vivianne.dos.santos discreto (estilo FreeMe).
 function credito(light: boolean): string {
-  const cor = light ? "rgba(74,47,27,0.4)" : "rgba(255,255,255,0.4)";
-  return `<div style="display:flex;align-items:center;gap:6px;font-family:Inter,sans-serif;font-size:13px;color:${cor};">
-    <span>©</span> <span>viviannedossantos</span>
-  </div>`;
+  const cor = light ? "rgba(74,47,27,0.45)" : "rgba(242,232,220,0.5)";
+  return `<div style="font-family:Inter,sans-serif;font-size:12px;letter-spacing:0.02em;color:${cor};">@vivianne.dos.santos</div>`;
 }
 
-const ARRASTE = `<div style="display:flex;align-items:center;justify-content:center;gap:8px;font-family:Inter,sans-serif;font-size:14px;font-weight:500;letter-spacing:0.05em;">Arraste para o lado <span style="font-size:20px;">→</span></div>`;
+const ARRASTE = `<div style="display:flex;align-items:center;justify-content:flex-start;gap:10px;font-family:Inter,sans-serif;font-size:14px;font-weight:600;letter-spacing:0.25em;text-transform:uppercase;">DESLIZA PARA O LADO <span style="font-size:18px;letter-spacing:0;">→</span></div>`;
 
 function paginacao(atual: number, total: number, light: boolean): string {
   const dots = Array.from({ length: total }, (_, i) =>
@@ -250,6 +249,73 @@ function layoutClaro(opts: FullOpts): string {
 }
 
 // ═══════════════════════════════════════════════════
+// LAYOUT F: Foto cheia, texto em baixo à esquerda
+// (estilo FreeMe principal — mais usado para capa e statement com foto)
+// ═══════════════════════════════════════════════════
+function layoutFotoCheia(opts: FullOpts): string {
+  const h = opts.formato === "story" ? H_STORY : H_FEED;
+  const textoComBold = parseBold(opts.texto);
+  const linhas = textoComBold.split(/\n/).map(l => l.trim()).filter(Boolean);
+  const charCount = opts.texto.replace(/\*\*/g, "").length;
+  const fs = charCount < 30 ? 84 : charCount < 60 ? 72 : charCount < 100 ? 60 : charCount < 160 ? 50 : 42;
+
+  // Gradient suave: praticamente transparente em cima, escuro quente
+  // a meio, muito escuro em baixo para o texto agarrar bem.
+  const scrim = `linear-gradient(180deg,rgba(28,18,11,0.10) 0%,rgba(28,18,11,0.35) 45%,rgba(28,18,11,0.85) 75%,rgba(28,18,11,0.95) 100%)`;
+
+  return `${base(W, h)}
+<div style="position:relative;width:${W}px;height:${h}px;background:${BG_SLIDE};overflow:hidden;">
+  ${opts.imagemUrl
+    ? `<img src="${opts.imagemUrl}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 30%;"/>
+       <div style="position:absolute;inset:0;background:${scrim};"></div>`
+    : `<div style="position:absolute;inset:0;background:radial-gradient(ellipse at 30% 25%,#3a2515 0%,${BG_SLIDE} 60%,#180e08 100%);"></div>`
+  }
+  <div style="position:absolute;top:36px;left:44px;z-index:3;">${marca(false)}</div>
+
+  <div style="position:absolute;left:0;right:0;bottom:0;z-index:2;padding:0 56px 130px 56px;">
+    <style>strong{color:${BOLD_COR};font-weight:700;}</style>
+    <div style="font-size:${fs}px;line-height:1.18;color:${CREME};text-shadow:0 2px 16px rgba(0,0,0,0.6);">
+      ${linhas.map(l => `<p style="margin-bottom:10px;">${l}</p>`).join("")}
+    </div>
+  </div>
+
+  <div style="position:absolute;bottom:38px;left:56px;z-index:3;color:rgba(242,232,220,0.55);">${ARRASTE}</div>
+  <div style="position:absolute;bottom:38px;right:56px;z-index:3;">${credito(false)}</div>
+</div>
+</body></html>`;
+}
+
+// ═══════════════════════════════════════════════════
+// LAYOUT G: Fecho/CTA sobre fundo terra quente (sem foto)
+// (estilo FreeMe último slide — bold âmbar + CTA discreto)
+// ═══════════════════════════════════════════════════
+function layoutFechoCta(opts: FullOpts): string {
+  const h = opts.formato === "story" ? H_STORY : H_FEED;
+  const textoComBold = parseBold(opts.texto);
+  const linhas = textoComBold.split(/\n/).map(l => l.trim()).filter(Boolean);
+  const charCount = opts.texto.replace(/\*\*/g, "").length;
+  const fs = charCount < 60 ? 56 : charCount < 120 ? 46 : charCount < 200 ? 38 : 32;
+
+  return `${base(W, h)}
+<div style="position:relative;width:${W}px;height:${h}px;background:radial-gradient(ellipse at 25% 20%,#4a2f1b 0%,${BG_SLIDE} 55%,#170d07 100%);overflow:hidden;">
+  <div style="position:absolute;top:0;left:0;right:0;height:60%;background:radial-gradient(ellipse at 50% 0%,rgba(235,174,74,0.10) 0%,transparent 70%);"></div>
+
+  <div style="position:absolute;top:36px;left:44px;z-index:2;">${marca(false)}</div>
+
+  <div style="position:relative;z-index:1;height:100%;display:flex;flex-direction:column;justify-content:center;padding:120px 64px 130px 64px;">
+    <style>strong{color:${BOLD_COR};font-weight:700;}</style>
+    <div style="font-size:${fs}px;line-height:1.25;color:${CREME};">
+      ${linhas.map(l => `<p style="margin-bottom:14px;">${l}</p>`).join("")}
+    </div>
+  </div>
+
+  <div style="position:absolute;bottom:38px;left:64px;z-index:2;color:rgba(242,232,220,0.55);font-family:Inter,sans-serif;font-size:13px;letter-spacing:0.18em;text-transform:uppercase;">link na bio</div>
+  <div style="position:absolute;bottom:38px;right:56px;z-index:2;">${credito(false)}</div>
+</div>
+</body></html>`;
+}
+
+// ═══════════════════════════════════════════════════
 
 export type SlideOpts = {
   texto: string;
@@ -257,7 +323,7 @@ export type SlideOpts = {
   tema: string;
   modo: "capa" | "conteudo" | "cta";
   formato: "feed" | "story";
-  layout?: "foto-topo" | "foto-lado" | "statement" | "cta" | "claro";
+  layout?: "foto-topo" | "foto-lado" | "statement" | "cta" | "claro" | "foto-cheia" | "fecho-cta";
   slideNum?: number;
   totalSlides?: number;
   imagemUrl?: string;
@@ -268,34 +334,37 @@ type FullOpts = SlideOpts;
 function escolherLayout(opts: SlideOpts): string {
   const layout = opts.layout ?? inferirLayout(opts);
   switch (layout) {
+    case "foto-cheia": return layoutFotoCheia(opts);
+    case "fecho-cta": return layoutFechoCta(opts);
     case "foto-topo": return layoutFotoTopo(opts);
     case "foto-lado": return layoutFotoLado(opts);
     case "statement": return layoutStatement(opts);
     case "cta": return layoutCta(opts);
     case "claro": return layoutClaro(opts);
-    default: return layoutStatement(opts);
+    default: return layoutFotoCheia(opts);
   }
 }
 
 function inferirLayout(opts: SlideOpts): string {
-  if (opts.modo === "cta") return "cta";
+  // Fecho/CTA: terra quente sem foto, texto + "link na bio" (estilo FreeMe)
+  if (opts.modo === "cta") return "fecho-cta";
 
   const temImagem = !!opts.imagemUrl;
 
+  // Capa com foto: foto cheia + texto em baixo, scrim suave (estilo FreeMe)
+  // Capa sem foto: statement no centro
   if (opts.modo === "capa") {
-    return temImagem ? "foto-topo" : "statement";
+    return temImagem ? "foto-cheia" : "statement";
   }
 
-  // Slides internos de carrossel: com imagem alterna foto-topo/foto-lado,
-  // sem imagem alterna claro/statement (cria ritmo visual dentro do carrossel)
+  // Slides internos: com foto vai foto-cheia (mais elegante e legível);
+  // sem foto alterna claro/statement para criar ritmo visual.
   if (opts.modo === "conteudo") {
-    if (temImagem) {
-      return opts.slideNum && opts.slideNum % 3 === 0 ? "foto-lado" : "foto-topo";
-    }
+    if (temImagem) return "foto-cheia";
     return opts.slideNum && opts.slideNum % 2 === 0 ? "claro" : "statement";
   }
 
-  return "statement";
+  return "foto-cheia";
 }
 
 export async function renderSlides(
