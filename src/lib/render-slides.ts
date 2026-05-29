@@ -345,6 +345,12 @@ function escolherLayout(opts: SlideOpts): string {
   }
 }
 
+// Devolve só o HTML do slide, sem screenshot. Para pré-visualização
+// em iframe no editor, sem precisar de Chromium.
+export function buildSlideHtml(opts: SlideOpts): string {
+  return escolherLayout(opts);
+}
+
 function inferirLayout(opts: SlideOpts): string {
   // Fecho/CTA: terra quente sem foto, texto + "link na bio" (estilo FreeMe)
   if (opts.modo === "cta") return "fecho-cta";

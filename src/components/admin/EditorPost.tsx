@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { DropImagens } from "./DropImagens";
+import { PreviewCarrossel } from "./PreviewCarrossel";
 
 type Post = {
   id: string;
@@ -61,6 +62,9 @@ export function EditorPost({ post }: { post: Post }) {
   const [promptMJ, setPromptMJ] = useState<string | null>(null);
   const [estadoReplicate, setEstadoReplicate] = useState<"calmo" | "a-gerar" | "ok" | "erro">("calmo");
   const [erroReplicate, setErroReplicate] = useState<string | null>(null);
+  // Trigger para forçar refresh da pré-visualização (ao guardar, ao
+  // gerar imagem nova, ou ao mudar imagens). Incrementa o contador.
+  const [previewKey, setPreviewKey] = useState(0);
 
   function setCampo<K extends keyof typeof form>(k: K, v: (typeof form)[K]) {
     setForm({ ...form, [k]: v });
@@ -92,6 +96,7 @@ export function EditorPost({ post }: { post: Post }) {
       }
       setEstado("guardado");
       setMensagem("Guardado.");
+      setPreviewKey((k) => k + 1);
       setTimeout(() => setEstado("calmo"), 2000);
     } catch (e: unknown) {
       setEstado("erro");
@@ -137,6 +142,7 @@ export function EditorPost({ post }: { post: Post }) {
       setCampo("imagens", [j.url, ...form.imagens.filter((u) => u !== j.url)]);
       setCampo("imagem_url", j.url);
       setEstadoReplicate("ok");
+      setPreviewKey((k) => k + 1);
     } catch (e: unknown) {
       setErroReplicate(e instanceof Error ? e.message : "erro");
       setEstadoReplicate("erro");
@@ -185,7 +191,14 @@ export function EditorPost({ post }: { post: Post }) {
   const textoCompleto = composarTextoFinal(form);
 
   return (
-    <div className="grid lg:grid-cols-[1fr_320px] gap-10">
+    <div className="space-y-8">
+      <PreviewCarrossel
+        dia={post.dia}
+        slot={post.slot ?? "manha"}
+        refreshKey={previewKey}
+      />
+
+      <div className="grid lg:grid-cols-[1fr_320px] gap-10">
       <div className="space-y-6">
         <Linha label="formato">
           <select
@@ -261,6 +274,7 @@ export function EditorPost({ post }: { post: Post }) {
             onUpload={(urls) => {
               setCampo("imagens", urls);
               setCampo("imagem_url", urls[0] ?? "");
+              setPreviewKey((k) => k + 1);
             }}
           />
         </Linha>
@@ -443,6 +457,7 @@ export function EditorPost({ post }: { post: Post }) {
           )}
         </div>
       </aside>
+      </div>
 
       <style>{`
         .input {

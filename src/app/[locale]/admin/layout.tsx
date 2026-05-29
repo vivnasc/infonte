@@ -6,6 +6,7 @@ import "./admin.css";
 const NAV = [
   { href: "/admin", label: "Painel" },
   { href: "/admin/campanha", label: "Campanha 30 dias" },
+  { href: "/admin/biblioteca", label: "Biblioteca" },
 ];
 
 export default async function AdminLayout({
