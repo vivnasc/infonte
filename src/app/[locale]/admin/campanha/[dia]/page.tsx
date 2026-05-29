@@ -32,7 +32,7 @@ export default async function EditarPostPage({
 
   return (
     <div>
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
           <Link href="/admin/campanha" className="text-xs uppercase tracking-[0.25em] text-[var(--texto-mudo)] hover:text-[var(--ambar)]">
             ← voltar à lista
@@ -44,6 +44,27 @@ export default async function EditarPostPage({
             semana {post.semana} · {post.formato ?? "sem formato"}
             {post.slot === "tarde" ? " · 13h emocional" : " · 10h"}
           </p>
+        </div>
+        <div className="flex items-center gap-2">
+          {dia > 1 && (
+            <Link
+              href={`/admin/campanha/${dia - 1}?slot=${post.slot ?? "manha"}`}
+              className="estudio-btn text-xs"
+            >
+              ← dia {dia - 1}
+            </Link>
+          )}
+          <span className="text-xs text-[var(--texto-mudo)] font-mono px-2">
+            {String(dia).padStart(2, "0")} / 30
+          </span>
+          {dia < 30 && (
+            <Link
+              href={`/admin/campanha/${dia + 1}?slot=${post.slot ?? "manha"}`}
+              className="estudio-btn text-xs"
+            >
+              dia {dia + 1} →
+            </Link>
+          )}
         </div>
       </div>
 
