@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 type Estado = "calmo" | "a-testar" | "ok" | "erro";
 
@@ -11,6 +11,44 @@ type Resultado = {
   dica?: string;
   [k: string]: unknown;
 };
+
+type CacheValor = {
+  resultado: Resultado;
+  estado: "ok" | "erro";
+  ts: number;
+};
+
+function chaveCache(url: string): string {
+  return `infonte:diag:${url}`;
+}
+
+function lerCache(url: string): CacheValor | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = window.localStorage.getItem(chaveCache(url));
+    if (!raw) return null;
+    return JSON.parse(raw) as CacheValor;
+  } catch {
+    return null;
+  }
+}
+
+function escreverCache(url: string, v: CacheValor): void {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(chaveCache(url), JSON.stringify(v));
+  } catch {}
+}
+
+function quandoFmt(ts: number): string {
+  const d = new Date(ts);
+  const hoje = new Date();
+  const mesmoDia = d.toDateString() === hoje.toDateString();
+  const hh = String(d.getHours()).padStart(2, "0");
+  const mm = String(d.getMinutes()).padStart(2, "0");
+  if (mesmoDia) return `${hh}:${mm}`;
+  return `${d.getDate()}/${d.getMonth() + 1} ${hh}:${mm}`;
+}
 
 function Pastilha({
   nome,
@@ -23,6 +61,17 @@ function Pastilha({
 }) {
   const [estado, setEstado] = useState<Estado>("calmo");
   const [resultado, setResultado] = useState<Resultado | null>(null);
+  const [quando, setQuando] = useState<number | null>(null);
+
+  // Restaurar resultado anterior do localStorage ao montar
+  useEffect(() => {
+    const cache = lerCache(url);
+    if (cache) {
+      setResultado(cache.resultado);
+      setEstado(cache.estado);
+      setQuando(cache.ts);
+    }
+  }, [url]);
 
   async function testar() {
     setEstado("a-testar");
@@ -36,11 +85,19 @@ function Pastilha({
       } catch {
         j = { ok: false, erro: `resposta não-JSON (${r.status})`, detalhe: texto.slice(0, 200) };
       }
+      const novoEstado: "ok" | "erro" = j.ok ? "ok" : "erro";
+      const ts = Date.now();
       setResultado(j);
-      setEstado(j.ok ? "ok" : "erro");
+      setEstado(novoEstado);
+      setQuando(ts);
+      escreverCache(url, { resultado: j, estado: novoEstado, ts });
     } catch (e) {
-      setResultado({ ok: false, erro: e instanceof Error ? e.message : "erro" });
+      const j: Resultado = { ok: false, erro: e instanceof Error ? e.message : "erro" };
+      const ts = Date.now();
+      setResultado(j);
       setEstado("erro");
+      setQuando(ts);
+      escreverCache(url, { resultado: j, estado: "erro", ts });
     }
   }
 
@@ -70,6 +127,11 @@ function Pastilha({
         </button>
       </div>
       <p className="text-[11px] text-[var(--texto-suave)] mt-1">{legenda}</p>
+      {quando && (
+        <p className="text-[10px] text-[var(--texto-mudo)] mt-0.5">
+          última verificação: {quandoFmt(quando)}
+        </p>
+      )}
       {resultado && (
         <div className="mt-2 text-[11px]">
           {resultado.ok ? (

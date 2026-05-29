@@ -29,18 +29,25 @@ export async function POST(request: Request) {
     );
   }
 
-  let body: { dias?: number[] | "all"; slot?: string } = {};
+  let body: { dias?: number[] | "all"; slot?: string; semana?: number } = {};
   try {
     body = await request.json();
   } catch {}
 
-  // Aceita também query params para o BotaoSeed conseguir disparar
-  // sem body: ?dias=all&slot=manha ou ?dias=[1,2,3]&slot=tarde.
+  // Aceita também query params: ?dias=all|[1,2,3] · ?slot=manha|tarde
+  // · ?semana=1..4 (atalho que expande para os dias 1-7, 8-14, ...).
   const url = new URL(request.url);
   const diasQs = url.searchParams.get("dias");
   const slotQs = url.searchParams.get("slot");
+  const semanaQs = url.searchParams.get("semana");
   let diasInput: number[] | "all" = body.dias ?? "all";
-  if (!body.dias && diasQs) {
+
+  const semana = body.semana ?? (semanaQs ? parseInt(semanaQs, 10) : null);
+  if (semana && semana >= 1 && semana <= 5) {
+    const inicio = (semana - 1) * 7 + 1;
+    const fim = Math.min(30, semana * 7);
+    diasInput = Array.from({ length: fim - inicio + 1 }, (_, i) => inicio + i);
+  } else if (!body.dias && diasQs) {
     if (diasQs === "all") diasInput = "all";
     else {
       try {
