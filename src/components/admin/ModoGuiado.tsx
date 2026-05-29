@@ -132,6 +132,7 @@ export function ModoGuiado() {
   const [s4semana, setS4semana] = useState(1);
   const [msg, setMsg] = useState<Record<string, string>>({});
   const [thumbs, setThumbs] = useState<string[]>([]);
+  const [tabActivo, setTabActivo] = useState<number>(1);
 
   async function refrescar() {
     setA(true);
@@ -188,7 +189,39 @@ export function ModoGuiado() {
         </button>
       </div>
 
-      {/* PASSO 1: limpar a base */}
+      {/* Barra horizontal de tabs */}
+      <div className="flex flex-wrap gap-2 border-b border-[var(--borda)] pb-3">
+        {[
+          { n: 1, label: "Limpar base", feito: passo1Feito },
+          { n: 2, label: "Conteúdo", feito: passo2Feito },
+          { n: 3, label: "Imagens", feito: passo3Feito },
+          { n: 4, label: "Render HD", feito: false },
+          { n: 5, label: "Agendar + CSV", feito: false },
+        ].map((p) => {
+          const activo = tabActivo === p.n;
+          return (
+            <button
+              key={p.n}
+              type="button"
+              onClick={() => setTabActivo(p.n)}
+              className={`px-4 py-2 rounded-md text-sm border transition-colors flex items-center gap-2 ${
+                activo
+                  ? "border-[var(--ambar)] bg-[var(--ambar)]/10 text-[var(--ambar-claro)]"
+                  : "border-[var(--borda)] text-[var(--texto-suave)] hover:border-[var(--borda-forte)]"
+              }`}
+            >
+              <span className="font-mono text-[10px] text-[var(--texto-mudo)]">
+                {String(p.n).padStart(2, "0")}
+              </span>
+              <span className="font-serif">{p.label}</span>
+              {p.feito && <span className="text-[var(--verde)] text-xs">✓</span>}
+            </button>
+          );
+        })}
+      </div>
+
+      {tabActivo === 1 && (
+      /* PASSO 1: limpar a base */
       <PassoCard
         n={1}
         titulo="Limpar a base"
@@ -225,8 +258,10 @@ export function ModoGuiado() {
           />
         )}
       </PassoCard>
+      )}
 
-      {/* PASSO 2: conteúdo */}
+      {tabActivo === 2 && (
+      /* PASSO 2: conteúdo */
       <PassoCard
         n={2}
         titulo="Conteúdo"
@@ -293,8 +328,10 @@ export function ModoGuiado() {
           </>
         )}
       </PassoCard>
+      )}
 
-      {/* PASSO 3: imagens automáticas */}
+      {tabActivo === 3 && (
+      /* PASSO 3: imagens automáticas */
       <PassoCard
         n={3}
         titulo="Imagens (Replicate / FLUX 1.1 Pro)"
@@ -442,8 +479,10 @@ export function ModoGuiado() {
           </>
         )}
       </PassoCard>
+      )}
 
-      {/* PASSO 4: render HD por semana */}
+      {tabActivo === 4 && (
+      /* PASSO 4: render HD por semana */
       <PassoCard
         n={4}
         titulo="Render HD, semana a semana"
@@ -508,8 +547,10 @@ export function ModoGuiado() {
           </>
         )}
       </PassoCard>
+      )}
 
-      {/* PASSO 5: agendar + exportar */}
+      {tabActivo === 5 && (
+      /* PASSO 5: agendar + exportar */
       <PassoCard
         n={5}
         titulo="Agendar datas e exportar CSV"
@@ -531,6 +572,30 @@ export function ModoGuiado() {
           </div>
         )}
       </PassoCard>
+      )}
+
+      {/* Navegação inferior: anterior / próximo */}
+      <div className="flex items-center justify-between pt-4 border-t border-[var(--borda)]">
+        <button
+          type="button"
+          onClick={() => setTabActivo(Math.max(1, tabActivo - 1))}
+          disabled={tabActivo === 1}
+          className="estudio-btn text-xs disabled:opacity-40"
+        >
+          ← passo anterior
+        </button>
+        <span className="text-[10px] text-[var(--texto-mudo)]">
+          passo {tabActivo} de 5
+        </span>
+        <button
+          type="button"
+          onClick={() => setTabActivo(Math.min(5, tabActivo + 1))}
+          disabled={tabActivo === 5}
+          className="estudio-btn text-xs disabled:opacity-40"
+        >
+          próximo passo →
+        </button>
+      </div>
     </div>
   );
 }
