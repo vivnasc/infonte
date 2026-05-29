@@ -43,6 +43,22 @@ export async function POST(request: Request) {
   async function processarDia(dia: number): Promise<void> {
     const temaManha = TEMAS_MANHA[dia] ?? `DIA ${dia}`;
 
+    // Check de existência ANTES de chamar a Claude. Se já existe com
+    // texto, salta sem gastar tokens nem segundos. Isto evita o timeout
+    // do Vercel quando o lote já está quase todo feito.
+    const { data: jaExiste } = await sb
+      .from("campanha_posts")
+      .select("id, texto_imagem")
+      .eq("dia", dia)
+      .eq("slot", "tarde")
+      .maybeSingle();
+
+    if (jaExiste && jaExiste.texto_imagem?.trim()) {
+      saltados++;
+      log.push(`Dia ${dia}: já existia, saltado`);
+      return;
+    }
+
     const r = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
       headers: {
@@ -102,33 +118,20 @@ Devolve APENAS o JSON, sem explicação.`,
       return;
     }
 
-    const { data: existente } = await sb
-      .from("campanha_posts")
-      .select("id, texto_imagem")
-      .eq("dia", dia)
-      .eq("slot", "tarde")
-      .maybeSingle();
-
-    // Idempotência: se já existe com texto, salta (não chama a Claude
-    // por nada). Útil para retomar lotes sem re-pagar tokens.
-    if (existente && existente.texto_imagem?.trim()) {
-      saltados++;
-      log.push(`Dia ${dia}: já existia, saltado`);
-      return;
-    }
-
-    if (existente) {
+    // Re-aproveitamos o jaExiste do início. Se existia mas sem texto,
+    // atualizamos. Se não existia, criamos novo.
+    if (jaExiste) {
       await sb.from("campanha_posts").update({
         texto_imagem: parsed.texto_imagem,
         legenda: parsed.legenda,
         pergunta: parsed.pergunta,
-      }).eq("id", existente.id);
+      }).eq("id", jaExiste.id);
       gerados++;
       log.push(`Dia ${dia}: atualizado`);
     } else {
       const { error } = await sb.from("campanha_posts").insert({
         dia,
-        semana: Math.ceil(dia / 7),
+        semana: Math.min(4, Math.ceil(dia / 7)),
         tema: `${temaManha} (emocional)`,
         formato: "post-unico",
         texto_imagem: parsed.texto_imagem,

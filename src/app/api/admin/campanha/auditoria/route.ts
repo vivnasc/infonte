@@ -55,7 +55,8 @@ export async function GET() {
 
   const semanaErrada: Array<{ id: string; dia: number; semanaActual: number | null; semanaCorrecta: number }> = [];
   for (const p of lista as Linha[]) {
-    const correcta = Math.ceil(p.dia / 7);
+    // Schema tem check (semana between 1 and 4), então clamp.
+    const correcta = Math.min(4, Math.ceil(p.dia / 7));
     if (p.semana !== correcta) {
       semanaErrada.push({
         id: p.id,

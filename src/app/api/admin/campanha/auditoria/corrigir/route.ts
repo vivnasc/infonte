@@ -62,7 +62,8 @@ export async function POST() {
 
   // 2. Semana errada
   for (const p of lista as Linha[]) {
-    const correcta = Math.ceil(p.dia / 7);
+    // Schema tem check (semana between 1 and 4), por isso clamp a 4.
+    const correcta = Math.min(4, Math.ceil(p.dia / 7));
     if (p.semana !== correcta) {
       const { error: errUp } = await sb
         .from("campanha_posts")
