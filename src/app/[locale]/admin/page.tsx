@@ -2,6 +2,7 @@ import { Link } from "@/i18n/routing";
 import { BotaoSeed } from "@/components/admin/BotaoSeed";
 import { BotaoSyncRender } from "@/components/admin/BotaoSyncRender";
 import { BotaoRenderSemana } from "@/components/admin/BotaoRenderSemana";
+import { BotaoResetRendering } from "@/components/admin/BotaoResetRendering";
 import { ModoGuiado } from "@/components/admin/ModoGuiado";
 import { criarClienteAdmin } from "@/lib/supabase/admin";
 
@@ -164,6 +165,12 @@ export default async function PainelPage() {
         Em cima tens o modo guiado, passo a passo, do início ao Metricool.
         Em baixo tens a vista panorâmica (funil, cobertura por semana).
       </p>
+
+      {funil.rendering > 0 && (
+        <div className="mt-6">
+          <BotaoResetRendering rendering={funil.rendering} />
+        </div>
+      )}
 
       <div className="mt-8">
         <ModoGuiado />
