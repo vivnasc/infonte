@@ -5,6 +5,7 @@ import { BotaoRenderSemana } from "@/components/admin/BotaoRenderSemana";
 import { BotaoResetRendering } from "@/components/admin/BotaoResetRendering";
 import { WorkflowsRender } from "@/components/admin/WorkflowsRender";
 import { AgendarTudo } from "@/components/admin/AgendarTudo";
+import { ReconstruirCampanha } from "@/components/admin/ReconstruirCampanha";
 import { criarClienteAdmin } from "@/lib/supabase/admin";
 
 type EstadoRaw = string | null;
@@ -166,6 +167,10 @@ export default async function PainelPage() {
         Estado da campanha + atalhos. Edição por dia em Campanha 30 dias.
         Pré-visualização total em Pré-visualizar tudo.
       </p>
+
+      <div className="mt-8">
+        <ReconstruirCampanha />
+      </div>
 
       {funil.rendering > 0 && (
         <div className="mt-6">
