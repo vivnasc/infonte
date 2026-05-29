@@ -2,8 +2,11 @@ import { criarClienteAdmin } from "@/lib/supabase/admin";
 import { Link } from "@/i18n/routing";
 import { BotaoSeed } from "@/components/admin/BotaoSeed";
 import { Diagnostico } from "@/components/admin/Diagnostico";
+import { BotaoBulkImagens } from "@/components/admin/BotaoBulkImagens";
+import { CardRetoma } from "@/components/admin/CardRetoma";
+import { BotaoSyncRender } from "@/components/admin/BotaoSyncRender";
 
-type Estado = "rascunho" | "pronto" | "agendado" | "publicado";
+type Estado = "rascunho" | "rendering" | "failed" | "pronto" | "agendado" | "publicado";
 
 type PostResumo = {
   dia: number;
@@ -87,7 +90,7 @@ export default async function CampanhaListaPage() {
       acc[e] = (acc[e] ?? 0) + 1;
       return acc;
     },
-    { rascunho: 0, pronto: 0, agendado: 0, publicado: 0 }
+    { rascunho: 0, rendering: 0, failed: 0, pronto: 0, agendado: 0, publicado: 0 }
   );
 
   const totalManha = posts.filter((p) => p.slot !== "tarde").length;
@@ -164,24 +167,25 @@ export default async function CampanhaListaPage() {
         </p>
       </Fase>
 
-      <Fase numero={2} titulo="Imagens automáticas" subtitulo="FLUX 1.1 Pro via Replicate. Claude decide o que mostra cada imagem. Testa 3 antes do lote." custo="$0.04 / imagem · ~$1.20 os 30 dias">
+      <Fase numero={2} titulo="Imagens automáticas" subtitulo="FLUX 1.1 Pro via Replicate. Claude decide o assunto, valida regras editoriais e dispara 1 retry se violar. Testa 3 antes do lote." custo="$0.04 / imagem">
+        <CardRetoma />
         <div className="space-y-4">
           <div>
             <div className="text-[10px] uppercase tracking-[0.25em] text-[var(--texto-mudo)] mb-2">teste</div>
-            <BotaoSeed url="/api/admin/campanha/imagens-replicate?inicio=1&fim=3&slot=manha" titulo="Testar 3 primeiros (dias 1-3)" descricao="~30s · ~$0.12. Confirma o look antes de escalar." />
+            <BotaoBulkImagens inicio={1} fim={3} slot="manha" titulo="Testar 3 primeiros (dias 1-3)" />
           </div>
           <div>
             <div className="text-[10px] uppercase tracking-[0.25em] text-[var(--texto-mudo)] mb-2">lotes completos</div>
             <div className="flex flex-wrap gap-3">
-              <BotaoSeed url="/api/admin/campanha/imagens-replicate?inicio=1&fim=10&slot=manha" titulo="Dias 1-10" descricao="~40s · ~$0.40" />
-              <BotaoSeed url="/api/admin/campanha/imagens-replicate?inicio=11&fim=20&slot=manha" titulo="Dias 11-20" descricao="~40s · ~$0.40" />
-              <BotaoSeed url="/api/admin/campanha/imagens-replicate?inicio=21&fim=30&slot=manha" titulo="Dias 21-30" descricao="~40s · ~$0.40" />
+              <BotaoBulkImagens inicio={1} fim={10} slot="manha" titulo="Dias 1-10" />
+              <BotaoBulkImagens inicio={11} fim={20} slot="manha" titulo="Dias 11-20" />
+              <BotaoBulkImagens inicio={21} fim={30} slot="manha" titulo="Dias 21-30" />
             </div>
           </div>
         </div>
       </Fase>
 
-      <Fase numero={3} titulo="Render HD" subtitulo="PNGs dos slides em 2160x3840 via Playwright no GitHub Actions, sobe direto ao Storage." custo="grátis (GitHub Actions)">
+      <Fase numero={3} titulo="Render HD" subtitulo="PNGs dos slides em 2160x3840 via Playwright no GitHub Actions, sobe direto ao Storage. Marca os dias como 'rendering' enquanto corre." custo="grátis (GitHub Actions)">
         <div className="space-y-4">
           <div>
             <div className="text-[10px] uppercase tracking-[0.25em] text-[var(--texto-mudo)] mb-2">teste</div>
@@ -193,6 +197,10 @@ export default async function CampanhaListaPage() {
               <BotaoSeed url="/api/admin/campanha/render-submit?dias=all&slot=manha" titulo="30 dias da manhã" descricao="2-5 minutos. Workflow no GitHub." />
               <BotaoSeed url="/api/admin/campanha/render-submit?dias=all&slot=tarde" titulo="30 dias da tarde" descricao="2-5 minutos. Workflow no GitHub." />
             </div>
+          </div>
+          <div>
+            <div className="text-[10px] uppercase tracking-[0.25em] text-[var(--texto-mudo)] mb-2">sincronizar estado depois</div>
+            <BotaoSyncRender />
           </div>
         </div>
       </Fase>

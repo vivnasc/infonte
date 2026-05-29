@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { exigirAdmin } from "@/lib/admin";
+import { criarClienteAdmin } from "@/lib/supabase/admin";
 
 export const runtime = "nodejs";
 export const maxDuration = 30;
@@ -84,6 +85,26 @@ export async function POST(request: Request) {
       },
       { status: 500 }
     );
+  }
+
+  // Marca os dias do batch como "rendering" para o utilizador ver
+  // que estão em vôo (state machine SyncHim). Só promove de rascunho/
+  // failed; não atropela agendado/publicado.
+  try {
+    const sb = criarClienteAdmin();
+    const diasAlvo =
+      diasInput === "all" ? Array.from({ length: 30 }, (_, i) => i + 1) : diasInput;
+    if (Array.isArray(diasAlvo)) {
+      await sb
+        .from("campanha_posts")
+        .update({ estado: "rendering" })
+        .in("dia", diasAlvo)
+        .eq("slot", slot)
+        .in("estado", ["rascunho", "failed", "rendering"]);
+    }
+  } catch (e) {
+    // Não bloquear o dispatch se a marcação falhar.
+    console.warn("[render-submit] erro a marcar rendering:", e);
   }
 
   // O workflow_dispatch não devolve o run_id directamente, só status 204.

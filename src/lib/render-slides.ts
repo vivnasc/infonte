@@ -61,6 +61,21 @@ function credito(light: boolean): string {
 
 const ARRASTE = `<div style="display:flex;align-items:center;justify-content:flex-start;gap:10px;font-family:Inter,sans-serif;font-size:14px;font-weight:600;letter-spacing:0.25em;text-transform:uppercase;">DESLIZA PARA O LADO <span style="font-size:18px;letter-spacing:0;">→</span></div>`;
 
+// Número ghost: dígito enorme em creme translúcido atrás do conteúdo
+// (regra 5 do SyncHim — número fantasma visível em todas as slides).
+function ghostNumero(slideNum: number | undefined, light: boolean): string {
+  if (!slideNum) return "";
+  const cor = light ? "rgba(74,47,27,0.06)" : "rgba(242,232,220,0.05)";
+  return `<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-58%);font-family:'EB Garamond',serif;font-weight:600;font-size:780px;line-height:1;color:${cor};z-index:0;pointer-events:none;letter-spacing:-0.05em;">${String(slideNum).padStart(2, "0")}</div>`;
+}
+
+// Paginação textual (regra 6 do SyncHim): "01 / 07" em vez de só dots,
+// mais editorial. Devolve string formatada para usar no canto inferior.
+function paginacaoTextual(atual: number, total: number, light: boolean): string {
+  const cor = light ? "rgba(74,47,27,0.55)" : "rgba(242,232,220,0.6)";
+  return `<div style="font-family:Inter,sans-serif;font-size:12px;letter-spacing:0.2em;color:${cor};">${String(atual).padStart(2, "0")} / ${String(total).padStart(2, "0")}</div>`;
+}
+
 function paginacao(atual: number, total: number, light: boolean): string {
   const dots = Array.from({ length: total }, (_, i) =>
     `<div style="width:8px;height:8px;border-radius:50%;background:${i + 1 === atual
@@ -263,6 +278,10 @@ function layoutFotoCheia(opts: FullOpts): string {
   // a meio, muito escuro em baixo para o texto agarrar bem.
   const scrim = `linear-gradient(180deg,rgba(28,18,11,0.10) 0%,rgba(28,18,11,0.35) 45%,rgba(28,18,11,0.85) 75%,rgba(28,18,11,0.95) 100%)`;
 
+  const total = opts.totalSlides ?? 1;
+  const num = opts.slideNum ?? 1;
+  const mostraPag = total > 1;
+
   return `${base(W, h)}
 <div style="position:relative;width:${W}px;height:${h}px;background:${BG_SLIDE};overflow:hidden;">
   ${opts.imagemUrl
@@ -270,6 +289,9 @@ function layoutFotoCheia(opts: FullOpts): string {
        <div style="position:absolute;inset:0;background:${scrim};"></div>`
     : `<div style="position:absolute;inset:0;background:radial-gradient(ellipse at 30% 25%,#3a2515 0%,${BG_SLIDE} 60%,#180e08 100%);"></div>`
   }
+
+  ${!opts.imagemUrl ? ghostNumero(num, false) : ""}
+
   <div style="position:absolute;top:36px;left:44px;z-index:3;">${marca(false)}</div>
 
   <div style="position:absolute;left:0;right:0;bottom:0;z-index:2;padding:0 56px 130px 56px;">
@@ -279,8 +301,11 @@ function layoutFotoCheia(opts: FullOpts): string {
     </div>
   </div>
 
-  <div style="position:absolute;bottom:38px;left:56px;z-index:3;color:rgba(242,232,220,0.55);">${ARRASTE}</div>
-  <div style="position:absolute;bottom:38px;right:56px;z-index:3;">${credito(false)}</div>
+  ${mostraPag ? `<div style="position:absolute;bottom:38px;left:56px;z-index:3;color:rgba(242,232,220,0.55);">${ARRASTE}</div>` : ""}
+  <div style="position:absolute;bottom:38px;right:56px;z-index:3;display:flex;align-items:center;gap:18px;">
+    ${mostraPag ? paginacaoTextual(num, total, false) : ""}
+    ${credito(false)}
+  </div>
 </div>
 </body></html>`;
 }
@@ -296,9 +321,15 @@ function layoutFechoCta(opts: FullOpts): string {
   const charCount = opts.texto.replace(/\*\*/g, "").length;
   const fs = charCount < 60 ? 56 : charCount < 120 ? 46 : charCount < 200 ? 38 : 32;
 
+  const total = opts.totalSlides ?? 1;
+  const num = opts.slideNum ?? total;
+  const mostraPag = total > 1;
+
   return `${base(W, h)}
 <div style="position:relative;width:${W}px;height:${h}px;background:radial-gradient(ellipse at 25% 20%,#4a2f1b 0%,${BG_SLIDE} 55%,#170d07 100%);overflow:hidden;">
   <div style="position:absolute;top:0;left:0;right:0;height:60%;background:radial-gradient(ellipse at 50% 0%,rgba(235,174,74,0.10) 0%,transparent 70%);"></div>
+
+  ${ghostNumero(num, false)}
 
   <div style="position:absolute;top:36px;left:44px;z-index:2;">${marca(false)}</div>
 
@@ -310,7 +341,10 @@ function layoutFechoCta(opts: FullOpts): string {
   </div>
 
   <div style="position:absolute;bottom:38px;left:64px;z-index:2;color:rgba(242,232,220,0.55);font-family:Inter,sans-serif;font-size:13px;letter-spacing:0.18em;text-transform:uppercase;">link na bio</div>
-  <div style="position:absolute;bottom:38px;right:56px;z-index:2;">${credito(false)}</div>
+  <div style="position:absolute;bottom:38px;right:56px;z-index:2;display:flex;align-items:center;gap:18px;">
+    ${mostraPag ? paginacaoTextual(num, total, false) : ""}
+    ${credito(false)}
+  </div>
 </div>
 </body></html>`;
 }

@@ -335,6 +335,8 @@ export function EditorPost({ post }: { post: Post }) {
               className="input"
             >
               <option value="rascunho">rascunho</option>
+              <option value="rendering">a renderizar</option>
+              <option value="failed">falhou</option>
               <option value="pronto">pronto</option>
               <option value="agendado">agendado</option>
               <option value="publicado">publicado</option>

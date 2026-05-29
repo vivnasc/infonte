@@ -5,6 +5,31 @@ import { criarClienteAdmin } from "@/lib/supabase/admin";
 // a decisão do que mostrar é da Claude, post a post.
 const QUALIDADE = `warm terra and ocre palette (#2E1D12 deep terra, #F2E8DC cream, #B8843D ocre, #EBAE4A amber gold, #6B6B47 olive), painterly editorial photography, soft natural light, gentle chiaroscuro, 9:16 vertical, high resolution, no text in image, no logos, no watermarks, no extreme close-up faces, no faces filling the frame, no portrait headshots`;
 
+// Regras editoriais SyncHim: detecta violações no prompt antes de
+// mandar para a FLUX. Dispara 1 retry cirúrgico se falhar.
+type Violacao = "close-up" | "cadencia-semanal" | "texto-na-imagem";
+
+function detectarViolacoes(prompt: string): Violacao[] {
+  const baixo = prompt.toLowerCase();
+  const v: Violacao[] = [];
+  if (/(close[\s-]?up|extreme close|tight crop|headshot|head shot|portrait of (a |the )?(woman|man|girl)|face fill|filling the frame)/i.test(baixo)) {
+    v.push("close-up");
+  }
+  if (/(semana que vem|próxima semana|next week|this week|today|amanhã|tomorrow)/i.test(baixo)) {
+    v.push("cadencia-semanal");
+  }
+  if (/(handwritten text|written words|sign with text|typography of)/i.test(baixo)) {
+    v.push("texto-na-imagem");
+  }
+  return v;
+}
+
+const REPARO: Record<Violacao, string> = {
+  "close-up": "evita ABSOLUTAMENTE qualquer close-up de cara, retrato, ou cara a preencher o enquadramento. Se houver pessoas, capta-as a média ou longa distância, em interacção, ou de costas.",
+  "cadencia-semanal": "não menciones tempo (semana, hoje, amanhã, próxima semana, etc.).",
+  "texto-na-imagem": "remove qualquer referência a texto, letras, palavras ou tipografia dentro da imagem.",
+};
+
 // Remove flags de Midjourney (--ar, --v, etc.) que o Replicate não
 // entende. O aspect ratio passa em campo separado do input.
 function limparPromptParaReplicate(prompt: string): string {
@@ -155,11 +180,24 @@ export async function gerarEUploadDia(opts: {
   if (!post) throw new Error("post não encontrado");
 
   const textoContexto = post.texto_imagem || post.legenda || post.tema;
-  const promptCru = await gerarPromptViaClaude(opts.anthropicKey, {
+  let promptCru = await gerarPromptViaClaude(opts.anthropicKey, {
     dia: post.dia,
     tema: post.tema,
     texto: textoContexto,
   });
+
+  // Post-validação editorial (SyncHim, regra 4 + 3). 1 retry cirúrgico.
+  const viol = detectarViolacoes(promptCru);
+  if (viol.length > 0) {
+    const correccoes = viol.map((v) => REPARO[v]).join(" ");
+    const retryPrompt = `${promptCru}\n\nO prompt acima viola regras editoriais. Reescreve-o respeitando: ${correccoes} Mantém a mesma cena e emoção. Devolve APENAS o prompt reescrito.`;
+    promptCru = await gerarPromptViaClaude(opts.anthropicKey, {
+      dia: post.dia,
+      tema: post.tema,
+      texto: retryPrompt,
+    });
+  }
+
   const prompt = fixarQualidade(limparPromptParaReplicate(promptCru));
 
   const imagemUrl = await chamarReplicate(opts.replicateToken, prompt);
