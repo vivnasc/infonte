@@ -25,12 +25,14 @@ const PROMPT_MANHA = (texto: string, legenda: string) => `És a Vivianne dos San
 Legenda completa do post:
 "${legenda}"
 
-Expande esta ideia num mini-carrossel de 3 slides para Instagram. Cada slide é UMA frase curta (1-2 linhas), numerada (1. 2. 3.).
+Expande esta ideia num carrossel de 5 slides para Instagram. Cada slide é UMA frase curta (1-2 linhas), numerada (1. 2. 3. 4. 5.).
 
 Estrutura:
 - Slide 1: hook impactante (o statement actual ou variação muito próxima)
-- Slide 2: o porquê (desenvolve a razão por trás, vai mais fundo)
-- Slide 3: a consequência ou o convite à reflexão (não é CTA de venda, é o "agora vê")
+- Slide 2: contexto / observação concreta (onde isto aparece na vida da mulher)
+- Slide 3: o porquê (a razão por trás, vai mais fundo)
+- Slide 4: a consequência (o custo de não ver isto, ou o ganho de ver)
+- Slide 5: convite à reflexão ou frase-âncora (não CTA de venda)
 
 Regras de voz (não negociáveis):
 - pt-PT, segunda pessoa (tu), íntima
@@ -40,10 +42,12 @@ Regras de voz (não negociáveis):
 - Sem inglês de marketing: "hustle", "growth", "mindset"
 - Tom: quem se bastou a falar para quem persegue. Calma com autoridade.
 
-Devolve APENAS as 3 linhas, no formato:
+Devolve APENAS as 5 linhas, no formato:
 1. [primeira linha]
 2. [segunda linha]
 3. [terceira linha]
+4. [quarta linha]
+5. [quinta linha]
 
 Nada mais. Sem prefácio, sem aspas, sem explicação.`;
 
@@ -52,12 +56,14 @@ const PROMPT_TARDE = (texto: string, tema: string) => `És a Vivianne dos Santos
 Tema: "${tema}"
 Frase única actual na arte: "${texto}"
 
-Expande em 3 slides numerados que aprofundam o reconhecimento. A tarde NÃO ensina, RECONHECE.
+Expande em 5 slides numerados que aprofundam o reconhecimento. A tarde NÃO ensina, RECONHECE. Cada slide intensifica o sentir, sem soluções.
 
 Estrutura:
 - Slide 1: o feeling raw (a frase actual ou eco próximo)
-- Slide 2: o que está por trás daquele feeling
-- Slide 3: a verdade nua que fica depois
+- Slide 2: o gesto concreto (onde isto se manifesta no corpo ou no dia)
+- Slide 3: o que está por trás daquele feeling
+- Slide 4: a verdade nua que custa admitir
+- Slide 5: o silêncio que fica (frase que para o scroll, não conclui)
 
 Cada slide UMA frase curta (1-2 linhas).
 
@@ -72,6 +78,8 @@ Devolve APENAS:
 1. [primeira linha]
 2. [segunda linha]
 3. [terceira linha]
+4. [quarta linha]
+5. [quinta linha]
 
 Sem prefácio, sem aspas.`;
 
@@ -101,7 +109,7 @@ async function expandirComClaude(
     },
     body: JSON.stringify({
       model: "claude-sonnet-4-6",
-      max_tokens: 512,
+      max_tokens: 800,
       messages: [{ role: "user", content: prompt }],
     }),
   });
@@ -109,10 +117,10 @@ async function expandirComClaude(
   const j = await r.json();
   const out = j.content?.[0]?.text?.trim();
   if (!out) return null;
-  // Verificar que tem 3 linhas numeradas
+  // Verificar que tem pelo menos 5 linhas numeradas
   const lines = out.split("\n").filter((l: string) => /^\d+\.\s+.+/.test(l.trim()));
-  if (lines.length < 3) return null;
-  return lines.slice(0, 3).join("\n");
+  if (lines.length < 5) return null;
+  return lines.slice(0, 5).join("\n");
 }
 
 export async function POST(request: Request) {
