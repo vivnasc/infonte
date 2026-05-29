@@ -492,62 +492,128 @@ export function ModoGuiado() {
       )}
 
       {tabActivo === 4 && (
-      /* PASSO 4: render HD em 2 cliques */
+      /* PASSO 4: pré-visualizar → render → ver depois */
       <PassoCard
         n={4}
         titulo="Render HD"
-        descricao="Dois cliques. Cada workflow gera os PNGs HD dos 30 dias num só job (manhã ou tarde). 5-10 minutos cada, podem correr em paralelo no GitHub Actions."
+        descricao="Vê tudo antes. Renderiza. Vê tudo depois. Sem te deixar gastar minutos do GitHub Actions às cegas."
         activo={passo3Feito}
         bloqueado={!passo3Feito}
-        sumario="quando os 2 workflows terminarem, vês cá os PNGs em /admin/preview-tudo → modo 'depois'"
+        sumario="3 passos: pré-visualizar → render → comparar depois"
       >
         {passo3Feito && (
-          <>
-            <div className="flex flex-wrap gap-3">
-              <BlocoAcao
-                estado={s4}
-                rotulo="render HD, 30 manhã"
-                textoOk={msg.s4}
-                textoErro={msg.s4err}
-                exec={async () => {
-                  setS4("a-correr");
-                  const { ok, json } = await call(
-                    `/api/admin/campanha/render-submit?dias=all&slot=manha`,
-                    { method: "POST" }
-                  );
-                  if (ok) {
-                    setS4("ok");
-                    setMsg((m) => ({ ...m, s4: `lançado, jobId ${json.jobId}` }));
-                  } else {
-                    setS4("erro");
-                    setMsg((m) => ({ ...m, s4err: String(json.erro ?? "erro") }));
-                  }
-                }}
-              />
-              <BlocoAcao
-                estado={s3tardeImg === "ok" ? "calmo" : "calmo"}
-                rotulo="render HD, 30 tarde"
-                textoOk={msg.s4tarde}
-                textoErro={msg.s4tardeerr}
-                exec={async () => {
-                  setMsg((m) => ({ ...m, s4tarde: "a lançar..." }));
-                  const { ok, json } = await call(
-                    `/api/admin/campanha/render-submit?dias=all&slot=tarde`,
-                    { method: "POST" }
-                  );
-                  if (ok) {
-                    setMsg((m) => ({ ...m, s4tarde: `lançado, jobId ${json.jobId}` }));
-                  } else {
-                    setMsg((m) => ({ ...m, s4tardeerr: String(json.erro ?? "erro") }));
-                  }
-                }}
-              />
+          <div className="space-y-5">
+            <div className="estudio-card-elevado" style={{ borderColor: "var(--ambar)", borderWidth: 1 }}>
+              <div className="text-[10px] uppercase tracking-[0.25em] text-[var(--ambar)] mb-2">
+                4.1 — ver TUDO antes de renderizar (obrigatório)
+              </div>
+              <p className="text-xs text-[var(--texto-suave)] mb-3 max-w-leitura">
+                Vais ver os 60 posts × ~3 slides cada (≈ 180 cartões),
+                exactamente como vão sair em PNG. Se algum estiver mal,
+                clicas no &quot;editar&quot; do dia para ajustar antes de render.
+              </p>
+              <a
+                href="/admin/preview-tudo"
+                target="_blank"
+                rel="noreferrer"
+                className="estudio-btn estudio-btn-primario"
+              >
+                abrir pré-visualização completa →
+              </a>
             </div>
-            <p className="text-xs text-[var(--texto-suave)] mt-4 max-w-leitura">
-              Acompanha os workflows na tabela em baixo do painel
-              (auto-actualiza). Quando ficam verdes, vai ao Passo 5.
-            </p>
-          </>
+
+            <div className="estudio-card-elevado">
+              <div className="text-[10px] uppercase tracking-[0.25em] text-[var(--texto-mudo)] mb-2">
+                amostra rápida (3 dias por semana)
+              </div>
+              <div className="flex flex-wrap items-center gap-2 mb-3">
+                <span className="text-xs text-[var(--texto-suave)]">semana</span>
+                {[1, 2, 3, 4, 5].map((s) => (
+                  <button
+                    key={s}
+                    onClick={() => setS4semana(s)}
+                    className={`px-3 py-1 rounded-full text-xs border ${
+                      s === s4semana
+                        ? "border-[var(--ambar)] bg-[var(--ambar)]/10 text-[var(--ambar-claro)]"
+                        : "border-[var(--borda)] text-[var(--texto-suave)]"
+                    }`}
+                  >
+                    {s}
+                  </button>
+                ))}
+              </div>
+              <PreviewSemana semana={s4semana} slot="manha" />
+            </div>
+
+            <div className="estudio-card-elevado">
+              <div className="text-[10px] uppercase tracking-[0.25em] text-[var(--oliva)] mb-3">
+                4.2 — renderizar HD (depois de aprovar acima)
+              </div>
+              <div className="flex flex-wrap gap-3">
+                <BlocoAcao
+                  estado={s4}
+                  rotulo="render HD, 30 manhã"
+                  textoOk={msg.s4}
+                  textoErro={msg.s4err}
+                  exec={async () => {
+                    setS4("a-correr");
+                    const { ok, json } = await call(
+                      `/api/admin/campanha/render-submit?dias=all&slot=manha`,
+                      { method: "POST" }
+                    );
+                    if (ok) {
+                      setS4("ok");
+                      setMsg((m) => ({ ...m, s4: `lançado, jobId ${json.jobId}` }));
+                    } else {
+                      setS4("erro");
+                      setMsg((m) => ({ ...m, s4err: String(json.erro ?? "erro") }));
+                    }
+                  }}
+                />
+                <BlocoAcao
+                  estado="calmo"
+                  rotulo="render HD, 30 tarde"
+                  textoOk={msg.s4tarde}
+                  textoErro={msg.s4tardeerr}
+                  exec={async () => {
+                    setMsg((m) => ({ ...m, s4tarde: "a lançar..." }));
+                    const { ok, json } = await call(
+                      `/api/admin/campanha/render-submit?dias=all&slot=tarde`,
+                      { method: "POST" }
+                    );
+                    if (ok) {
+                      setMsg((m) => ({ ...m, s4tarde: `lançado, jobId ${json.jobId}` }));
+                    } else {
+                      setMsg((m) => ({ ...m, s4tardeerr: String(json.erro ?? "erro") }));
+                    }
+                  }}
+                />
+              </div>
+              <p className="text-xs text-[var(--texto-suave)] mt-3">
+                5-10 min cada. Vês os runs em tempo real na tabela
+                WORKFLOWS DE RENDER HD em baixo do painel.
+              </p>
+            </div>
+
+            <div className="estudio-card-elevado" style={{ borderColor: "var(--verde)", borderWidth: 1 }}>
+              <div className="text-[10px] uppercase tracking-[0.25em] text-[var(--verde)] mb-2">
+                4.3 — ver os PNGs renderizados (depois do render terminar)
+              </div>
+              <p className="text-xs text-[var(--texto-suave)] mb-3 max-w-leitura">
+                Mesma página de pré-visualização, mas troca o toggle no topo
+                para <em>depois (PNG renderizado)</em>. Vês os PNGs HD reais
+                que vão para o Storage e para o Metricool.
+              </p>
+              <a
+                href="/admin/preview-tudo"
+                target="_blank"
+                rel="noreferrer"
+                className="estudio-btn"
+              >
+                abrir vista &quot;depois&quot; →
+              </a>
+            </div>
+          </div>
         )}
       </PassoCard>
       )}
