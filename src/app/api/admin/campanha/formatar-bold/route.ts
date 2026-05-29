@@ -4,37 +4,53 @@ import { criarClienteAdmin } from "@/lib/supabase/admin";
 
 export const runtime = "nodejs";
 
-const BOLD_MAP: Record<number, string> = {
-  2: "A tua cabeça tem\n**vinte abas abertas.**\nPor isso estás cansada\nsem ter feito nada.",
-  3: "E se **metade dos teus sonhos**\nnem fossem teus?",
-  4: "Aprendeste cedo que tinhas\nde **fazer muito para valer.**\nE nunca mais paraste.",
-  5: "Tens **talento a mais.**\nE **clareza a menos.**\nPor isso tocas em tudo\ne não aprofundas nada.",
-  6: "Sabes dar.\nMas **sabes receber?**",
-  7: "Se esta semana te tocou,\né porque **já sabes**\no que vem a seguir.",
-  8: "A abundância não responde\na quem a persegue.\n**Responde a quem se basta.**",
-  9: "Bastar-se não é\n**desistir de querer.**\nÉ querer de um\n**lugar cheio.**",
-  10: '"Deseja com mais força."\n**Mentira.**',
-  11: "Quem tem fome\n**aceita migalhas.**\nQuem se basta\n**cobra o que vale.**",
-  12: "Não tens falta de dinheiro.\nTens falta de **permissão**\npara o ter.",
-  13: "O sucesso que te cansa\nnão é teu.\nO que é teu\n**dá-te energia.**",
-  14: "Não precisas de mais motivação.\nPrecisas de **mais verdade.**",
-  15: "Esta semana mudou\na forma como olhas\npara o que **persegues.**",
-  16: "**Esvaziar a mesa.**\nA primeira ferramenta\nque fica para a vida.",
-  17: "Ao lado de cada sonho,\nescreve uma palavra:\n**meu, emprestado, ou de outro.**",
-  18: "O que acendes mesmo\nquando **é difícil?**\nO mundo **já te pediu?**\nVai doer se **não fizeres?**",
-  19: "Não é falta de foco.\nÉ **excesso.**\nA dispersão entre\ncoisas boas é a pior.",
-  20: "Um sonho grande.\nTrês meses.\nEsta semana.\n**Primeiro passo em 24h.**",
-  21: "A maioria dos planos falha\nporque são **grandes demais.**\nO teu primeiro passo\ntem de ser **pequeno demais.**",
-  22: "Vinte minutos por semana.\n**Três perguntas.**\nO encontro contigo\nque mantém tudo vivo.",
-  23: "Agora tens um método.\nNão precisas de **inspiração.**\nPrecisas de **estrutura.**",
-  24: "Isto chama-se **Infonte.**\nUm percurso de sete etapas\nque te leva da dispersão\nà ação concreta.",
-  25: "Não é mais um curso\nde mentalidade.\nÉ um percurso que\n**toca a raiz.**",
-  26: "Sou a Vivianne.\nNão te ensino o que tenho.\nEnsino o caminho\naté ao **bastar-te.**",
-  27: "Sete etapas.\nTrês semanas.\nFerramentas que ficam\n**para a vida.**",
-  28: "Pagas uma vez.\n**Acesso vitalício.**\nSem subscrição,\nsem upsell.",
-  29: "A etapa 1 é **grátis.**\nExperimenta antes de decidir.\nSem cartão, sem compromisso.",
-  30: "Pára de perseguir\no que **nunca foi teu.**\nComeça o percurso.\n**infonte.vivannedossantos.com**",
+// Palavras-chave a sublinhar a negrito em cada dia. NÃO substitui o
+// texto — só envolve estas substrings com **bold**. Preserva
+// numeração ("1. Tens...") e estrutura original do seed.
+const KEYWORDS_BOLD: Record<number, string[]> = {
+  2: ["vinte abas abertas"],
+  3: ["metade dos teus sonhos"],
+  4: ["fazer muito para valer"],
+  5: ["talento a mais", "clareza a menos"],
+  6: ["sabes receber"],
+  7: ["já sabes"],
+  8: ["Responde a quem se basta"],
+  9: ["desistir de querer", "lugar cheio"],
+  10: ["Mentira"],
+  11: ["aceita migalhas", "cobra o que vale"],
+  12: ["permissão"],
+  13: ["dá-te energia"],
+  14: ["mais verdade"],
+  15: ["persegues"],
+  16: ["Esvaziar a mesa"],
+  17: ["meu, emprestado, ou de outro"],
+  18: ["é difícil", "já te pediu", "não fizeres"],
+  19: ["excesso"],
+  20: ["Primeiro passo em 24h"],
+  21: ["grandes demais", "pequeno demais"],
+  22: ["Três perguntas"],
+  23: ["inspiração", "estrutura"],
+  24: ["Infonte"],
+  25: ["toca a raiz"],
+  26: ["bastar-te"],
+  27: ["para a vida"],
+  28: ["Acesso vitalício"],
+  29: ["grátis"],
+  30: ["nunca foi teu", "infonte.vivannedossantos.com"],
 };
+
+function aplicarBold(texto: string, keywords: string[]): string {
+  let resultado = texto;
+  for (const kw of keywords) {
+    // Não envolver se já está envolvido
+    const regex = new RegExp(
+      `(?<!\\*\\*)\\b${kw.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b(?!\\*\\*)`,
+      "gi"
+    );
+    resultado = resultado.replace(regex, (match) => `**${match}**`);
+  }
+  return resultado;
+}
 
 export async function POST() {
   const admin = await exigirAdmin();
@@ -44,22 +60,43 @@ export async function POST() {
 
   const sb = criarClienteAdmin();
   let atualizados = 0;
+  let saltados = 0;
   const log: string[] = [];
 
-  for (const [diaStr, texto] of Object.entries(BOLD_MAP)) {
+  // Lê o texto existente do seed e adiciona bold sem destruir estrutura.
+  for (const [diaStr, keywords] of Object.entries(KEYWORDS_BOLD)) {
     const dia = parseInt(diaStr, 10);
+    const { data: post } = await sb
+      .from("campanha_posts")
+      .select("id, texto_imagem")
+      .eq("dia", dia)
+      .eq("slot", "manha")
+      .maybeSingle();
+
+    if (!post || !post.texto_imagem?.trim()) {
+      saltados++;
+      log.push(`Dia ${dia}: sem texto_imagem, saltado`);
+      continue;
+    }
+
+    const novo = aplicarBold(post.texto_imagem, keywords);
+    if (novo === post.texto_imagem) {
+      saltados++;
+      log.push(`Dia ${dia}: já tinha bold ou keywords não encontradas`);
+      continue;
+    }
+
     const { error } = await sb
       .from("campanha_posts")
-      .update({ texto_imagem: texto })
-      .eq("dia", dia)
-      .eq("slot", "manha");
+      .update({ texto_imagem: novo })
+      .eq("id", post.id);
     if (error) {
       log.push(`Dia ${dia}: erro, ${error.message}`);
     } else {
-      log.push(`Dia ${dia}: bold aplicado`);
+      log.push(`Dia ${dia}: bold aplicado em [${keywords.join(", ")}]`);
       atualizados++;
     }
   }
 
-  return NextResponse.json({ ok: true, atualizados, log });
+  return NextResponse.json({ ok: true, atualizados, saltados, log });
 }
