@@ -5,7 +5,6 @@ import { Diagnostico } from "@/components/admin/Diagnostico";
 import { BotaoBulkImagens } from "@/components/admin/BotaoBulkImagens";
 import { CardRetoma } from "@/components/admin/CardRetoma";
 import { BotaoSyncRender } from "@/components/admin/BotaoSyncRender";
-import { ProduzirTudo } from "@/components/admin/ProduzirTudo";
 
 type Estado = "rascunho" | "rendering" | "failed" | "pronto" | "agendado" | "publicado";
 
@@ -152,9 +151,6 @@ export default async function CampanhaListaPage() {
         </div>
       </div>
 
-      <div className="mt-10">
-        <ProduzirTudo />
-      </div>
 
       <Fase numero={0} titulo="Diagnóstico" subtitulo="Testa as integrações antes de produzir. Faz isto sempre primeiro.">
         <Diagnostico />
