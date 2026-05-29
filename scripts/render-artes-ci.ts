@@ -84,16 +84,12 @@ async function processarDia(dia: number): Promise<{ urls: string[] } | { erro: s
     urls.push(`${pub.publicUrl}?v=${Date.now()}`);
   }
 
-  // Anexa as novas URLs no topo das imagens já existentes, sem perder MJ
-  // ou Replicate antigos.
-  const antigas = (post.imagens as string[] | null) ?? [];
-  const novas = [...urls, ...antigas.filter((u) => !urls.includes(u))];
-  await sb
-    .from("campanha_posts")
-    .update({ imagens: novas, imagem_url: urls[0] })
-    .eq("dia", dia)
-    .eq("slot", slot);
-
+  // NÃO tocar em campanha_posts.imagens nem imagem_url. Esses campos
+  // são para fundos MJ/Replicate (entrada do render). Os PNGs do render
+  // saem em result.json + ficheiros no bucket, e são lidos pela vista
+  // "depois" através do endpoint /renders-hd. Antes este código
+  // sobrescrevia imagens e partia o preview HTML em loop.
+  void post;
   return { urls };
 }
 

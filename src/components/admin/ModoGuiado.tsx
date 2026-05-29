@@ -19,7 +19,8 @@ type EstadoCampanha = {
   tarde: number;
   manha: number;
   semBold: number;
-  semImagem: number;
+  semImagemManha: number;
+  semImagemTarde: number;
   rendered: number; // estado pronto/agendado/publicado
   agendados: number;
   duplicados: number;
@@ -36,26 +37,22 @@ type Passo = {
 };
 
 async function lerEstado(): Promise<EstadoCampanha> {
-  const [aud, posts] = await Promise.all([
+  const [aud, manhaEst, tardeEst] = await Promise.all([
     fetch("/api/admin/campanha/auditoria").then((r) => r.json()),
     fetch("/api/admin/campanha/imagens-replicate/estimativa?inicio=1&fim=30&slot=manha&strategy=prefer-existing")
       .then((r) => r.json()),
+    fetch("/api/admin/campanha/imagens-replicate/estimativa?inicio=1&fim=30&slot=tarde&strategy=prefer-existing")
+      .then((r) => r.json()),
   ]);
-
-  // Inferir "rendered" e "agendados" via segundo fetch dos posts brutos
-  // através da auditoria não dá; usamos a estimativa para com_imagem.
-  // Para estado, fazemos call ao endpoint específico do painel — ou
-  // simplificamos contando via estado real noutro fetch.
-  const respostaEstado = await fetch("/api/admin/campanha/auditoria");
-  void respostaEstado;
 
   return {
     total: aud.total ?? 0,
     tarde: aud.porSlot?.tarde ?? 0,
     manha: aud.porSlot?.manha ?? 0,
-    semBold: 0, // Calculado mais à frente se preciso; bold é difícil de auditar barato
-    semImagem: posts.dias_total ? posts.dias_total - posts.dias_com_imagem : 30,
-    rendered: 0, // ver nota acima
+    semBold: 0,
+    semImagemManha: manhaEst.dias_total ? manhaEst.dias_total - manhaEst.dias_com_imagem : 30,
+    semImagemTarde: tardeEst.dias_total ? tardeEst.dias_total - tardeEst.dias_com_imagem : 30,
+    rendered: 0,
     agendados: 0,
     duplicados: aud.contagens?.duplicados ?? 0,
     semanaErrada: aud.contagens?.semanaErrada ?? 0,
@@ -127,7 +124,8 @@ export function ModoGuiado() {
   const [s2bold, setS2bold] = useState<"calmo" | "a-correr" | "ok" | "erro">("calmo");
   const [s2tarde, setS2tarde] = useState<"calmo" | "a-correr" | "ok" | "erro">("calmo");
   const [s3, setS3] = useState<"calmo" | "a-correr" | "ok" | "erro">("calmo");
-  const [s3img, setS3img] = useState<"calmo" | "a-correr" | "ok" | "erro">("calmo");
+  const [s3manha, setS3manha] = useState<"calmo" | "a-correr" | "ok" | "erro">("calmo");
+  const [s3tardeImg, setS3tardeImg] = useState<"calmo" | "a-correr" | "ok" | "erro">("calmo");
   const [s4, setS4] = useState<"calmo" | "a-correr" | "ok" | "erro">("calmo");
   const [s4semana, setS4semana] = useState(1);
   const [msg, setMsg] = useState<Record<string, string>>({});
@@ -154,7 +152,9 @@ export function ModoGuiado() {
   // Lógica de "feito"
   const passo1Feito = estado.total > 0 && estado.duplicados === 0 && estado.semanaErrada === 0;
   const passo2Feito = estado.tarde >= 30;
-  const passo3Feito = estado.semImagem === 0;
+  const passo3ManhaFeito = estado.semImagemManha === 0;
+  const passo3TardeFeito = estado.semImagemTarde === 0;
+  const passo3Feito = passo3ManhaFeito && passo3TardeFeito;
 
   return (
     <div className="space-y-6">
@@ -173,7 +173,9 @@ export function ModoGuiado() {
         </p>
         <div className="text-xs text-[var(--texto-mudo)] mt-3">
           {estado.total}/60 posts · {estado.manha} manhã · {estado.tarde} tarde ·{" "}
-          {30 - estado.semImagem}/30 com imagem · {estado.duplicados} duplicados
+          {30 - estado.semImagemManha}/30 imagem manhã ·{" "}
+          {30 - estado.semImagemTarde}/30 imagem tarde ·{" "}
+          {estado.duplicados} duplicados
         </div>
         <button onClick={refrescar} disabled={a} className="estudio-btn text-xs mt-3 disabled:opacity-50">
           {a ? "a actualizar..." : "actualizar estado"}
@@ -367,10 +369,10 @@ export function ModoGuiado() {
             )}
             {s3 === "ok" && (
               <BlocoAcao
-                estado={s3img}
+                estado={s3manha}
                 rotulo="3.2 — gerar restantes (~$1.08, 27 dias)"
-                textoOk={msg.s3img}
-                textoErro={msg.s3imgerr}
+                textoOk={msg.s3manha}
+                textoErro={msg.s3manhaerr}
                 exec={async () => {
                   setS3img("a-correr");
                   const lotes = ["1&fim=10", "11&fim=20", "21&fim=30"];
@@ -383,7 +385,7 @@ export function ModoGuiado() {
                     );
                     if (!ok) {
                       setS3img("erro");
-                      setMsg((m) => ({ ...m, s3imgerr: String(json.erro ?? "erro") }));
+                      setMsg((m) => ({ ...m, s3manhaerr: String(json.erro ?? "erro") }));
                       return;
                     }
                     totalGerados += Number(json.gerados ?? 0);
@@ -392,7 +394,40 @@ export function ModoGuiado() {
                   setS3img("ok");
                   setMsg((m) => ({
                     ...m,
-                    s3img: `${totalGerados} gerados · ${totalReusados} reusados`,
+                    s3manha: `${totalGerados} gerados · ${totalReusados} reusados`,
+                  }));
+                  await refrescar();
+                }}
+              />
+            )}
+            {passo3ManhaFeito && (
+              <BlocoAcao
+                estado={s3tardeImg}
+                rotulo="3.3 — gerar imagens da TARDE (~$1.20, 30 dias)"
+                textoOk={msg.s3tarde}
+                textoErro={msg.s3tardeerr}
+                exec={async () => {
+                  setS3tardeImg("a-correr");
+                  const lotes = ["1&fim=10", "11&fim=20", "21&fim=30"];
+                  let totalGerados = 0;
+                  let totalReusados = 0;
+                  for (const l of lotes) {
+                    const { ok, json } = await call(
+                      `/api/admin/campanha/imagens-replicate?inicio=${l}&slot=tarde&strategy=prefer-existing`,
+                      { method: "POST" }
+                    );
+                    if (!ok) {
+                      setS3tardeImg("erro");
+                      setMsg((m) => ({ ...m, s3tardeerr: String(json.erro ?? "erro") }));
+                      return;
+                    }
+                    totalGerados += Number(json.gerados ?? 0);
+                    totalReusados += Number(json.reusados ?? 0);
+                  }
+                  setS3tardeImg("ok");
+                  setMsg((m) => ({
+                    ...m,
+                    s3tarde: `${totalGerados} gerados · ${totalReusados} reusados`,
                   }));
                   await refrescar();
                 }}

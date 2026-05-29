@@ -17,13 +17,25 @@ type PostInfo = {
 
 type Filtro = "todos" | "manha" | "tarde";
 
-function SlideThumb({ dia, slot, idx }: { dia: number; slot: string; idx: number }) {
+type Modo = "antes" | "depois";
+
+function SlideThumb({
+  dia,
+  slot,
+  idx,
+  modo,
+  urlDepois,
+}: {
+  dia: number;
+  slot: string;
+  idx: number;
+  modo: Modo;
+  urlDepois?: string;
+}) {
   const [visivel, setVisivel] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
-  // Lazy load via IntersectionObserver: só monta o iframe quando entra
-  // na viewport. Sem isto, 240 iframes pesados de início iam queimar
-  // o browser.
+  // Lazy load via IntersectionObserver
   useEffect(() => {
     if (!ref.current) return;
     const obs = new IntersectionObserver(
@@ -41,29 +53,43 @@ function SlideThumb({ dia, slot, idx }: { dia: number; slot: string; idx: number
     return () => obs.disconnect();
   }, []);
 
+  const semRender = modo === "depois" && !urlDepois;
+
   return (
     <div
       ref={ref}
       className="relative bg-black rounded overflow-hidden border border-[var(--borda)]"
       style={{ aspectRatio: "1080 / 1350" }}
     >
-      {visivel ? (
+      {!visivel ? (
+        <div className="absolute inset-0 flex items-center justify-center text-[10px] text-[var(--texto-mudo)]">
+          ...
+        </div>
+      ) : semRender ? (
+        <div className="absolute inset-0 flex items-center justify-center text-[10px] text-[var(--texto-mudo)] text-center px-2">
+          ainda sem render HD
+        </div>
+      ) : modo === "depois" && urlDepois ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={urlDepois}
+          alt={`Dia ${dia} ${slot} slide ${idx}`}
+          loading="lazy"
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+      ) : (
         <iframe
           src={`/api/admin/campanha/${dia}/preview?slot=${slot}&slide=${idx}`}
           title={`Dia ${dia} ${slot} slide ${idx}`}
           className="absolute inset-0 w-full h-full"
           style={{
-            transform: "scale(0.15)",
+            transform: "scale(0.33)",
             transformOrigin: "top left",
-            width: "667%",
-            height: "667%",
+            width: "303%",
+            height: "303%",
             border: "0",
           }}
         />
-      ) : (
-        <div className="absolute inset-0 flex items-center justify-center text-[10px] text-[var(--texto-mudo)]">
-          ...
-        </div>
       )}
       <div className="absolute bottom-1 left-1 text-[9px] font-mono text-[var(--texto-mudo)] bg-black/60 px-1 rounded">
         {String(idx).padStart(2, "0")}
@@ -72,12 +98,54 @@ function SlideThumb({ dia, slot, idx }: { dia: number; slot: string; idx: number
   );
 }
 
+// Cache de PNGs renderizados por (dia, slot). Carregamento lazy quando
+// a Vivianne troca para "depois".
+function useRendersHD(posts: PostInfo[] | null, modo: Modo) {
+  const [renders, setRenders] = useState<Record<string, string[]>>({});
+
+  useEffect(() => {
+    if (modo !== "depois" || !posts) return;
+    let cancelado = false;
+    async function carregar() {
+      const novos: Record<string, string[]> = {};
+      // Paralelo, mas em pequenos lotes para não rebentar a rede
+      const LOTE = 8;
+      for (let i = 0; i < posts!.length; i += LOTE) {
+        const lote = posts!.slice(i, i + LOTE);
+        await Promise.all(
+          lote.map(async (p) => {
+            const k = `${p.dia}-${p.slot}`;
+            try {
+              const r = await fetch(`/api/admin/campanha/${p.dia}/renders-hd?slot=${p.slot}`);
+              const j = await r.json();
+              if (j.ok && j.urls) novos[k] = j.urls;
+              else novos[k] = [];
+            } catch {
+              novos[k] = [];
+            }
+          })
+        );
+        if (cancelado) return;
+      }
+      if (!cancelado) setRenders(novos);
+    }
+    carregar();
+    return () => {
+      cancelado = true;
+    };
+  }, [modo, posts]);
+
+  return renders;
+}
+
 export function PreviewTudo() {
   const [posts, setPosts] = useState<PostInfo[] | null>(null);
   const [erro, setErro] = useState<string | null>(null);
   const [a, setA] = useState(false);
   const [filtro, setFiltro] = useState<Filtro>("todos");
   const [semana, setSemana] = useState<number | null>(null);
+  const [modo, setModo] = useState<Modo>("antes");
+  const renders = useRendersHD(posts, modo);
 
   useEffect(() => {
     setA(true);
@@ -114,6 +182,25 @@ export function PreviewTudo() {
 
   return (
     <div>
+      <div className="flex flex-wrap items-center gap-3 mb-4">
+        <span className="text-[10px] uppercase tracking-[0.25em] text-[var(--oliva)]">modo</span>
+        <div className="flex gap-1">
+          {(["antes", "depois"] as Modo[]).map((m) => (
+            <button
+              key={m}
+              onClick={() => setModo(m)}
+              className={`px-3 py-1 rounded-full text-xs border ${
+                modo === m
+                  ? "border-[var(--ambar)] bg-[var(--ambar)]/10 text-[var(--ambar-claro)]"
+                  : "border-[var(--borda)] text-[var(--texto-suave)] hover:border-[var(--borda-forte)]"
+              }`}
+            >
+              {m === "antes" ? "antes (HTML preview)" : "depois (PNG renderizado)"}
+            </button>
+          ))}
+        </div>
+      </div>
+
       <div className="flex flex-wrap items-center gap-3 mb-6">
         <span className="text-[10px] uppercase tracking-[0.25em] text-[var(--oliva)]">filtros</span>
         <div className="flex gap-1">
@@ -186,17 +273,23 @@ export function PreviewTudo() {
                 </div>
               ) : (
                 <div
-                  className="grid gap-2"
-                  style={{ gridTemplateColumns: `repeat(${numColunas}, minmax(0, 1fr))` }}
+                  className="grid gap-3"
+                  style={{ gridTemplateColumns: `repeat(${Math.min(4, numColunas)}, minmax(0, 1fr))` }}
                 >
-                  {p.slides.map((s) => (
-                    <SlideThumb
-                      key={s.idx}
-                      dia={p.dia}
-                      slot={p.slot}
-                      idx={s.idx}
-                    />
-                  ))}
+                  {p.slides.map((s) => {
+                    const k = `${p.dia}-${p.slot}`;
+                    const urlsDep = renders[k] ?? [];
+                    return (
+                      <SlideThumb
+                        key={s.idx}
+                        dia={p.dia}
+                        slot={p.slot}
+                        idx={s.idx}
+                        modo={modo}
+                        urlDepois={urlsDep[s.idx - 1]}
+                      />
+                    );
+                  })}
                 </div>
               )}
             </div>
