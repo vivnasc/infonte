@@ -156,8 +156,12 @@ export default async function CampanhaListaPage() {
         <div className="flex flex-wrap gap-3">
           <BotaoSeed url="/api/admin/campanha/formatar-bold" titulo="Aplicar bold aos 30 posts" descricao="Mete **negrito** nas palavras-chave do texto das artes." />
           <BotaoSeed url="/api/admin/campanha/gerar-tarde" titulo="Gerar 30 posts da tarde (Claude)" descricao="Posts emocionais das 13h, par emocional do didáctico das 10h." />
-          <BotaoSeed url="/api/admin/campanha/taguear" titulo="Tagar @vivianne.dos.santos" descricao="Acrescenta a menção ao fim de todas as 60 legendas. Idempotente, não duplica." />
         </div>
+        <p className="text-[11px] text-[var(--texto-mudo)] mt-3 max-w-leitura">
+          Menção do autor é injectada automaticamente no CSV se a env
+          <code className="text-[var(--ambar)] mx-1">CAPTION_AUTHOR_TAG</code>
+          estiver definida. Vê o estado actual no Diagnóstico → Deploy + envs.
+        </p>
       </Fase>
 
       <Fase numero={2} titulo="Imagens automáticas" subtitulo="FLUX 1.1 Pro via Replicate. Claude decide o que mostra cada imagem. Testa 3 antes do lote." custo="$0.04 / imagem · ~$1.20 os 30 dias">

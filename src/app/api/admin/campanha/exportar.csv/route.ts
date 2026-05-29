@@ -102,6 +102,16 @@ function composarTexto(p: Post): string {
   if (p.legenda?.trim()) partes.push(p.legenda.trim());
   if (p.pergunta?.trim()) partes.push("Pergunta: " + p.pergunta.trim());
   if (p.link?.trim()) partes.push(p.link.trim());
+
+  // Menção do autor, injectada antes das hashtags para o IG/TikTok a
+  // detectarem bem. Configurável por env CAPTION_AUTHOR_TAG; vazia
+  // desactiva (útil em projectos partilhados).
+  const tag = (process.env.CAPTION_AUTHOR_TAG ?? "").trim();
+  const baseAteAqui = partes.join("\n\n");
+  if (tag && !baseAteAqui.toLowerCase().includes(tag.toLowerCase())) {
+    partes.push(tag);
+  }
+
   if (p.hashtags?.trim()) partes.push(p.hashtags.trim());
   return partes.join("\n\n");
 }

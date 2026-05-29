@@ -35,6 +35,7 @@ export async function GET() {
   }
 
   const todasOk = Object.values(envs).every(Boolean);
+  const captionTag = (process.env.CAPTION_AUTHOR_TAG ?? "").trim();
 
   return NextResponse.json({
     ok: todasOk,
@@ -42,6 +43,7 @@ export async function GET() {
     branch: process.env.VERCEL_GIT_COMMIT_REF ?? "(local)",
     region: process.env.VERCEL_REGION ?? "(local)",
     ambiente: process.env.VERCEL_ENV ?? "development",
+    captionTag: captionTag || "(desactivada)",
     envs,
     emFalta: Object.entries(envs)
       .filter(([, v]) => !v)
