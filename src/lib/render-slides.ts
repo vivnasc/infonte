@@ -1,4 +1,5 @@
 import { chromium } from "playwright-core";
+import { aplicarBoldDinamico } from "./keywords-bold";
 
 // Caminho local para o Chromium pré-instalado, se existir. Em ambientes
 // como GitHub Actions o Playwright tem o browser instalado num path
@@ -133,8 +134,8 @@ function layoutFotoTopo(opts: FullOpts): string {
   <div style="position:absolute;top:32px;left:40px;z-index:2;">${marca(false)}</div>
 </div>
 <div style="position:relative;width:${W}px;height:${textoH}px;background:${BG_SLIDE};padding:48px 56px;display:flex;flex-direction:column;justify-content:center;">
-  <style>strong{color:${BOLD_COR};font-weight:700;}</style>
-  <div style="font-size:${fs}px;line-height:1.2;color:${CREME};text-shadow:0 2px 12px rgba(0,0,0,0.3);">
+  <style>strong{color:${BOLD_COR};font-weight:800;text-shadow:0 1px 8px rgba(0,0,0,0.4);}</style>
+  <div style="font-size:${fs}px;line-height:1.2;color:${CREME};text-shadow:0 2px 12px rgba(0,0,0,0.3);letter-spacing:-0.005em;">
     ${linhas.map(l => `<p style="margin-bottom:12px;">${l}</p>`).join("")}
   </div>
   <div style="position:absolute;bottom:32px;left:56px;">${credito(false)}</div>
@@ -191,7 +192,11 @@ function layoutStatement(opts: FullOpts): string {
   const textoComBold = parseBold(opts.texto);
   const linhas = textoComBold.split(/\n/).map(l => l.trim()).filter(Boolean);
   const charCount = opts.texto.replace(/\*\*/g, "").length;
-  const fs = charCount < 30 ? 100 : charCount < 50 ? 86 : charCount < 80 ? 72 : charCount < 120 ? 60 : charCount < 200 ? 48 : 38;
+  const isCapa = opts.modo === "capa";
+  const fs = isCapa
+    ? (charCount < 30 ? 108 : charCount < 50 ? 92 : charCount < 80 ? 76 : charCount < 120 ? 64 : charCount < 200 ? 52 : 42)
+    : (charCount < 30 ? 92 : charCount < 50 ? 78 : charCount < 80 ? 64 : charCount < 120 ? 54 : charCount < 200 ? 44 : 36);
+  const italic = isCapa ? "font-style:italic;" : "";
 
   return `${base(W, h)}
 <div style="position:relative;width:${W}px;height:${h}px;">
@@ -203,9 +208,9 @@ function layoutStatement(opts: FullOpts): string {
   }
   <div style="position:absolute;top:36px;left:48px;z-index:2;">${marca(false)}</div>
   <div style="position:relative;z-index:1;height:100%;display:flex;flex-direction:column;justify-content:center;padding:80px 72px;text-align:center;">
-    <style>strong{color:${BOLD_COR};font-weight:700;}</style>
-    <div style="font-size:${fs}px;line-height:1.2;color:${CREME};text-shadow:0 3px 20px rgba(0,0,0,0.5);">
-      ${linhas.map(l => `<p style="margin-bottom:16px;">${l}</p>`).join("")}
+    <style>strong{color:${BOLD_COR};font-weight:800;text-shadow:0 1px 8px rgba(0,0,0,0.4);}</style>
+    <div style="font-size:${fs}px;line-height:1.18;color:${CREME};text-shadow:0 3px 20px rgba(0,0,0,0.6);${italic}letter-spacing:-0.01em;">
+      ${linhas.map(l => `<p style="margin-bottom:18px;">${l}</p>`).join("")}
     </div>
   </div>
   <div style="position:absolute;bottom:32px;left:48px;z-index:2;">${credito(false)}</div>
@@ -256,16 +261,20 @@ function layoutClaro(opts: FullOpts): string {
   const textoComBold = parseBold(opts.texto);
   const linhas = textoComBold.split(/\n/).map(l => l.trim()).filter(Boolean);
   const charCount = opts.texto.replace(/\*\*/g, "").length;
-  const fs = charCount < 30 ? 96 : charCount < 50 ? 82 : charCount < 80 ? 68 : charCount < 120 ? 56 : charCount < 180 ? 46 : 38;
+  const isCapa = opts.modo === "capa";
+  const fs = isCapa
+    ? (charCount < 30 ? 100 : charCount < 50 ? 86 : charCount < 80 ? 72 : charCount < 120 ? 60 : charCount < 180 ? 50 : 42)
+    : (charCount < 30 ? 84 : charCount < 50 ? 72 : charCount < 80 ? 60 : charCount < 120 ? 50 : charCount < 180 ? 42 : 34);
+  const italic = isCapa ? "font-style:italic;" : "";
 
   return `${base(W, h)}
 <div style="position:relative;width:${W}px;height:${h}px;background:linear-gradient(175deg,${CREME} 0%,#e8ddd0 60%,#ddd2c3 100%);">
   <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 60% 40%,rgba(184,132,61,0.06) 0%,transparent 50%);"></div>
   <div style="position:relative;z-index:1;height:100%;display:flex;flex-direction:column;justify-content:center;padding:80px 72px;">
     <div style="margin-bottom:32px;">${marca(true)}</div>
-    <div style="font-size:${fs}px;line-height:1.25;color:${CASTANHO};">
-      <style>strong{color:${OCRE_FORTE};font-weight:700;}</style>
-      ${linhas.map(l => `<p style="margin-bottom:14px;">${l}</p>`).join("")}
+    <div style="font-size:${fs}px;line-height:1.2;color:${CASTANHO};${italic}letter-spacing:-0.01em;">
+      <style>strong{color:${OCRE_FORTE};font-weight:800;}</style>
+      ${linhas.map(l => `<p style="margin-bottom:16px;">${l}</p>`).join("")}
     </div>
   </div>
   <div style="position:absolute;bottom:32px;left:72px;">${credito(true)}</div>
@@ -285,7 +294,13 @@ function layoutFotoCheia(opts: FullOpts): string {
   const textoComBold = parseBold(opts.texto);
   const linhas = textoComBold.split(/\n/).map(l => l.trim()).filter(Boolean);
   const charCount = opts.texto.replace(/\*\*/g, "").length;
-  const fs = charCount < 30 ? 84 : charCount < 60 ? 72 : charCount < 100 ? 60 : charCount < 160 ? 50 : 42;
+  // Capa: tipografia maior e mais confiante (estilo FreeMe).
+  // Conteúdo: legível mas com hierarquia inferior à capa.
+  const isCapa = opts.modo === "capa";
+  const fs = isCapa
+    ? (charCount < 30 ? 96 : charCount < 60 ? 84 : charCount < 100 ? 68 : charCount < 160 ? 56 : 46)
+    : (charCount < 30 ? 78 : charCount < 60 ? 66 : charCount < 100 ? 54 : charCount < 160 ? 46 : 38);
+  const italic = isCapa ? "font-style:italic;" : "";
 
   // Gradient suave: praticamente transparente em cima, escuro quente
   // a meio, muito escuro em baixo para o texto agarrar bem.
@@ -308,9 +323,9 @@ function layoutFotoCheia(opts: FullOpts): string {
   <div style="position:absolute;top:36px;left:44px;z-index:3;">${marca(false)}</div>
 
   <div style="position:absolute;left:0;right:0;bottom:0;z-index:2;padding:0 56px 130px 56px;">
-    <style>strong{color:${BOLD_COR};font-weight:700;}</style>
-    <div style="font-size:${fs}px;line-height:1.18;color:${CREME};text-shadow:0 2px 16px rgba(0,0,0,0.6);">
-      ${linhas.map(l => `<p style="margin-bottom:10px;">${l}</p>`).join("")}
+    <style>strong{color:${BOLD_COR};font-weight:800;text-shadow:0 1px 8px rgba(0,0,0,0.4);}</style>
+    <div style="font-size:${fs}px;line-height:1.15;color:${CREME};text-shadow:0 2px 16px rgba(0,0,0,0.7);${italic}letter-spacing:-0.01em;">
+      ${linhas.map(l => `<p style="margin-bottom:12px;">${l}</p>`).join("")}
     </div>
   </div>
 
@@ -476,6 +491,11 @@ export function parseTextoImagemToSlides(
   imagens?: string[] | null,
 ): SlideOpts[] {
   if (!textoImagem?.trim()) return [];
+  // Bold dinâmico: aplica KEYWORDS_BOLD[dia] aqui em render-time,
+  // por cima do que já estiver na BD. Idempotente (não duplica
+  // `**...**`). Garante que o preview do editor mostra os destaques
+  // dourados sem precisar de re-correr o seed.
+  textoImagem = aplicarBoldDinamico(textoImagem, dia);
   const isStory = formato === "reel";
   const fmt: "feed" | "story" = isStory ? "story" : "feed";
 
