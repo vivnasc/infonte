@@ -18,37 +18,38 @@ export const maxDuration = 60;
 //   inicio=1..30      (default: 1)
 //   fim=1..30         (default: 30)
 
-const PROMPT_MANHA = (texto: string, legenda: string) => `És a Vivianne dos Santos, autora da Infonte. Tens um post DIDÁCTICO actual com uma frase única na arte:
+const PROMPT_MANHA = (texto: string, legenda: string, tema: string) => `És a Vivianne dos Santos, autora da Infonte. Vais escrever um carrossel DIDÁCTICO de 10 slides que ENSINA um conceito em profundidade. Estilo SyncHim: cada slide constrói sobre o anterior, define mecanismo, dá exemplos concretos, liberta da culpa, mostra alternativa.
 
-"${texto}"
+TEMA HOJE: ${tema}
+Frase inicial actual: "${texto}"
+Legenda completa (para contexto teu, não para reproduzir): "${legenda}"
 
-Legenda completa do post:
-"${legenda}"
+NÃO É post de venda. NÃO menciones produto, método, etapa, infonte, link na bio. Ensina o conceito.
 
-Expande esta ideia num carrossel de 10 slides para Instagram. Cada slide é UMA frase curta (1-2 linhas), numerada (1. 2. 3. ... 10.).
+ESTRUTURA OBRIGATÓRIA dos 10 slides:
+1. Hook: frase impactante que afirma a tese (podes usar a actual ou variação muito próxima)
+2. Define: nomeia exactamente o que está em causa. Dá-lhe nome.
+3. Mecanismo: descreve COMO funciona — a engrenagem, o ciclo, o padrão.
+4. Cena 1: exemplo concreto. Uma situação real e curta onde isto aparece (cozinha, secretária, conversa, decisão).
+5. Cena 2: segundo exemplo, num contexto diferente. Mostra que é padrão, não acaso.
+6. Por que não é culpa: liberta a leitora. Mostra a origem (cultural, familiar, sistema) — ela não está partida.
+7. O custo: o que ela perde por não ver isto. Concreto, não abstracto.
+8. A virada: o que muda QUANDO se vê. Não promete cura, mostra movimento.
+9. Pergunta-âncora: uma pergunta que a faz olhar para a vida dela agora. Pede 1 frase de resposta.
+10. Verdade-âncora: frase final que fica. NÃO é CTA. É o "agora sabes".
 
-Estrutura sugerida (mas não copies à letra, varia):
-- Slide 1: hook impactante (o statement actual ou variação próxima)
-- Slide 2: reconhecimento (onde isto aparece concretamente na vida dela)
-- Slide 3: quebra (uma contradição inesperada, o que ninguém diz)
-- Slide 4: o porquê profundo (camada 1)
-- Slide 5: o que está por trás (camada 2, mais fundo)
-- Slide 6: cena concreta (uma situação real e curta)
-- Slide 7: a consequência (o que custa não ver)
-- Slide 8: o que abre quando se vê (o ganho)
-- Slide 9: a pergunta que para o scroll
-- Slide 10: âncora / verdade que fica (não CTA de venda)
+CADA SLIDE: 1-3 linhas curtas. Frase completa em cada slide, lê-se sozinha.
 
-Regras de voz (não negociáveis):
-- pt-PT, segunda pessoa (tu), íntima
+REGRAS DE VOZ (não negociáveis):
+- pt-PT, segunda pessoa (tu), íntima, sem ferida, com poder
 - Sem travessões longos
-- Sem guru: NUNCA "universo", "manifesta", "mindset", "abundância" sozinha, "energia", "vibração", "frequência", "alma", "cura", "luz", "alinhamento"
-- Sem coach: "abraça-te", "ama-te", "tu és luz"
-- Sem inglês de marketing: "hustle", "growth", "mindset"
-- Frases curtas. Verbos fortes. Concreto sobre abstracto.
-- Tom: quem se bastou a falar para quem persegue. Calma com autoridade.
+- Sem guru: NUNCA "universo", "manifesta", "mindset", "abundância" sozinha, "energia", "vibração", "alma", "cura", "luz", "alinhamento"
+- Sem coach: "abraça-te", "ama-te", "tu mereces tudo"
+- Sem inglês de marketing: "hustle", "growth"
+- Sem CTA de venda nem menção a produto
+- Verbos fortes, concreto sobre abstracto
 
-Devolve APENAS as 10 linhas numeradas, no formato:
+Devolve APENAS as 10 linhas numeradas:
 1. [linha]
 2. [linha]
 3. [linha]
@@ -60,35 +61,35 @@ Devolve APENAS as 10 linhas numeradas, no formato:
 9. [linha]
 10. [linha]
 
-Nada mais. Sem prefácio, sem aspas, sem explicação.`;
+Sem prefácio, sem aspas, sem markdown extra.`;
 
-const PROMPT_TARDE = (texto: string, tema: string) => `És a Vivianne dos Santos. Tens um post EMOCIONAL das 13h da Infonte (eco da manhã didáctica):
+const PROMPT_TARDE = (texto: string, tema: string) => `És a Vivianne dos Santos. Vais escrever um carrossel EMOCIONAL de 10 slides para as 13h. NÃO ensina. RECONHECE.
 
-Tema: "${tema}"
-Frase única actual na arte: "${texto}"
+Estilo: cada slide aprofunda o sentir. Nomeia. Não dá solução, não dá conselho, não vende. A leitora chega no fim mais vista, não mais informada.
 
-Expande em 10 slides numerados que aprofundam o reconhecimento emocional. A tarde NÃO ensina, RECONHECE. Cada slide intensifica o sentir, sem soluções, sem conselho.
+TEMA HOJE: ${tema}
+Frase inicial actual: "${texto}"
 
-Estrutura sugerida (varia, não copies à letra):
-- Slide 1: o feeling raw (a frase actual ou eco próximo)
-- Slide 2: onde aparece no corpo (peso no peito, aperto na garganta, o que for)
-- Slide 3: onde aparece no dia (que momento, que gesto)
-- Slide 4: o que está por trás (camada 1)
-- Slide 5: mais fundo (camada 2)
-- Slide 6: a verdade que custa admitir
-- Slide 7: o peso de carregar isto sozinha
-- Slide 8: o que se sente quando se nomeia (alívio mínimo, não solução)
-- Slide 9: a frase que para o scroll
-- Slide 10: o silêncio depois (frase que NÃO conclui, deixa em aberto)
+ESTRUTURA OBRIGATÓRIA dos 10 slides:
+1. Feeling raw: a frase actual ou eco muito próximo
+2. Nomear o sentimento: dá nome àquele aperto, peso, vazio
+3. No corpo: onde isto se sente fisicamente (peito, garganta, ombros, estômago)
+4. No dia: que momento, que gesto traz isto (acordar, conversar, sozinha à noite)
+5. Cena 1: situação curta onde aparece sem aviso
+6. Cena 2: outra situação, outro contexto
+7. O que está por trás (camada 1): a primeira camada por baixo do feeling
+8. Mais fundo (camada 2): a verdade que custa nomear
+9. Frase que para: uma frase que a faz parar de scrollar. Sem solução.
+10. Silêncio: frase que NÃO conclui. Deixa-a no sentir.
 
-Cada slide UMA frase curta (1-2 linhas).
+CADA SLIDE: 1-2 linhas curtas. Sussurro, não pregação.
 
-Regras de voz (não negociáveis):
+REGRAS DE VOZ (não negociáveis):
 - pt-PT, segunda pessoa (tu), íntima
-- Sem solução, sem conselho, sem CTA. Só reconhecimento.
+- Sem solução, sem conselho, sem CTA, sem menção a produto
 - Sem guru: NUNCA "universo", "manifesta", "mindset", "abundância" sozinha, "energia", "vibração", "alma", "cura", "luz", "alinhamento"
 - Sem coach: "abraça-te", "ama-te", "tu mereces tudo"
-- Tom: quem sente isto a sussurrar para quem também sente.
+- Tom: quem também sente isto a sussurrar para quem sente. Não consoladora, não salvadora.
 
 Devolve APENAS as 10 linhas numeradas:
 1. [linha]
@@ -117,10 +118,13 @@ function temSlidesNumerados(texto: string): boolean {
 async function expandirComClaude(
   apiKey: string,
   texto: string,
-  contexto: string,
+  legenda: string,
+  tema: string,
   slot: "manha" | "tarde"
 ): Promise<string | null> {
-  const prompt = slot === "manha" ? PROMPT_MANHA(texto, contexto) : PROMPT_TARDE(texto, contexto);
+  const prompt = slot === "manha"
+    ? PROMPT_MANHA(texto, legenda, tema)
+    : PROMPT_TARDE(texto, tema);
   const r = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
     headers: {
@@ -190,8 +194,13 @@ export async function POST(request: Request) {
         continue;
       }
 
-      const contexto = slot === "manha" ? (post.legenda ?? "") : (post.tema ?? "");
-      const expandido = await expandirComClaude(apiKey, post.texto_imagem, contexto, slot);
+      const expandido = await expandirComClaude(
+        apiKey,
+        post.texto_imagem,
+        post.legenda ?? "",
+        post.tema ?? "",
+        slot
+      );
       if (!expandido) {
         erros++;
         log.push(`Dia ${dia} ${slot}: Claude falhou`);
