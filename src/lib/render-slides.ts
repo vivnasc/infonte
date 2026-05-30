@@ -367,11 +367,19 @@ function layoutFechoCta(opts: FullOpts): string {
   // Quando não, é só fecho de palavra; um selo pequeno bastará.
   const gotaSize = temGotaToken ? 112 : 56;
 
-  return `${base(W, h)}
-<div style="position:relative;width:${W}px;height:${h}px;background:radial-gradient(ellipse at 25% 20%,#4a2f1b 0%,${BG_SLIDE} 55%,#170d07 100%);overflow:hidden;">
-  <div style="position:absolute;top:0;left:0;right:0;height:60%;background:radial-gradient(ellipse at 50% 0%,rgba(235,174,74,0.14) 0%,transparent 70%);"></div>
+  // Quando há imagem-fonte para este slide (CTA), usa-a como fundo
+  // com scrim escuro forte para manter o punch do texto + gota.
+  const fundo = opts.imagemUrl
+    ? `<img src="${opts.imagemUrl}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;"/>
+       <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(28,18,11,0.65) 0%,rgba(28,18,11,0.88) 60%,rgba(20,12,6,0.96) 100%);"></div>`
+    : `<div style="position:absolute;inset:0;background:radial-gradient(ellipse at 25% 20%,#4a2f1b 0%,${BG_SLIDE} 55%,#170d07 100%);"></div>
+       <div style="position:absolute;top:0;left:0;right:0;height:60%;background:radial-gradient(ellipse at 50% 0%,rgba(235,174,74,0.14) 0%,transparent 70%);"></div>`;
 
-  ${ghostNumero(num, false)}
+  return `${base(W, h)}
+<div style="position:relative;width:${W}px;height:${h}px;overflow:hidden;">
+  ${fundo}
+
+  ${!opts.imagemUrl ? ghostNumero(num, false) : ""}
 
   <div style="position:absolute;top:36px;left:44px;z-index:2;">${marca(false)}</div>
 
@@ -528,11 +536,22 @@ export function parseTextoImagemToSlides(
     const total = numerados.length;
     const slides: SlideOpts[] = [];
 
+    // Mapeamento de slides que devem ter imagem (alinhado com
+    // imagens-por-slide): capa (1), ímpares do meio, e CTA (último).
+    // O índice no pool segue a mesma ordem, por isso imagens[0] = capa,
+    // imagens[1] = slide 3, imagens[2] = slide 5, ..., last = CTA.
+    const slidesComImagem: number[] = [1];
+    for (let i = 3; i < total; i += 2) slidesComImagem.push(i);
+    if (total > 1 && !slidesComImagem.includes(total)) slidesComImagem.push(total);
+    const posicaoNoPool = new Map(slidesComImagem.map((s, i) => [s, i]));
+
     numerados.forEach((line, i) => {
       const slideN = i + 1;
       const modo: "capa" | "conteudo" | "cta" =
         slideN === 1 ? "capa" : slideN === total ? "cta" : "conteudo";
-      const podeImagem = pool.length >= total || slideN % 2 !== 0;
+      const posicao = posicaoNoPool.get(slideN);
+      const imagemUrl =
+        posicao !== undefined && pool[posicao] ? pool[posicao] : undefined;
       slides.push({
         texto: line.replace(/^\d+\.\s*/, ""),
         dia,
@@ -541,7 +560,7 @@ export function parseTextoImagemToSlides(
         formato: fmt,
         slideNum: slideN,
         totalSlides: total,
-        imagemUrl: podeImagem ? pool[(slideN - 1) % Math.max(1, pool.length)] : undefined,
+        imagemUrl,
       });
     });
 
