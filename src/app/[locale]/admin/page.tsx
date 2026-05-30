@@ -6,6 +6,7 @@ import { BotaoResetRendering } from "@/components/admin/BotaoResetRendering";
 import { WorkflowsRender } from "@/components/admin/WorkflowsRender";
 import { AgendarTudo } from "@/components/admin/AgendarTudo";
 import { ReconstruirCampanha } from "@/components/admin/ReconstruirCampanha";
+import { BotaoImagensPorSlide } from "@/components/admin/BotaoImagensPorSlide";
 import { criarClienteAdmin } from "@/lib/supabase/admin";
 
 type EstadoRaw = string | null;
@@ -170,6 +171,10 @@ export default async function PainelPage() {
 
       <div className="mt-8">
         <ReconstruirCampanha />
+      </div>
+
+      <div className="mt-6">
+        <BotaoImagensPorSlide />
       </div>
 
       {funil.rendering > 0 && (
