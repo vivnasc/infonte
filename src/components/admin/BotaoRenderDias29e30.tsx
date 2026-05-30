@@ -12,6 +12,32 @@ export function BotaoRenderDias29e30() {
     setEstado("a-disparar");
     setMsg(null);
     try {
+      // 1. Expand singles para dias 29, 30 (caso Claude tenha falhado
+      //    antes e tenham ficado como single statement de 1 slide).
+      setMsg("a expandir conteúdo via Claude...");
+      await Promise.all(
+        (["manha", "tarde"] as const).map((slot) =>
+          fetch(
+            `/api/admin/campanha/expandir-singles?slot=${slot}&inicio=29&fim=30`,
+            { method: "POST" }
+          )
+        )
+      );
+
+      // 2. Gerar imagens por slide (5 por carrossel) para os 4 posts.
+      //    Endpoint aceita só um slot por chamada.
+      setMsg("a gerar imagens por slide via Replicate...");
+      await Promise.all(
+        (["manha", "tarde"] as const).map((slot) =>
+          fetch(
+            `/api/admin/campanha/imagens-por-slide?slot=${slot}&inicio=29&fim=30&max=5`,
+            { method: "POST" }
+          )
+        )
+      );
+
+      // 3. Disparar render workflows.
+      setMsg("a disparar render...");
       const resultados = await Promise.all(
         (["manha", "tarde"] as const).map((slot) =>
           fetch(
@@ -19,7 +45,7 @@ export function BotaoRenderDias29e30() {
             { method: "POST" }
           ).then(async (r) => {
             const j = await r.json().catch(() => ({}));
-            return { ok: r.ok && !j.erro, slot, erro: j.erro, jobId: j.jobId };
+            return { ok: r.ok && !j.erro, slot, erro: j.erro };
           })
         )
       );
@@ -29,7 +55,9 @@ export function BotaoRenderDias29e30() {
         setMsg(erros.map((e) => `${e.slot}: ${e.erro ?? "erro"}`).join(" | "));
       } else {
         setEstado("ok");
-        setMsg(`2 workflows disparados. ~5 min. Depois sincroniza.`);
+        setMsg(
+          "expand + imagens + render disparados. ~5 min. Depois sincroniza e exporta CSV ?dias=29,30."
+        );
       }
     } catch (e) {
       setEstado("erro");
