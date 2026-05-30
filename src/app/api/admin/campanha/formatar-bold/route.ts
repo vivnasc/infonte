@@ -8,6 +8,7 @@ export const runtime = "nodejs";
 // texto — só envolve estas substrings com **bold**. Preserva
 // numeração ("1. Tens...") e estrutura original do seed.
 const KEYWORDS_BOLD: Record<number, string[]> = {
+  1: ["cansada de perseguir", "se basta", "clareza", "foco", "acção", "infonte"],
   2: ["vinte abas abertas"],
   3: ["metade dos teus sonhos"],
   4: ["fazer muito para valer"],

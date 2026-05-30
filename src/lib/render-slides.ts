@@ -32,11 +32,24 @@ function esc(s: string): string {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
-function parseBold(s: string): string {
-  return esc(s).replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+const GOTA_INLINE = (size: number) =>
+  `<svg width="${size}" height="${size}" viewBox="0 0 512 512" style="display:inline-block;"><path d="M256 116 C198 218 166 282 166 334 A90 90 0 0 0 346 334 C346 282 314 218 256 116 Z" fill="${AMBAR_CLARO}" stroke="${AMBAR}" stroke-width="14" stroke-linejoin="round"/></svg>`;
+
+const GOTA_SVG = `<svg width="72" height="72" viewBox="0 0 512 512"><path d="M256 116 C198 218 166 282 166 334 A90 90 0 0 0 346 334 C346 282 314 218 256 116 Z" fill="${AMBAR_CLARO}" stroke="${AMBAR}" stroke-width="16" stroke-linejoin="round"/></svg>`;
+
+// Substitui tokens do brief que devem virar SVG/ícone no render.
+// O brief escreve "(gota)" como marcador editorial; aqui troca-se
+// por uma gota inline (estilo capitular).
+function substituirTokens(s: string): string {
+  return s.replace(
+    /\(gota\)/gi,
+    `<span style="display:inline-block;vertical-align:-0.18em;margin:0 0.1em;">${GOTA_INLINE(72)}</span>`
+  );
 }
 
-const GOTA_SVG = `<svg width="48" height="48" viewBox="0 0 512 512"><path d="M256 116 C198 218 166 282 166 334 A90 90 0 0 0 346 334 C346 282 314 218 256 116 Z" fill="none" stroke="${AMBAR}" stroke-width="18" stroke-linejoin="round"/><circle cx="256" cy="338" r="34" fill="${AMBAR_CLARO}"/></svg>`;
+function parseBold(s: string): string {
+  return substituirTokens(esc(s)).replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+}
 
 const GOTA_ICON = (size: number, cor: string = AMBAR, fill: string = AMBAR_CLARO) =>
   `<svg width="${size}" height="${size}" viewBox="0 0 512 512"><path d="M256 116 C198 218 166 282 166 334 A90 90 0 0 0 346 334 C346 282 314 218 256 116 Z" fill="none" stroke="${cor}" stroke-width="20" stroke-linejoin="round"/><circle cx="256" cy="338" r="34" fill="${fill}"/></svg>`;
@@ -316,31 +329,45 @@ function layoutFotoCheia(opts: FullOpts): string {
 // ═══════════════════════════════════════════════════
 function layoutFechoCta(opts: FullOpts): string {
   const h = opts.formato === "story" ? H_STORY : H_FEED;
-  const textoComBold = parseBold(opts.texto);
+  const textoOriginal = opts.texto;
+  const temGotaToken = /\(gota\)/i.test(textoOriginal);
+  // Remove o token para o cálculo do tamanho de fonte (a gota
+  // visualmente ocupa espaço próprio).
+  const textoSemToken = textoOriginal.replace(/\(gota\)/gi, "").trim();
+  const textoComBold = parseBold(textoSemToken);
   const linhas = textoComBold.split(/\n/).map(l => l.trim()).filter(Boolean);
-  const charCount = opts.texto.replace(/\*\*/g, "").length;
-  const fs = charCount < 60 ? 56 : charCount < 120 ? 46 : charCount < 200 ? 38 : 32;
+  const charCount = textoSemToken.replace(/\*\*/g, "").length;
+  // Fecho/CTA é o slide-punch. Fonte grande, italic levemente
+  // (estilo manifesto). Hierarquia: punch breve = 96px, médio = 76px.
+  const fs = charCount < 40 ? 96 : charCount < 80 ? 76 : charCount < 140 ? 60 : charCount < 200 ? 48 : 40;
 
   const total = opts.totalSlides ?? 1;
   const num = opts.slideNum ?? total;
   const mostraPag = total > 1;
 
+  // No brief, "(gota)" sinaliza que a gota deve aparecer como
+  // selo visual neste slide. Quando o token está presente,
+  // mostra-se em grande acima do texto (estilo capitular).
+  // Quando não, é só fecho de palavra; um selo pequeno bastará.
+  const gotaSize = temGotaToken ? 112 : 56;
+
   return `${base(W, h)}
 <div style="position:relative;width:${W}px;height:${h}px;background:radial-gradient(ellipse at 25% 20%,#4a2f1b 0%,${BG_SLIDE} 55%,#170d07 100%);overflow:hidden;">
-  <div style="position:absolute;top:0;left:0;right:0;height:60%;background:radial-gradient(ellipse at 50% 0%,rgba(235,174,74,0.10) 0%,transparent 70%);"></div>
+  <div style="position:absolute;top:0;left:0;right:0;height:60%;background:radial-gradient(ellipse at 50% 0%,rgba(235,174,74,0.14) 0%,transparent 70%);"></div>
 
   ${ghostNumero(num, false)}
 
   <div style="position:absolute;top:36px;left:44px;z-index:2;">${marca(false)}</div>
 
-  <div style="position:relative;z-index:1;height:100%;display:flex;flex-direction:column;justify-content:center;padding:120px 64px 130px 64px;">
+  <div style="position:relative;z-index:1;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:120px 64px 150px 64px;text-align:center;">
     <style>strong{color:${BOLD_COR};font-weight:700;}</style>
-    <div style="font-size:${fs}px;line-height:1.25;color:${CREME};">
-      ${linhas.map(l => `<p style="margin-bottom:14px;">${l}</p>`).join("")}
+    <div style="margin-bottom:44px;">${GOTA_INLINE(gotaSize)}</div>
+    <div style="font-size:${fs}px;line-height:1.18;color:${CREME};font-style:italic;letter-spacing:-0.005em;">
+      ${linhas.map(l => `<p style="margin-bottom:18px;">${l}</p>`).join("")}
     </div>
+    <div style="margin-top:48px;font-family:Inter,sans-serif;font-size:13px;letter-spacing:0.32em;text-transform:uppercase;color:${AMBAR};">link na bio</div>
   </div>
 
-  <div style="position:absolute;bottom:38px;left:64px;z-index:2;color:rgba(242,232,220,0.55);font-family:Inter,sans-serif;font-size:13px;letter-spacing:0.18em;text-transform:uppercase;">link na bio</div>
   <div style="position:absolute;bottom:38px;right:56px;z-index:2;display:flex;align-items:center;gap:18px;">
     ${mostraPag ? paginacaoTextual(num, total, false) : ""}
     ${credito(false)}
