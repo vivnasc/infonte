@@ -266,6 +266,15 @@ export default async function PainelPage() {
         </div>
       </section>
 
+      <section className="mt-12">
+        <h2 className="estudio-titulo text-xl mb-4">Agendar publicação</h2>
+        <p className="text-sm text-[var(--texto-suave)] max-w-leitura mb-4">
+          Distribui os 60 posts pelos 30 dias, manhã 10h + tarde 13h. Necessário
+          antes de exportar o CSV do Metricool (senão Date/Time saem vazios).
+        </p>
+        <AgendarTudo />
+      </section>
+
       <section className="mt-12" id="seeds">
         <h2 className="estudio-titulo text-xl mb-4">Configuração inicial</h2>
         <p className="text-sm text-[var(--texto-suave)] max-w-leitura mb-4">
