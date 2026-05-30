@@ -4,6 +4,11 @@ import { criarClienteAdmin } from "@/lib/supabase/admin";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
+// Sem cache: cada download lê result.json mais recente da Storage.
+// Sem isto, o Next 15 podia cachear a resposta e devolver URLs antigos
+// mesmo depois de um novo render ter terminado.
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 // CSV bulk para Metricool. Cabeçalho oficial 2026 (93 colunas).
 // Cada linha = 1 post (manhã ou tarde). Picture Url 1..10 vêm dos
