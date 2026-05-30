@@ -121,11 +121,26 @@ export function ReconstruirCampanha() {
       <h3 className="estudio-titulo text-xl mt-1">Recompor 60 posts + imagens + render</h3>
       <p className="text-sm text-[var(--texto-suave)] mt-2 max-w-leitura">
         Apaga as 30 tarde antigas, lê os teus markdowns para repopular as
-        30 manhã, gera tarde nova com o prompt reforçado, completa
-        imagens em falta e dispara render HD dos 60. Custo estimado: ~$2.50
-        em créditos (Claude + Replicate). Duração: ~5 min de cliques
-        nesta página, +10 min de render no GitHub a correr em paralelo.
+        30 manhã, expande singles em carrosséis de 10 slides (manhã
+        didáctico, tarde emocional), completa imagens em falta e dispara
+        render HD dos 60. Custo estimado: ~$3.20 em créditos. Duração:
+        ~5 min de cliques nesta página, +10 min de render no GitHub.
       </p>
+
+      <div className="mt-3 flex flex-wrap gap-3">
+        <a
+          href="/admin/preview-tudo"
+          target="_blank"
+          rel="noreferrer"
+          className="estudio-btn text-xs"
+        >
+          abrir pré-visualização tudo (novo separador) →
+        </a>
+        <span className="text-[11px] text-[var(--texto-mudo)] self-center">
+          deixa aberto e refresca durante a reconstrução para veres
+          os carrosséis a aparecer
+        </span>
+      </div>
 
       <button
         onClick={correr}
