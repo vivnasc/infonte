@@ -172,9 +172,22 @@ async function carregarRenders(): Promise<Map<string, string[]>> {
   return renders;
 }
 
-export async function GET() {
+export async function GET(request: Request) {
   const admin = await exigirAdmin();
   if (!admin) return NextResponse.json({ erro: "acesso negado" }, { status: 403 });
+
+  // ?dias=29,30 → exporta só esses dias (útil para re-importar
+  // apenas os que falharam, sem duplicar os 41 já agendados).
+  const url = new URL(request.url);
+  const diasParam = url.searchParams.get("dias");
+  const diasFiltro = diasParam
+    ? new Set(
+        diasParam
+          .split(",")
+          .map((s) => parseInt(s.trim(), 10))
+          .filter((n) => Number.isFinite(n))
+      )
+    : null;
 
   const sb = criarClienteAdmin();
   const { data, error } = await sb
@@ -198,6 +211,7 @@ export async function GET() {
   };
 
   for (const p of (data ?? []) as Post[]) {
+    if (diasFiltro && !diasFiltro.has(p.dia)) continue;
     const row = new Array(HEADER.length).fill("");
 
     set(row, "Text", composarTexto(p));
@@ -236,7 +250,8 @@ export async function GET() {
   }
 
   const csv = linhas.map((cols) => cols.map(escaparCSV).join(",")).join("\r\n");
-  const nome = `infonte-campanha-metricool.csv`;
+  const sufixo = diasFiltro ? `-dias-${[...diasFiltro].sort((a, b) => a - b).join("-")}` : "";
+  const nome = `infonte-campanha-metricool${sufixo}.csv`;
 
   return new NextResponse("﻿" + csv, {
     status: 200,
