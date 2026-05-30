@@ -261,16 +261,20 @@ function composarTexto(p: Post): string {
 
 function formatarData(iso: string | null, slot?: string | null): { date: string; time: string } {
   // Metricool: Date = YYYY-MM-DD, Time = HH:MM:SS.
-  // Lemos o ISO directo em texto para preservar a hora local de Maputo
-  // (10:00 ou 13:00). Passar por `new Date()` num servidor UTC converte
-  // 10:00+02:00 em 08:00 UTC, e Metricool importava 08:00.
+  // Supabase devolve TIMESTAMPTZ sempre em UTC ("2026-06-01T08:00:00Z"
+  // mesmo que tenha sido guardado como 10:00+02:00). Aplicamos o offset
+  // de Maputo de volta para repor 10:00 / 13:00.
   const horaSlot = slot === "tarde" ? "13:00:00" : "10:00:00";
   if (!iso) return { date: "", time: horaSlot };
-  // ISO armazenado tipo "2026-06-01T10:00:00+02:00".
-  const m = iso.match(/^(\d{4}-\d{2}-\d{2})T(\d{2}):(\d{2})(?::(\d{2}))?/);
-  if (!m) return { date: "", time: horaSlot };
-  const [, date, hh, mm, ss] = m;
-  return { date, time: `${hh}:${mm}:${ss ?? "00"}` };
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return { date: "", time: horaSlot };
+  const offsetMin = 2 * 60; // Maputo (CAT) +02:00 todo o ano
+  const maputo = new Date(d.getTime() + offsetMin * 60 * 1000);
+  const iso2 = maputo.toISOString();
+  return {
+    date: iso2.slice(0, 10),
+    time: iso2.slice(11, 19),
+  };
 }
 
 function escaparCSV(s: string): string {
