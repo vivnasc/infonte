@@ -244,12 +244,20 @@ function CarrosselCard({ item }: { item: Item }) {
           ))}
         </div>
 
-        <Link
-          href={`/admin/campanha/${item.dia}?slot=${slot}`}
-          className="estudio-btn text-xs w-full text-center block"
-        >
-          abrir editor →
-        </Link>
+        <div className="flex gap-2">
+          <Link
+            href={`/admin/campanha/${item.dia}?slot=${slot}`}
+            className="estudio-btn text-xs flex-1 text-center block"
+          >
+            abrir editor
+          </Link>
+          <a
+            href={`/api/admin/campanha/${item.dia}/zip-pngs?slot=${slot}`}
+            className="estudio-btn text-xs flex-1 text-center block"
+          >
+            ↓ ZIP
+          </a>
+        </div>
       </div>
     </div>
   );
