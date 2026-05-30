@@ -267,12 +267,31 @@ export default async function PainelPage() {
       </section>
 
       <section className="mt-12">
-        <h2 className="estudio-titulo text-xl mb-4">Agendar publicação</h2>
+        <h2 className="estudio-titulo text-xl mb-4">Agendar e exportar</h2>
         <p className="text-sm text-[var(--texto-suave)] max-w-leitura mb-4">
-          Distribui os 60 posts pelos 30 dias, manhã 10h + tarde 13h. Necessário
-          antes de exportar o CSV do Metricool (senão Date/Time saem vazios).
+          Primeiro distribui os 60 posts pelos 30 dias, manhã 10h + tarde 13h.
+          Depois descarrega o CSV para o Metricool (Date/Time vêm preenchidos,
+          93 colunas oficiais).
         </p>
         <AgendarTudo />
+        <div className="estudio-card-elevado mt-4">
+          <div className="text-[10px] uppercase tracking-[0.25em] text-[var(--oliva)] mb-3">
+            descarregar CSV Metricool
+          </div>
+          <p className="text-xs text-[var(--texto-suave)] mb-3 max-w-leitura">
+            Cabeçalho oficial 2026 (93 colunas). Picture Url 1..10 vêm dos
+            PNGs HD renderizados. Importa direto em Metricool → Calendar →
+            Import posts from CSV.
+          </p>
+          <div className="flex flex-wrap gap-3">
+            <a
+              href="/api/admin/campanha/exportar.csv"
+              className="estudio-btn estudio-btn-primario"
+            >
+              ↓ CSV Metricool (60 posts)
+            </a>
+          </div>
+        </div>
       </section>
 
       <section className="mt-12" id="seeds">
