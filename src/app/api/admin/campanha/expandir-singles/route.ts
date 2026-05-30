@@ -41,6 +41,8 @@ ESTRUTURA OBRIGATÓRIA dos 10 slides:
 
 CADA SLIDE: 1-3 linhas curtas. Frase completa em cada slide, lê-se sozinha.
 
+DESTAQUE OBRIGATÓRIO: em CADA slide, envolve com **negrito** entre 1 e 3 palavras-chave que mais doem ou que carregam o significado. Sai em dourado no slide. Não enches a frase de bolds, só os pontos de tensão.
+
 REGRAS DE VOZ (não negociáveis):
 - pt-PT, segunda pessoa (tu), íntima, sem ferida, com poder
 - NUNCA usar travessão longo (—) nem en-dash (–). Sem excepção. Usa vírgulas, pontos, dois pontos, parênteses
@@ -84,6 +86,8 @@ ESTRUTURA OBRIGATÓRIA dos 10 slides:
 10. Silêncio: frase que NÃO conclui. Deixa-a no sentir.
 
 CADA SLIDE: 1-2 linhas curtas. Sussurro, não pregação.
+
+DESTAQUE OBRIGATÓRIO: em CADA slide, envolve com **negrito** 1 a 2 palavras que carregam o peso emocional. Sai em dourado no slide. Mínimo, certeiro. Não enches a frase.
 
 REGRAS DE VOZ (não negociáveis):
 - pt-PT, segunda pessoa (tu), íntima
