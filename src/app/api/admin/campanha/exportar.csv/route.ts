@@ -260,15 +260,17 @@ function composarTexto(p: Post): string {
 }
 
 function formatarData(iso: string | null, slot?: string | null): { date: string; time: string } {
-  // Metricool: Date = YYYY-MM-DD, Time = HH:MM:SS
+  // Metricool: Date = YYYY-MM-DD, Time = HH:MM:SS.
+  // Lemos o ISO directo em texto para preservar a hora local de Maputo
+  // (10:00 ou 13:00). Passar por `new Date()` num servidor UTC converte
+  // 10:00+02:00 em 08:00 UTC, e Metricool importava 08:00.
   const horaSlot = slot === "tarde" ? "13:00:00" : "10:00:00";
   if (!iso) return { date: "", time: horaSlot };
-  const d = new Date(iso);
-  const pad = (n: number) => String(n).padStart(2, "0");
-  return {
-    date: `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`,
-    time: `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`,
-  };
+  // ISO armazenado tipo "2026-06-01T10:00:00+02:00".
+  const m = iso.match(/^(\d{4}-\d{2}-\d{2})T(\d{2}):(\d{2})(?::(\d{2}))?/);
+  if (!m) return { date: "", time: horaSlot };
+  const [, date, hh, mm, ss] = m;
+  return { date, time: `${hh}:${mm}:${ss ?? "00"}` };
 }
 
 function escaparCSV(s: string): string {

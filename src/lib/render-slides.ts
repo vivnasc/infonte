@@ -502,8 +502,12 @@ export function parseTextoImagemToSlides(
   // `**...**`). Garante que o preview do editor mostra os destaques
   // dourados sem precisar de re-correr o seed.
   textoImagem = aplicarBoldDinamico(textoImagem, dia);
-  const isStory = formato === "reel";
-  const fmt: "feed" | "story" = isStory ? "story" : "feed";
+  // Tudo renderiza como FEED (1080x1350, 4:5). Não fazemos vídeo,
+  // por isso o "reel" do brief não tem sentido em PNG. 9:16 é também
+  // rejeitado pelo Metricool em posts de imagem ("aspect ratio
+  // must be between 3:4 and 1.91:1"). Forçar feed evita rerenders.
+  void formato;
+  const fmt: "feed" | "story" = "feed";
 
   // Pool de imagens: usa o array de múltiplas, ou fallback para a URL única
   const pool = imagens && imagens.length > 0
