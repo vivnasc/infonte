@@ -34,8 +34,11 @@ export async function POST() {
   const log: string[] = [];
   let atualizados = 0;
 
-  // Pega os 5 mais recentes (chega para apanhar o último completo).
-  const jobsRecentes = (jobs ?? []).slice(0, 5);
+  // Lê os 50 jobs mais recentes. Quando se disparam 8 workflows numa
+  // sessão (4 semanas × 2 slots), 5 não chega. Como deduplicamos
+  // (dia, slot) com o set `visto`, jobs antigos não sobrescrevem
+  // jobs novos: o primeiro a ser visitado (mais recente) ganha.
+  const jobsRecentes = (jobs ?? []).slice(0, 50);
 
   // Já visitamos este (dia,slot) — não sobrescrever resultado de job
   // mais recente com um mais antigo.
