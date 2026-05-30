@@ -222,6 +222,10 @@ export async function GET() {
     if (redes.includes("linkedin") && urls.length > 1) {
       set(row, "LinkedIn Images as Carousel", "yes");
     }
+    // TikTok: tem que indicar quem pode ver, senão o auto-publish falha.
+    if (redes.includes("tiktok")) {
+      set(row, "TikTok Post Privacy", "PUBLIC_TO_EVERYONE");
+    }
 
     linhas.push(row);
   }
@@ -256,13 +260,14 @@ function composarTexto(p: Post): string {
 }
 
 function formatarData(iso: string | null, slot?: string | null): { date: string; time: string } {
-  const horaSlot = slot === "tarde" ? "13:00" : "10:00";
+  // Metricool: Date = YYYY-MM-DD, Time = HH:MM:SS
+  const horaSlot = slot === "tarde" ? "13:00:00" : "10:00:00";
   if (!iso) return { date: "", time: horaSlot };
   const d = new Date(iso);
   const pad = (n: number) => String(n).padStart(2, "0");
   return {
-    date: `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()}`,
-    time: `${pad(d.getHours())}:${pad(d.getMinutes())}`,
+    date: `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`,
+    time: `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`,
   };
 }
 
