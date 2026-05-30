@@ -44,8 +44,10 @@ const PASSOS: Passo[] = [
   { id: "img-t4", rotulo: "Imagens tarde 16-20", url: "/api/admin/campanha/imagens-replicate?inicio=16&fim=20&slot=tarde&strategy=prefer-existing" },
   { id: "img-t5", rotulo: "Imagens tarde 21-25", url: "/api/admin/campanha/imagens-replicate?inicio=21&fim=25&slot=tarde&strategy=prefer-existing" },
   { id: "img-t6", rotulo: "Imagens tarde 26-30", url: "/api/admin/campanha/imagens-replicate?inicio=26&fim=30&slot=tarde&strategy=prefer-existing" },
-  { id: "render-manha", rotulo: "Render HD 30 manhã (GitHub Actions)", url: "/api/admin/campanha/render-submit?dias=all&slot=manha" },
-  { id: "render-tarde", rotulo: "Render HD 30 tarde (GitHub Actions)", url: "/api/admin/campanha/render-submit?dias=all&slot=tarde" },
+  // Render HD intencionalmente FORA daqui. A Vivianne quer ver preview
+  // (HTML) primeiro, aprovar, e depois disparar render manualmente nos
+  // botões "render manhã" / "render tarde" do painel ou por semana
+  // na tabela cobertura.
 ];
 
 type Linha = { estado: Estado; detalhe?: string; erro?: string };
@@ -118,13 +120,15 @@ export function ReconstruirCampanha() {
       <div className="text-[10px] uppercase tracking-[0.3em] text-[var(--ambar)]">
         reconstruir a campanha do brief
       </div>
-      <h3 className="estudio-titulo text-xl mt-1">Recompor 60 posts + imagens + render</h3>
+      <h3 className="estudio-titulo text-xl mt-1">Recompor 60 posts + imagens (sem render)</h3>
       <p className="text-sm text-[var(--texto-suave)] mt-2 max-w-leitura">
         Apaga as 30 tarde antigas, lê os teus markdowns para repopular as
         30 manhã, expande singles em carrosséis de 10 slides (manhã
-        didáctico, tarde emocional), completa imagens em falta e dispara
-        render HD dos 60. Custo estimado: ~$3.20 em créditos. Duração:
-        ~5 min de cliques nesta página, +10 min de render no GitHub.
+        didáctico, tarde emocional) e completa imagens em falta.
+        <strong className="text-[var(--ambar)]"> NÃO dispara render HD</strong>:
+        primeiro vês a pré-visualização e aprovas. O render é um clique
+        separado no painel quando quiseres. Custo: ~$3.20 em créditos.
+        Duração: ~5 min.
       </p>
 
       <div className="mt-3 flex flex-wrap gap-3">
