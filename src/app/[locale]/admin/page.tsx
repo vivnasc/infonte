@@ -7,6 +7,7 @@ import { WorkflowsRender } from "@/components/admin/WorkflowsRender";
 import { AgendarTudo } from "@/components/admin/AgendarTudo";
 import { ReconstruirCampanha } from "@/components/admin/ReconstruirCampanha";
 import { BotaoImagensPorSlide } from "@/components/admin/BotaoImagensPorSlide";
+import { BotaoRenderDias29e30 } from "@/components/admin/BotaoRenderDias29e30";
 import { criarClienteAdmin } from "@/lib/supabase/admin";
 
 type EstadoRaw = string | null;
@@ -263,6 +264,9 @@ export default async function PainelPage() {
         <div className="mt-4 grid lg:grid-cols-[1fr_1fr] gap-4 items-start">
           <WorkflowsRender />
           <BotaoSyncRender />
+        </div>
+        <div className="mt-4">
+          <BotaoRenderDias29e30 />
         </div>
       </section>
 
