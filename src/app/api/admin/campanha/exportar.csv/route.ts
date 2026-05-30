@@ -2,22 +2,122 @@ import { NextResponse } from "next/server";
 import { exigirAdmin } from "@/lib/admin";
 import { criarClienteAdmin } from "@/lib/supabase/admin";
 
-// CSV bulk para o Metricool.
-//
-// O Metricool aceita importação em massa via CSV/Excel. As colunas
-// principais são:
-//   date       (DD/MM/YYYY)
-//   time       (HH:MM, 24h)
-//   text       (texto da publicação)
-//   link       (URL associada, opcional)
-//   image      (URL da arte/vídeo, opcional)
-//   networks   (Facebook;Instagram;Twitter;LinkedIn;TikTok;...)
-//
-// Há dois modos:
-//   - default: uma linha por dia, todas as redes na coluna networks
-//   - por-rede: uma linha por (dia × rede), útil quando o texto difere
-//
-// Para já geramos texto idêntico em todas as redes, com tagged hashtags.
+export const runtime = "nodejs";
+export const maxDuration = 60;
+
+// CSV bulk para Metricool. Cabeçalho oficial 2026 (93 colunas).
+// Cada linha = 1 post (manhã ou tarde). Picture Url 1..10 vêm dos
+// PNGs HD renderizados via Playwright (carregados de result.json
+// no bucket infonte-assets/infonte-campanha-hd/<jobId>/).
+
+const HEADER = [
+  "Text",
+  "Date",
+  "Time",
+  "Draft",
+  "Facebook",
+  "Twitter/X",
+  "LinkedIn",
+  "GBP",
+  "Instagram",
+  "Pinterest",
+  "TikTok",
+  "Youtube",
+  "Threads",
+  "Bluesky",
+  "Picture Url 1",
+  "Picture Url 2",
+  "Picture Url 3",
+  "Picture Url 4",
+  "Picture Url 5",
+  "Picture Url 6",
+  "Picture Url 7",
+  "Picture Url 8",
+  "Picture Url 9",
+  "Picture Url 10",
+  "Alt text picture 1",
+  "Alt text picture 2",
+  "Alt text picture 3",
+  "Alt text picture 4",
+  "Alt text picture 5",
+  "Alt text picture 6",
+  "Alt text picture 7",
+  "Alt text picture 8",
+  "Alt text picture 9",
+  "Alt text picture 10",
+  "Document title",
+  "Shortener",
+  "Video Thumbnail Url",
+  "Video Cover Frame",
+  "Twitter/X Can reply",
+  "Twitter/X Type",
+  "Twitter/X Poll Duration minutes",
+  "Twitter/X Poll Option 1",
+  "Twitter/X Poll Option 2",
+  "Twitter/X Poll Option 3",
+  "Twitter/X Poll Option 4",
+  "Pinterest Board",
+  "Pinterest Pin Title",
+  "Pinterest Pin Link",
+  "Pinterest Pin New Format",
+  "Instagram Post Type",
+  "Instagram Show Reel On Feed",
+  "Youtube Video Title",
+  "Youtube Video Type",
+  "Youtube Video Privacy",
+  "Youtube video for kids",
+  "Youtube Video Category",
+  "Youtube Video Tags",
+  "Youtube playlist",
+  "GBP Post Type",
+  "Facebook Post Type",
+  "Facebook Title",
+  "First Comment Text",
+  "TikTok Title",
+  "TikTok disable comments",
+  "TikTok disable duet",
+  "TikTok disable stitch",
+  "TikTok Post Privacy",
+  "TikTok Branded Content",
+  "TikTok Your Brand",
+  "TikTok Auto Add Music",
+  "TikTok Photo Cover Index",
+  "TikTok musicId",
+  "TikTok music title",
+  "TikTok music author",
+  "TikTok music previewUrl",
+  "TikTok music thumbnailUrl",
+  "TikTok music soundVolume",
+  "TikTok music originalVolume",
+  "TikTok music startMillis",
+  "TikTok music endMillis",
+  "TikTok is AI generated content",
+  "LinkedIn Type",
+  "LinkedIn Poll Question",
+  "LinkedIn Poll Option 1",
+  "LinkedIn Poll Option 2",
+  "LinkedIn Poll Option 3",
+  "LinkedIn Poll Option 4",
+  "LinkedIn Poll Duration",
+  "LinkedIn Show link preview",
+  "LinkedIn Images as Carousel",
+  "Threads Reply Control",
+  "Threads Is Spoiler",
+  "Threads Post Type",
+];
+
+// Mapa rede DB → coluna no cabeçalho Metricool.
+const COL_REDE: Record<string, string> = {
+  facebook: "Facebook",
+  twitter: "Twitter/X",
+  linkedin: "LinkedIn",
+  instagram: "Instagram",
+  pinterest: "Pinterest",
+  tiktok: "TikTok",
+  youtube: "Youtube",
+  threads: "Threads",
+  bluesky: "Bluesky",
+};
 
 type Post = {
   dia: number;
@@ -27,65 +127,107 @@ type Post = {
   pergunta: string | null;
   hashtags: string | null;
   link: string | null;
-  imagem_url: string | null;
   redes: string[] | null;
   data_publicacao: string | null;
   slot: string | null;
+  formato: string | null;
 };
 
-const NOME_REDE: Record<string, string> = {
-  instagram: "Instagram",
-  tiktok: "TikTok",
-  facebook: "Facebook",
-  linkedin: "LinkedIn",
-  twitter: "Twitter",
-  youtube: "YouTube",
-  pinterest: "Pinterest",
-};
+async function carregarRenders(): Promise<Map<string, string[]>> {
+  const sb = criarClienteAdmin();
+  const BUCKET = "infonte-assets";
+  const { data: jobs } = await sb.storage
+    .from(BUCKET)
+    .list("infonte-campanha-hd", {
+      limit: 100,
+      sortBy: { column: "created_at", order: "desc" },
+    });
 
-export async function GET(request: Request) {
+  const renders = new Map<string, string[]>();
+  for (const job of jobs ?? []) {
+    if (!job.name) continue;
+    const path = `infonte-campanha-hd/${job.name}/result.json`;
+    const { data: file } = await sb.storage.from(BUCKET).download(path);
+    if (!file) continue;
+    try {
+      const j = JSON.parse(await file.text());
+      const slot = (j.slot as string) ?? "manha";
+      const dias = (j.dias ?? {}) as Record<string, { urls?: string[] }>;
+      for (const [diaStr, r] of Object.entries(dias)) {
+        const dia = parseInt(diaStr, 10);
+        const key = `${dia}-${slot}`;
+        if (renders.has(key)) continue;
+        const urls = r?.urls;
+        if (Array.isArray(urls) && urls.length > 0) renders.set(key, urls);
+      }
+    } catch {
+      // ignora result.json inválido
+    }
+  }
+  return renders;
+}
+
+export async function GET() {
   const admin = await exigirAdmin();
   if (!admin) return NextResponse.json({ erro: "acesso negado" }, { status: 403 });
-
-  const url = new URL(request.url);
-  const modo = url.searchParams.get("modo") === "por-rede" ? "por-rede" : "default";
 
   const sb = criarClienteAdmin();
   const { data, error } = await sb
     .from("campanha_posts")
     .select(
-      "dia, semana, tema, legenda, pergunta, hashtags, link, imagem_url, redes, data_publicacao, slot"
+      "dia, semana, tema, legenda, pergunta, hashtags, link, redes, data_publicacao, slot, formato"
     )
     .order("dia", { ascending: true })
     .order("slot", { ascending: true });
 
   if (error) return NextResponse.json({ erro: error.message }, { status: 500 });
 
-  const linhas: string[][] = [];
-  const cabecalho = ["date", "time", "text", "link", "image", "networks"];
-  linhas.push(cabecalho);
+  const renders = await carregarRenders();
+  const linhas: string[][] = [HEADER];
+
+  // Índice por nome de coluna para preencher por chave sem erros de posição.
+  const idx = new Map(HEADER.map((h, i) => [h, i]));
+  const set = (row: string[], coluna: string, valor: string) => {
+    const i = idx.get(coluna);
+    if (i !== undefined) row[i] = valor;
+  };
 
   for (const p of (data ?? []) as Post[]) {
-    const texto = composarTexto(p);
-    const link = p.link ?? "";
-    const imagem = p.imagem_url ?? "";
-    const redes = (p.redes ?? ["instagram", "tiktok"]).map(
-      (r) => NOME_REDE[r] ?? r
-    );
+    const row = new Array(HEADER.length).fill("");
 
+    set(row, "Text", composarTexto(p));
     const { date, time } = formatarData(p.data_publicacao, p.slot);
+    set(row, "Date", date);
+    set(row, "Time", time);
+    // Draft fica vazio (post agendado).
 
-    if (modo === "por-rede") {
-      for (const r of redes) {
-        linhas.push([date, time, texto, link, imagem, r]);
-      }
-    } else {
-      linhas.push([date, time, texto, link, imagem, redes.join(";")]);
+    const redes = p.redes ?? ["instagram", "tiktok"];
+    for (const r of redes) {
+      const col = COL_REDE[r];
+      if (col) set(row, col, "yes");
     }
+
+    const slot = p.slot ?? "manha";
+    const urls = renders.get(`${p.dia}-${slot}`) ?? [];
+    for (let i = 0; i < Math.min(urls.length, 10); i++) {
+      set(row, `Picture Url ${i + 1}`, urls[i]);
+      set(row, `Alt text picture ${i + 1}`, p.tema ?? "");
+    }
+
+    // Instagram Post Type: Carousel se múltiplas imagens, senão vazio.
+    if (redes.includes("instagram") && urls.length > 1) {
+      set(row, "Instagram Post Type", "Carousel");
+    }
+    // LinkedIn carousel se múltiplas imagens.
+    if (redes.includes("linkedin") && urls.length > 1) {
+      set(row, "LinkedIn Images as Carousel", "yes");
+    }
+
+    linhas.push(row);
   }
 
   const csv = linhas.map((cols) => cols.map(escaparCSV).join(",")).join("\r\n");
-  const nome = `infonte-campanha-30dias${modo === "por-rede" ? "-por-rede" : ""}.csv`;
+  const nome = `infonte-campanha-metricool.csv`;
 
   return new NextResponse("﻿" + csv, {
     status: 200,
@@ -103,9 +245,6 @@ function composarTexto(p: Post): string {
   if (p.pergunta?.trim()) partes.push("Pergunta: " + p.pergunta.trim());
   if (p.link?.trim()) partes.push(p.link.trim());
 
-  // Menção do autor, injectada antes das hashtags para o IG/TikTok a
-  // detectarem bem. Configurável por env CAPTION_AUTHOR_TAG; vazia
-  // desactiva (útil em projectos partilhados).
   const tag = (process.env.CAPTION_AUTHOR_TAG ?? "").trim();
   const baseAteAqui = partes.join("\n\n");
   if (tag && !baseAteAqui.toLowerCase().includes(tag.toLowerCase())) {
@@ -117,7 +256,6 @@ function composarTexto(p: Post): string {
 }
 
 function formatarData(iso: string | null, slot?: string | null): { date: string; time: string } {
-  // Se não há data de publicação definida, usar hora padrão pelo slot
   const horaSlot = slot === "tarde" ? "13:00" : "10:00";
   if (!iso) return { date: "", time: horaSlot };
   const d = new Date(iso);
