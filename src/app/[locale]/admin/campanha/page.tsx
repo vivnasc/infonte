@@ -1,10 +1,5 @@
 import { criarClienteAdmin } from "@/lib/supabase/admin";
 import { Link } from "@/i18n/routing";
-import { BotaoSeed } from "@/components/admin/BotaoSeed";
-import { Diagnostico } from "@/components/admin/Diagnostico";
-import { BotaoBulkImagens } from "@/components/admin/BotaoBulkImagens";
-import { CardRetoma } from "@/components/admin/CardRetoma";
-import { BotaoSyncRender } from "@/components/admin/BotaoSyncRender";
 
 type Estado = "rascunho" | "rendering" | "failed" | "pronto" | "agendado" | "publicado";
 
@@ -31,32 +26,6 @@ function agruparPorDia(posts: PostResumo[]) {
     else grupo.manha = p;
   }
   return Array.from(mapa.values()).sort((a, b) => a.dia - b.dia);
-}
-
-function Fase({
-  numero,
-  titulo,
-  subtitulo,
-  custo,
-  children,
-}: {
-  numero: number;
-  titulo: string;
-  subtitulo: string;
-  custo?: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <section className="estudio-fase">
-      <header className="estudio-fase-header">
-        <span className="estudio-fase-numero">FASE {numero}</span>
-        <h2 className="estudio-fase-titulo">{titulo}</h2>
-        {custo && <span className="estudio-fase-custo">{custo}</span>}
-      </header>
-      <p className="estudio-fase-sub mb-4">{subtitulo}</p>
-      {children}
-    </section>
-  );
 }
 
 export default async function CampanhaListaPage() {
@@ -152,91 +121,13 @@ export default async function CampanhaListaPage() {
       </div>
 
 
-      <Fase numero={0} titulo="Diagnóstico" subtitulo="Testa as integrações antes de produzir. Faz isto sempre primeiro.">
-        <Diagnostico />
-      </Fase>
+      <div className="estudio-card mt-6 text-xs text-[var(--texto-suave)]">
+        Produção (bold, tarde, imagens, render, agendar, CSV) é toda no{" "}
+        <Link href="/admin" className="text-[var(--ambar)] underline">painel</Link>.
+        Aqui só navegas entre os 60 dias. Clica num dia para abrir o editor.
+      </div>
 
-      <Fase numero={1} titulo="Conteúdo" subtitulo="Bold nas artes + posts emocionais da tarde (Claude). Idempotente: salta dias que já têm conteúdo." custo="grátis (texto)">
-        <div className="space-y-4">
-          <div>
-            <div className="text-[10px] uppercase tracking-[0.25em] text-[var(--texto-mudo)] mb-2">bold das artes</div>
-            <BotaoSeed url="/api/admin/campanha/formatar-bold" titulo="Aplicar bold aos 30 posts" descricao="Mete **negrito** nas palavras-chave do texto das artes." />
-          </div>
-          <div>
-            <div className="text-[10px] uppercase tracking-[0.25em] text-[var(--texto-mudo)] mb-2">posts da tarde (3 lotes para caber no timeout)</div>
-            <div className="flex flex-wrap gap-3">
-              <BotaoSeed url="/api/admin/campanha/gerar-tarde?inicio=1&fim=10" titulo="Tarde, dias 1-10" descricao="10 posts emocionais via Claude." />
-              <BotaoSeed url="/api/admin/campanha/gerar-tarde?inicio=11&fim=20" titulo="Tarde, dias 11-20" descricao="10 posts emocionais via Claude." />
-              <BotaoSeed url="/api/admin/campanha/gerar-tarde?inicio=21&fim=30" titulo="Tarde, dias 21-30" descricao="10 posts emocionais via Claude." />
-            </div>
-          </div>
-        </div>
-        <p className="text-[11px] text-[var(--texto-mudo)] mt-3 max-w-leitura">
-          Menção do autor é injectada automaticamente no CSV se a env
-          <code className="text-[var(--ambar)] mx-1">CAPTION_AUTHOR_TAG</code>
-          estiver definida.
-        </p>
-      </Fase>
-
-      <Fase numero={2} titulo="Imagens automáticas" subtitulo="FLUX 1.1 Pro via Replicate. Claude decide o assunto, valida regras editoriais e dispara 1 retry se violar. Testa 3 antes do lote." custo="$0.04 / imagem">
-        <CardRetoma />
-        <div className="space-y-4">
-          <div>
-            <div className="text-[10px] uppercase tracking-[0.25em] text-[var(--texto-mudo)] mb-2">teste</div>
-            <BotaoBulkImagens inicio={1} fim={3} slot="manha" titulo="Testar 3 primeiros (dias 1-3)" />
-          </div>
-          <div>
-            <div className="text-[10px] uppercase tracking-[0.25em] text-[var(--texto-mudo)] mb-2">lotes completos</div>
-            <div className="flex flex-wrap gap-3">
-              <BotaoBulkImagens inicio={1} fim={5} slot="manha" titulo="Manhã 1-5" />
-              <BotaoBulkImagens inicio={6} fim={10} slot="manha" titulo="Manhã 6-10" />
-              <BotaoBulkImagens inicio={11} fim={15} slot="manha" titulo="Manhã 11-15" />
-              <BotaoBulkImagens inicio={16} fim={20} slot="manha" titulo="Manhã 16-20" />
-              <BotaoBulkImagens inicio={21} fim={25} slot="manha" titulo="Manhã 21-25" />
-              <BotaoBulkImagens inicio={26} fim={30} slot="manha" titulo="Manhã 26-30" />
-              <BotaoBulkImagens inicio={1} fim={5} slot="tarde" titulo="Tarde 1-5" />
-              <BotaoBulkImagens inicio={6} fim={10} slot="tarde" titulo="Tarde 6-10" />
-              <BotaoBulkImagens inicio={11} fim={15} slot="tarde" titulo="Tarde 11-15" />
-              <BotaoBulkImagens inicio={16} fim={20} slot="tarde" titulo="Tarde 16-20" />
-              <BotaoBulkImagens inicio={21} fim={25} slot="tarde" titulo="Tarde 21-25" />
-              <BotaoBulkImagens inicio={26} fim={30} slot="tarde" titulo="Tarde 26-30" />
-            </div>
-          </div>
-        </div>
-      </Fase>
-
-      <Fase numero={3} titulo="Render HD" subtitulo="PNGs dos slides em 2160x3840 via Playwright no GitHub Actions, sobe direto ao Storage. Marca os dias como 'rendering' enquanto corre." custo="grátis (GitHub Actions)">
-        <div className="space-y-4">
-          <div>
-            <div className="text-[10px] uppercase tracking-[0.25em] text-[var(--texto-mudo)] mb-2">teste</div>
-            <BotaoSeed url="/api/admin/campanha/render-submit?dias=[1,2,3]&slot=manha" titulo="Render HD, 3 dias" descricao="Dias 1-3 da manhã. Link do run no log." />
-          </div>
-          <div>
-            <div className="text-[10px] uppercase tracking-[0.25em] text-[var(--texto-mudo)] mb-2">lotes completos</div>
-            <div className="flex flex-wrap gap-3">
-              <BotaoSeed url="/api/admin/campanha/render-submit?dias=all&slot=manha" titulo="30 dias da manhã" descricao="2-5 minutos. Workflow no GitHub." />
-              <BotaoSeed url="/api/admin/campanha/render-submit?dias=all&slot=tarde" titulo="30 dias da tarde" descricao="2-5 minutos. Workflow no GitHub." />
-            </div>
-          </div>
-          <div>
-            <div className="text-[10px] uppercase tracking-[0.25em] text-[var(--texto-mudo)] mb-2">sincronizar estado depois</div>
-            <BotaoSyncRender />
-          </div>
-        </div>
-      </Fase>
-
-      <Fase numero={4} titulo="Agendar e exportar" subtitulo="Define data/redes em cada dia abaixo, muda para 'pronto' ou 'agendado', e exporta o CSV.">
-        <div className="flex flex-wrap gap-3">
-          <a href="/api/admin/campanha/exportar.csv" className="estudio-btn estudio-btn-primario">
-            CSV Metricool
-          </a>
-          <a href="/api/admin/campanha/exportar.csv?modo=por-rede" className="estudio-btn">
-            CSV por rede
-          </a>
-        </div>
-      </Fase>
-
-      <section className="mt-16 space-y-10">
+      <section className="mt-10 space-y-10">
         <h2 className="estudio-titulo text-2xl border-b border-[var(--borda)] pb-3">dias</h2>
         {porSemana.map(({ semana, posts: pSemana }) => (
           <div key={semana}>
