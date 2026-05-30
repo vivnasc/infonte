@@ -32,12 +32,22 @@ export async function GET() {
     slot: Item["slotInferido"];
   } {
     if (prefix.startsWith("infonte-campanha-hd/")) return { origem: "hd", dia: null, slot: null };
+    // Replicate per-day (formato antigo): dia-XX-replicate.png
     const mReplicate = nome.match(/^dia-(\d{2})(-tarde)?-replicate\.png$/i);
     if (mReplicate) {
       return {
         origem: "replicate",
         dia: parseInt(mReplicate[1], 10),
         slot: mReplicate[2] ? "tarde" : "manha",
+      };
+    }
+    // Replicate per-slide (imagens-por-slide): dia-XX-sN.png ou dia-XX-tarde-sN.png
+    const mReplicateSlide = nome.match(/^dia-(\d{2})(-tarde)?-s(\d+)\.png$/i);
+    if (mReplicateSlide) {
+      return {
+        origem: "replicate",
+        dia: parseInt(mReplicateSlide[1], 10),
+        slot: mReplicateSlide[2] ? "tarde" : "manha",
       };
     }
     const mMJ = nome.match(/^dia-(\d{2})(?:-(\d+))?\.(jpg|jpeg|png|webp)$/i);
