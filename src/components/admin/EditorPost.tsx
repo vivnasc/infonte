@@ -70,6 +70,8 @@ export function EditorPost({ post }: { post: Post }) {
   const [promptMJ, setPromptMJ] = useState<string | null>(null);
   const [estadoReplicate, setEstadoReplicate] = useState<"calmo" | "a-gerar" | "ok" | "erro">("calmo");
   const [erroReplicate, setErroReplicate] = useState<string | null>(null);
+  const [estadoRender, setEstadoRender] = useState<"calmo" | "a-disparar" | "ok" | "erro">("calmo");
+  const [mensagemRender, setMensagemRender] = useState<string | null>(null);
   // Trigger para forçar refresh da pré-visualização (ao guardar, ao
   // gerar imagem nova, ou ao mudar imagens). Incrementa o contador.
   const [previewKey, setPreviewKey] = useState(0);
@@ -126,6 +128,27 @@ export function EditorPost({ post }: { post: Post }) {
       setEstadoMJ("ok");
     } catch {
       setEstadoMJ("erro");
+    }
+  }
+
+  async function reRenderEsteDia() {
+    setEstadoRender("a-disparar");
+    setMensagemRender(null);
+    try {
+      const slot = post.slot ?? "manha";
+      const r = await fetch(
+        `/api/admin/campanha/render-submit?dias=[${post.dia}]&slot=${slot}`,
+        { method: "POST" }
+      );
+      const j = await r.json();
+      if (!r.ok || j.erro) throw new Error(j.erro ?? `erro ${r.status}`);
+      setEstadoRender("ok");
+      setMensagemRender(
+        `Workflow disparado (${j.jobId ?? "id?"}). ~3-5 min. Depois sincroniza em /admin.`
+      );
+    } catch (e) {
+      setEstadoRender("erro");
+      setMensagemRender(e instanceof Error ? e.message : "erro");
     }
   }
 
@@ -468,6 +491,27 @@ export function EditorPost({ post }: { post: Post }) {
           <button onClick={guardar} className="estudio-btn estudio-btn-primario w-full" disabled={estado === "a-guardar"}>
             {estado === "a-guardar" ? "a guardar..." : "guardar"}
           </button>
+          <button
+            onClick={reRenderEsteDia}
+            disabled={estadoRender === "a-disparar"}
+            className="estudio-btn w-full mt-2 text-xs"
+            title="Dispara workflow GitHub Actions só para este dia/slot. ~3-5 min."
+          >
+            {estadoRender === "a-disparar"
+              ? "a disparar..."
+              : estadoRender === "ok"
+              ? "render disparado ✓"
+              : "re-render este dia (HD)"}
+          </button>
+          {mensagemRender && (
+            <p
+              className={`text-[11px] mt-1 ${
+                estadoRender === "erro" ? "text-[var(--vermelho)]" : "text-[var(--texto-suave)]"
+              }`}
+            >
+              {mensagemRender}
+            </p>
+          )}
           {mensagem && (
             <p
               className={`text-xs mt-2 text-center ${
