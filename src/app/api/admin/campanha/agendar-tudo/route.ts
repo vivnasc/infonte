@@ -43,13 +43,16 @@ export async function POST(request: Request) {
   // via env CAMPAIGN_TZ_OFFSET (ex: "+02:00").
   const offset = process.env.CAMPAIGN_TZ_OFFSET ?? "+02:00";
 
+  // Parse dataInicial como data civil pura (sem TZ). Incrementar dias
+  // localmente para evitar que getUTCDate() devolva o dia anterior
+  // (Maputo 00:00 = UTC 22:00 do dia anterior).
+  const [yIn, mIn, dIn] = dataInicial.split("-").map(Number);
+
   for (let dia = 1; dia <= 30; dia++) {
-    // Data deste dia = dataInicial + (dia-1) dias
-    const d = new Date(`${dataInicial}T00:00:00${offset}`);
-    d.setUTCDate(d.getUTCDate() + (dia - 1));
-    const yyyy = d.getUTCFullYear();
-    const mm = String(d.getUTCMonth() + 1).padStart(2, "0");
-    const dd = String(d.getUTCDate()).padStart(2, "0");
+    const d = new Date(yIn, mIn - 1, dIn + (dia - 1));
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, "0");
+    const dd = String(d.getDate()).padStart(2, "0");
     const dataStr = `${yyyy}-${mm}-${dd}`;
 
     const isoManha = `${dataStr}T${horaManha}:00${offset}`;
