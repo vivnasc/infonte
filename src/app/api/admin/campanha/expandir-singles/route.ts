@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { exigirAdmin } from "@/lib/admin";
 import { criarClienteAdmin } from "@/lib/supabase/admin";
+import { limparTravessoes } from "@/lib/limpar-texto";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -29,10 +30,10 @@ NÃO É post de venda. NÃO menciones produto, método, etapa, infonte, link na 
 ESTRUTURA OBRIGATÓRIA dos 10 slides:
 1. Hook: frase impactante que afirma a tese (podes usar a actual ou variação muito próxima)
 2. Define: nomeia exactamente o que está em causa. Dá-lhe nome.
-3. Mecanismo: descreve COMO funciona — a engrenagem, o ciclo, o padrão.
+3. Mecanismo: descreve COMO funciona. A engrenagem, o ciclo, o padrão.
 4. Cena 1: exemplo concreto. Uma situação real e curta onde isto aparece (cozinha, secretária, conversa, decisão).
 5. Cena 2: segundo exemplo, num contexto diferente. Mostra que é padrão, não acaso.
-6. Por que não é culpa: liberta a leitora. Mostra a origem (cultural, familiar, sistema) — ela não está partida.
+6. Por que não é culpa: liberta a leitora. Mostra a origem (cultural, familiar, sistema). Ela não está partida.
 7. O custo: o que ela perde por não ver isto. Concreto, não abstracto.
 8. A virada: o que muda QUANDO se vê. Não promete cura, mostra movimento.
 9. Pergunta-âncora: uma pergunta que a faz olhar para a vida dela agora. Pede 1 frase de resposta.
@@ -42,7 +43,7 @@ CADA SLIDE: 1-3 linhas curtas. Frase completa em cada slide, lê-se sozinha.
 
 REGRAS DE VOZ (não negociáveis):
 - pt-PT, segunda pessoa (tu), íntima, sem ferida, com poder
-- Sem travessões longos
+- NUNCA usar travessão longo (—) nem en-dash (–). Sem excepção. Usa vírgulas, pontos, dois pontos, parênteses
 - Sem guru: NUNCA "universo", "manifesta", "mindset", "abundância" sozinha, "energia", "vibração", "alma", "cura", "luz", "alinhamento"
 - Sem coach: "abraça-te", "ama-te", "tu mereces tudo"
 - Sem inglês de marketing: "hustle", "growth"
@@ -86,6 +87,7 @@ CADA SLIDE: 1-2 linhas curtas. Sussurro, não pregação.
 
 REGRAS DE VOZ (não negociáveis):
 - pt-PT, segunda pessoa (tu), íntima
+- NUNCA usar travessão longo (—) nem en-dash (–). Sem excepção. Usa vírgulas, pontos, dois pontos, parênteses
 - Sem solução, sem conselho, sem CTA, sem menção a produto
 - Sem guru: NUNCA "universo", "manifesta", "mindset", "abundância" sozinha, "energia", "vibração", "alma", "cura", "luz", "alinhamento"
 - Sem coach: "abraça-te", "ama-te", "tu mereces tudo"
@@ -145,7 +147,9 @@ async function expandirComClaude(
   // Verificar que tem pelo menos 10 linhas numeradas
   const lines = out.split("\n").filter((l: string) => /^\d+\.\s+.+/.test(l.trim()));
   if (lines.length < 10) return null;
-  return lines.slice(0, 10).join("\n");
+  // Sanitiza travessões mesmo que o prompt os proíba (Claude às
+  // vezes meta um — em apostos).
+  return limparTravessoes(lines.slice(0, 10).join("\n"));
 }
 
 export async function POST(request: Request) {

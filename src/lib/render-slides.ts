@@ -1,5 +1,6 @@
 import { chromium } from "playwright-core";
 import { aplicarBoldDinamico } from "./keywords-bold";
+import { limparTravessoes } from "./limpar-texto";
 
 // Caminho local para o Chromium pré-instalado, se existir. Em ambientes
 // como GitHub Actions o Playwright tem o browser instalado num path
@@ -491,6 +492,11 @@ export function parseTextoImagemToSlides(
   imagens?: string[] | null,
 ): SlideOpts[] {
   if (!textoImagem?.trim()) return [];
+  // Higiene em render-time: troca travessões longos (—) e en-dashes
+  // (–) por vírgula. Regra de voz da Infonte. Aplica-se a tudo o
+  // que vier da BD, mesmo conteúdos antigos gerados antes de a
+  // sanitização entrar no pipeline.
+  textoImagem = limparTravessoes(textoImagem);
   // Bold dinâmico: aplica KEYWORDS_BOLD[dia] aqui em render-time,
   // por cima do que já estiver na BD. Idempotente (não duplica
   // `**...**`). Garante que o preview do editor mostra os destaques

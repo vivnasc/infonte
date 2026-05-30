@@ -42,6 +42,7 @@ const PASSOS: Passo[] = [
   { id: "expand-t4", rotulo: "Expandir tarde 16-20 em carrosséis", url: "/api/admin/campanha/expandir-singles?slot=tarde&inicio=16&fim=20" },
   { id: "expand-t5", rotulo: "Expandir tarde 21-25 em carrosséis", url: "/api/admin/campanha/expandir-singles?slot=tarde&inicio=21&fim=25" },
   { id: "expand-t6", rotulo: "Expandir tarde 26-30 em carrosséis", url: "/api/admin/campanha/expandir-singles?slot=tarde&inicio=26&fim=30" },
+  { id: "limpar-travessoes", rotulo: "Limpar travessões dos 60 posts", url: "/api/admin/campanha/limpar-travessoes" },
   { id: "img-m1", rotulo: "Imagens manhã 1-5", url: "/api/admin/campanha/imagens-replicate?inicio=1&fim=5&slot=manha&strategy=prefer-existing" },
   { id: "img-m2", rotulo: "Imagens manhã 6-10", url: "/api/admin/campanha/imagens-replicate?inicio=6&fim=10&slot=manha&strategy=prefer-existing" },
   { id: "img-m3", rotulo: "Imagens manhã 11-15", url: "/api/admin/campanha/imagens-replicate?inicio=11&fim=15&slot=manha&strategy=prefer-existing" },

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { exigirAdmin } from "@/lib/admin";
 import { criarClienteAdmin } from "@/lib/supabase/admin";
+import { limparTravessoes } from "@/lib/limpar-texto";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -140,6 +141,10 @@ Devolve APENAS o JSON, sem explicação.`,
       log.push(`Dia ${dia}: JSON inválido`);
       return;
     }
+    // Sanitiza travessões mesmo que o prompt os proíba.
+    parsed.texto_imagem = limparTravessoes(parsed.texto_imagem);
+    parsed.legenda = limparTravessoes(parsed.legenda);
+    parsed.pergunta = limparTravessoes(parsed.pergunta);
 
     // Re-aproveitamos o jaExiste do início. Se existia mas sem texto,
     // atualizamos. Se não existia, criamos novo.
