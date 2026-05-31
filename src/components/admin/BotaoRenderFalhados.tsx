@@ -110,6 +110,12 @@ export function BotaoRenderFalhados() {
       >
         ↓ CSV falhados (22)
       </a>
+      <a
+        href="/api/admin/campanha/exportar.csv?lista=5-tarde,8-manha,10-tarde,11-manha,11-tarde,12-tarde,13-manha,13-tarde,14-manha,14-tarde,16-tarde,17-tarde,18-tarde,19-manha,19-tarde,20-manha,29-manha,30-manha"
+        className="estudio-btn estudio-btn-primario ml-2 inline-block"
+      >
+        ↓ CSV só os 18 que falharam agora
+      </a>
       {msg && (
         <p
           className={`text-[11px] mt-2 ${
