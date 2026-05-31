@@ -5,51 +5,14 @@ import { criarClienteAdmin } from "@/lib/supabase/admin";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
+export const dynamic = "force-dynamic";
 
-// Bundle de todos os PNGs HD dos dias falhados num ZIP único,
-// organizado em pastas por dia/slot.
-//
-// GET /api/admin/campanha/zip-falhados
-//
-// Lista hardcoded — mesma que BotaoRenderFalhados.
+// Bundle ZIP único dos dias falhados. Paraleliza tudo para caber
+// nos 60s do Vercel: result.json em paralelo (lotes de 10), PNGs em
+// paralelo (lotes de 20), pára de procurar quando encontrou todos.
 
 const DIAS_MANHA = [3, 8, 11, 13, 14, 19, 20, 29, 30];
 const DIAS_TARDE = [5, 10, 11, 12, 13, 14, 16, 17, 18, 19, 20, 29, 30];
-
-async function carregarRendersPara(
-  sb: ReturnType<typeof criarClienteAdmin>,
-  alvos: Set<string>
-): Promise<Map<string, string[]>> {
-  const BUCKET = "infonte-assets";
-  const { data: jobs } = await sb.storage
-    .from(BUCKET)
-    .list("infonte-campanha-hd", {
-      limit: 100,
-      sortBy: { column: "created_at", order: "desc" },
-    });
-
-  const renders = new Map<string, string[]>();
-  for (const job of jobs ?? []) {
-    if (!job.name) continue;
-    const path = `infonte-campanha-hd/${job.name}/result.json`;
-    const { data: file } = await sb.storage.from(BUCKET).download(path);
-    if (!file) continue;
-    try {
-      const j = JSON.parse(await file.text());
-      const slot = (j.slot as string) ?? "manha";
-      const dias = (j.dias ?? {}) as Record<string, { urls?: string[] }>;
-      for (const [diaStr, r] of Object.entries(dias)) {
-        const dia = parseInt(diaStr, 10);
-        const key = `${dia}-${slot}`;
-        if (!alvos.has(key)) continue;
-        if (renders.has(key)) continue;
-        const urls = r?.urls;
-        if (Array.isArray(urls) && urls.length > 0) renders.set(key, urls);
-      }
-    } catch {}
-  }
-  return renders;
-}
 
 export async function GET() {
   const admin = await exigirAdmin();
@@ -59,46 +22,92 @@ export async function GET() {
     ...DIAS_MANHA.map((d) => `${d}-manha`),
     ...DIAS_TARDE.map((d) => `${d}-tarde`),
   ]);
+  const totalAlvos = alvos.size;
 
   const sb = criarClienteAdmin();
-  const renders = await carregarRendersPara(sb, alvos);
+  const BUCKET = "infonte-assets";
+
+  const { data: jobs } = await sb.storage
+    .from(BUCKET)
+    .list("infonte-campanha-hd", {
+      limit: 100,
+      sortBy: { column: "created_at", order: "desc" },
+    });
+
+  if (!jobs || jobs.length === 0) {
+    return NextResponse.json({ erro: "sem jobs" }, { status: 404 });
+  }
+
+  // Descarregar result.json em paralelo, mantendo ordem (mais recente
+  // primeiro) para depois fazer o "primeiro a aparecer ganha" por chave.
+  const renders = new Map<string, string[]>();
+  const LOTE_JSON = 10;
+  for (let i = 0; i < jobs.length && renders.size < totalAlvos; i += LOTE_JSON) {
+    const lote = jobs.slice(i, i + LOTE_JSON);
+    const parsed = await Promise.all(
+      lote.map(async (job) => {
+        if (!job.name) return null;
+        const path = `infonte-campanha-hd/${job.name}/result.json`;
+        const { data: file } = await sb.storage.from(BUCKET).download(path);
+        if (!file) return null;
+        try {
+          return JSON.parse(await file.text()) as {
+            slot?: string;
+            dias?: Record<string, { urls?: string[] }>;
+          };
+        } catch {
+          return null;
+        }
+      })
+    );
+    for (const j of parsed) {
+      if (!j) continue;
+      const slot = j.slot ?? "manha";
+      const dias = j.dias ?? {};
+      for (const [diaStr, r] of Object.entries(dias)) {
+        const dia = parseInt(diaStr, 10);
+        const key = `${dia}-${slot}`;
+        if (!alvos.has(key)) continue;
+        if (renders.has(key)) continue;
+        const urls = r?.urls;
+        if (Array.isArray(urls) && urls.length > 0) renders.set(key, urls);
+      }
+    }
+  }
 
   if (renders.size === 0) {
     return NextResponse.json(
-      { erro: "sem renders para os dias falhados. Corre primeiro o render." },
+      { erro: "sem renders para os dias falhados" },
       { status: 404 }
     );
   }
 
-  const zip = new JSZip();
-  const log: string[] = [];
-
-  // Descarrega todos os PNGs em paralelo (lotes de 6).
-  const tarefas: { chave: string; pngIdx: number; url: string }[] = [];
+  // Tarefas planas para download de PNG.
+  const tarefas: { chave: string; idx: number; url: string }[] = [];
   for (const [chave, urls] of renders.entries()) {
-    urls.forEach((url, idx) => {
-      tarefas.push({ chave, pngIdx: idx, url });
-    });
+    urls.forEach((url, idx) => tarefas.push({ chave, idx, url }));
   }
 
-  const CONC = 6;
+  // Download em paralelo, lotes grandes para acelerar.
   const buffers: { caminho: string; buf: Buffer }[] = [];
-  for (let i = 0; i < tarefas.length; i += CONC) {
-    const lote = tarefas.slice(i, i + CONC);
+  const LOTE_PNG = 20;
+  for (let i = 0; i < tarefas.length; i += LOTE_PNG) {
+    const lote = tarefas.slice(i, i + LOTE_PNG);
     const out = await Promise.all(
-      lote.map(async ({ chave, pngIdx, url }) => {
-        const r = await fetch(url);
-        if (!r.ok) {
-          log.push(`${chave} slide ${pngIdx + 1}: HTTP ${r.status}`);
+      lote.map(async ({ chave, idx, url }) => {
+        try {
+          const r = await fetch(url);
+          if (!r.ok) return null;
+          const [diaStr, slot] = chave.split("-");
+          const dia = String(diaStr).padStart(2, "0");
+          const slideN = String(idx + 1).padStart(2, "0");
+          return {
+            caminho: `dia-${dia}-${slot}/slide-${slideN}.png`,
+            buf: Buffer.from(await r.arrayBuffer()),
+          };
+        } catch {
           return null;
         }
-        const [diaStr, slot] = chave.split("-");
-        const dia = String(diaStr).padStart(2, "0");
-        const slideN = String(pngIdx + 1).padStart(2, "0");
-        return {
-          caminho: `dia-${dia}-${slot}/slide-${slideN}.png`,
-          buf: Buffer.from(await r.arrayBuffer()),
-        };
       })
     );
     for (const item of out) {
@@ -106,22 +115,21 @@ export async function GET() {
     }
   }
 
+  const zip = new JSZip();
   for (const { caminho, buf } of buffers) {
     zip.file(caminho, buf);
   }
-  // Adiciona um README com a lista de pastas.
   const readme =
     `infonte campanha — dias falhados\n\n` +
-    `Cada pasta = 1 post.\n` +
-    `Para o Metricool, cria o post na data certa e arrasta os 10 PNGs da pasta correspondente.\n\n` +
-    `Dias incluídos:\n` +
-    [...renders.keys()].sort().join("\n");
+    `${renders.size} posts, ${buffers.length} PNGs.\n` +
+    `Cada pasta = 1 post. Arrasta para o Metricool ao criar cada post.\n`;
   zip.file("LEIA-ME.txt", readme);
 
+  // STORE (nível 0) em vez de DEFLATE: PNGs já são comprimidos, deflate
+  // não reduz e gasta CPU/tempo.
   const zipBuffer = await zip.generateAsync({
     type: "uint8array",
-    compression: "DEFLATE",
-    compressionOptions: { level: 6 },
+    compression: "STORE",
   });
 
   return new NextResponse(zipBuffer as unknown as BodyInit, {
