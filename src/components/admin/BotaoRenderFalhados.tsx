@@ -104,6 +104,12 @@ export function BotaoRenderFalhados() {
           ? "disparado ✓"
           : "rever todos os falhados"}
       </button>
+      <a
+        href="/api/admin/campanha/zip-falhados"
+        className="estudio-btn ml-2 inline-block"
+      >
+        ↓ ZIP todos
+      </a>
       {msg && (
         <p
           className={`text-[11px] mt-2 ${
