@@ -412,3 +412,96 @@ A Vivianne disse "não terá próxima aqui". Se voltar:
 4. **CSV Metricool**: confirma headers oficiais antes. Eles mudam
    o template ocasionalmente.
 
+---
+
+## TAREFA PARA A PRÓXIMA SESSÃO: Lista de espera
+
+A Vivianne prometeu "lista de espera" em vários posts da campanha
+(dias 27, 28, 29 sobretudo, com o CTA "abri uma lista de espera,
+quem entra recebe o aviso antes de todos, e uma condição especial
+no lançamento"). Mas a app não tem isto. A subscrição do Infonte
+abre **1 de Julho 2026**, ela quer dar **desconto a quem se
+inscrever na lista** até essa data.
+
+### Requisitos
+
+1. **Página pública** `/lista-espera` (sem necessidade de login):
+   - Form mínimo: nome + email
+   - Tom editorial Infonte (cream/terra, EB Garamond, sem ruído)
+   - Acima da fold: 1 frase ("Sê das primeiras a saber. Acesso
+     antecipado + condição especial no lançamento.") + form +
+     micro-copy de privacidade
+   - Sucesso: confirmação inline ("Apontada. Email enviado.")
+   - Erro de email duplicado: "Já estás na lista, obrigada."
+
+2. **Schema Supabase** (schema `infonte`):
+   ```sql
+   create table infonte.lista_espera (
+     id uuid primary key default gen_random_uuid(),
+     nome text not null,
+     email text not null unique,
+     fonte text,             -- "instagram", "tiktok", "direto", etc
+     criado_em timestamptz default now(),
+     codigo_desconto text,   -- gerado no insert, ex: "INFONTE-EARLY-XXXX"
+     convertido_em timestamptz,  -- preenchido quando comprar
+     notas text
+   );
+   create index on infonte.lista_espera (criado_em desc);
+   ```
+   - RLS: bloqueado para tudo excepto service-role (admin acede
+     com service-role bypass que já existe).
+
+3. **Endpoint** `POST /api/lista-espera`:
+   - Body: `{ nome, email, fonte? }`
+   - Valida email (regex), trim, lowercase
+   - Insere na BD (upsert por email, mantém criado_em original)
+   - Gera `codigo_desconto` = `INFONTE-EARLY-${first4chars(uuid)}`
+   - Dispara email para a Vivianne via Resend (já tem RESEND_API_KEY):
+     "Nova inscrição na lista: nome (email), total agora N"
+   - Dispara email para a registrante via Resend:
+     - Subject: "Estás na lista, infonte abre 1 de Julho"
+     - Body: agradecimento + código de desconto + data do
+       lançamento + assinatura "Vivianne dos Santos"
+   - Devolve `{ ok: true, codigoDesconto, total }`
+   - Se erro Resend: insere na BD na mesma, devolve `ok: true` com
+     `emailPendente: true` (Vivianne pode ver na admin)
+
+4. **Página admin** `/admin/lista-espera`:
+   - Tabela com colunas: data, nome, email, fonte, código,
+     convertido (sim/não)
+   - Contagem total no topo
+   - Botão "exportar CSV" (nome, email, código) para usar em campanha
+     de email no lançamento
+   - Filtro: convertidas / não convertidas
+   - Botão "marcar convertida" por linha quando ela vê venda no PayPal
+
+5. **Integração com lançamento (1 Julho)**:
+   - No checkout do Infonte, aceitar `?desconto=CODIGO` na URL
+   - Se código existe em `lista_espera`, aplica desconto (ex: 25%)
+     e marca `convertido_em` na BD
+   - Não bloquear quem não tem código, só faz preço base
+
+6. **Onde linkar a lista**:
+   - Bio Instagram/TikTok (Vivianne actualiza manualmente)
+   - Página principal `/` (botão âmbar "Lista de espera, abre 1
+     de Julho")
+   - Email das etapas grátis (se aplicável)
+
+### Ordem de implementação (1 sessão de ~1h)
+
+1. SQL no Supabase SQL Editor → cria tabela + RLS
+2. Endpoint `/api/lista-espera/route.ts`
+3. Página `/lista-espera/page.tsx` (server component + form action)
+4. Página admin `/admin/lista-espera/page.tsx`
+5. CSV export `/api/admin/lista-espera/exportar.csv`
+6. Linkar na home `/page.tsx` com banner discreto
+7. Documentar no CLAUDE.md o desconto e como aplicar
+
+### O que perguntar à Vivianne antes de começar
+
+- Qual % de desconto? (sugestão: 25% ou €30 off)
+- Quer email duplo (confirmação dela + auto-reply à inscrita) ou só auto-reply?
+- Quer copy específica para os emails ou uso template editorial Infonte?
+- Quer rastrear UTM (`?utm_source=instagram` etc) para ver de onde
+  vêm? (sugestão: sim, é uma linha de código extra)
+
