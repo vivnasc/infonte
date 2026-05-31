@@ -272,3 +272,143 @@ Próximo passo dela: `/admin` → `reconstruir tudo agora` → verificar
 em `/admin/campanha/1` se os 5 slides aparecem → se sim, continuar
 para render e exportar.
 
+---
+
+## Sessão 2026-05-30/31 (lançamento)
+
+Esta foi a sessão do lançamento real. A campanha foi importada para o
+Metricool em três rondas (43 → 4 → 18). Funcional mas penoso para a
+Vivianne. Não voltar a fazer assim.
+
+### Bugs caçados (e fixes)
+
+1. **(gota) ficava literal no slide** — token do brief não era
+   substituído. Fix: `substituirTokens` em `render-slides.ts` troca
+   por SVG inline; `layoutFechoCta` mostra gota grande quando token
+   está presente.
+2. **Bold dourado não aparecia no slide 1** — KEYWORDS_BOLD não
+   tinha dia 1. Adicionado. Bold passou a aplicar em RENDER-TIME via
+   `aplicarBoldDinamico` no `parseTextoImagemToSlides`, não em
+   formatar-bold-na-DB. Mudanças a `keywords-bold.ts` aparecem
+   imediatamente no preview sem re-seed.
+3. **Renders 9:16 (story) rejeitados pelo Metricool** (ratio 0.562).
+   Vários dias no brief tinham `Formato: reel`. Fix: forçar
+   `fmt = "feed"` (1080×1350, 4:5) em `parseTextoImagemToSlides`,
+   ignorar `formato` do post. Reels viram carrosséis de imagens.
+4. **Travessões no conteúdo Claude** — os próprios prompts tinham
+   travessões, Claude espelhava. Fix: limpar prompts +
+   `limparTravessoes` em render-time + endpoint
+   `/api/admin/campanha/limpar-travessoes` para BD existente.
+5. **`/admin/campanha` tinha 5 Fases duplicadas** com os mesmos
+   endpoints que o painel `/admin`. Apagadas — só ficou lista de
+   60 dias clicável para o editor.
+6. **Sync render limit 5** — com 8 workflows simultâneos perdia 3.
+   Subido para 50.
+7. **CSV Metricool teve 5 bugs sequenciais**:
+   - Date era DD/MM/YYYY, Metricool quer YYYY-MM-DD
+   - Time era HH:MM, quer HH:MM:SS
+   - TikTok rejeitava sem Post Privacy → "PUBLIC_TO_EVERYONE"
+   - Cabeçalho minimal 6 colunas → cabeçalho oficial 93 colunas
+   - Sem `force-dynamic`: cache Next devolvia CSV antigo após
+     re-render. Adicionado.
+8. **AgendarTudo: parse data com TZ offset** convertia 1 Junho
+   Maputo → 31 Maio UTC. Fix: parse YYYY-MM-DD como data civil,
+   incrementar dias localmente.
+9. **CSV hora puxava UTC** porque Supabase devolve TIMESTAMPTZ em
+   UTC. Fix: somar offset Maputo +2h ao parsear.
+10. **Imagens repetidas nos slides** — pool com 1 imagem replicava
+    em slides 1,3,5,7. Fix: `imagens-por-slide` gera N imagens; o
+    `parseTextoImagemToSlides` alinha pool com `slidesComImagem`
+    map (imagens[0]=slide1, imagens[1]=slide3, etc), não cycle.
+11. **CTA ignorava imagem dele** — `imagens-por-slide` gerava imagem
+    para slide CTA mas o `layoutFechoCta` só usava gradiente. Fix:
+    usar imagemUrl como fundo com scrim escuro.
+12. **Biblioteca não contava imagens-por-slide** como Replicate —
+    regex só reconhecia `dia-XX-replicate.png` (formato antigo).
+    Adicionado padrão `dia-XX[-tarde]-sN.png`.
+
+### Componentes/endpoints adicionados
+
+- `BotaoImagensPorSlide` (no painel) — orquestra 60 chamadas
+  sequenciais para gerar 5 imagens por carrossel
+- `BotaoRenderDias29e30` — botão único: expand + imagens + render
+  para dia 29 e 30 (singles do brief)
+- `BotaoRenderFalhados` — botão para os ~22 dias que falharam no
+  Metricool (lista hardcoded)
+- `BotaoRenderFalhados` tem botão ZIP integrado (`zip-falhados`)
+  com paralelização e split por slot
+- `/api/admin/campanha/exportar.csv?dias=N,M` — filtro por dias
+- `/api/admin/campanha/exportar.csv?falhados=1` — só os 22 falhados
+- `/api/admin/campanha/exportar.csv?lista=3-manha,5-tarde` — exacto
+  por (dia,slot)
+- `/api/admin/campanha/diagnostico-falhados` — verifica dimensões
+  reais dos PNGs e diz porque falham
+- `/api/admin/campanha/aplicar-bold-carrosseis` — Claude reaplica
+  bold nos carrosséis já expandidos sem mudar texto
+- `/api/admin/campanha/popular-hashtags` — popula `hashtags` em
+  todos os 60 posts com pool do brief, rotacionando amplas/lusófonas
+- Editor: botão "re-render este dia (HD)" abaixo do guardar
+- `/admin`: card "Agendar e exportar" (AgendarTudo + ↓ CSV Metricool)
+  + card "rever dias falhados" + workflows + sync
+
+### Estado da campanha no fim da sessão
+
+- 60 posts no Metricool (alguns com duplicados de rondas múltiplas)
+- Campanha começa 1 Junho 2026 (segunda-feira), termina 30 Junho
+- Hashtags NÃO foram aplicadas em nenhum dos posts importados
+  (endpoint existe mas a Vivianne decidiu não re-importar)
+- 4 posts agendados a hora errada nas primeiras rondas (fix TZ
+  veio depois)
+
+### O que NÃO repetir nunca
+
+1. **Não assumir que o utilizador errou.** Sempre que ela diz "o que
+   vejo aqui é diferente do que vejo ali", a resposta é "vou
+   descobrir porquê", não "tens a certeza?". Custou-me ~10 mensagens
+   de fricção por causa disto.
+2. **Não iterar a adivinhar.** Quando há um bug que não consegues
+   ver, escreve um endpoint de diagnóstico (como
+   `diagnostico-falhados`) que devolve a verdade, em vez de propor
+   3 hipóteses.
+3. **Não pedir ao utilizador que faça diagnóstico manual.** Não
+   "abre o CSV no Notepad e cola-me a linha 5". Faz um endpoint
+   que extrai isso server-side. O utilizador não tem terminal nem
+   paciência.
+4. **Quando ela diz "n vou clicar 1 por 1", adicionar botão único.**
+   Não responder com URL longo que ela tem que copiar.
+5. **Não criar passos novos quando ela está exausta.** Se o painel
+   já tem ReconstruirCampanha, não adicionar paralelo "ProduzirTudo".
+   Estender o existente.
+6. **Reunir requisitos UPFRONT.** Hashtags, fonte, redes, padrão
+   visual — perguntar tudo no início, não descobrir bug a bug no
+   import final.
+7. **CSV bugs em cadeia** — sempre que mudar formato de CSV
+   externo (Metricool, etc), descarregar template oficial primeiro
+   e replicar EXACTAMENTE. Não inventar formato minimal.
+8. **Cache Next 15**: route handlers que retornam dados dinâmicos
+   TÊM que ter `export const dynamic = "force-dynamic"`. Senão
+   Vercel cacheia e devolve dados velhos sem aviso.
+9. **TIMESTAMPTZ em Supabase é SEMPRE devolvido em UTC.** Quando
+   apresentares ao utilizador em hora local, somar offset
+   manualmente (CAMPAIGN_TZ_OFFSET ou hardcoded Maputo +02:00).
+10. **`memory` em Vercel route handlers**: bundles >100MB em ZIP
+    rebentam o limite default. Stream em vez de buffer, ou split
+    em múltiplos endpoints menores.
+
+### Para a próxima campanha (se houver)
+
+A Vivianne disse "não terá próxima aqui". Se voltar:
+
+1. **Pergunta logo**:
+   - Hashtags pretendidas (núcleo + rotativas)
+   - Datas exactas
+   - Quais redes (IG/TikTok/etc)
+   - Quantas imagens por carrossel (1, 5, 10)
+2. **Corre tudo no orchestrator único do painel**. Não inventes
+   2º caminho.
+3. **Antes de pedir import ao Metricool**, corre o
+   `diagnostico-falhados` (adaptar para a nova campanha) e mostra
+   que tudo está válido.
+4. **CSV Metricool**: confirma headers oficiais antes. Eles mudam
+   o template ocasionalmente.
+
