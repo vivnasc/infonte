@@ -202,6 +202,19 @@ export async function GET(request: Request) {
       ])
     : null;
 
+  // ?lista=3-manha,5-tarde,8-manha → exporta exactamente esses
+  // (dia,slot). Permite re-importar só os que falharam na última
+  // tentativa sem trazer duplicados dos já agendados.
+  const listaParam = url.searchParams.get("lista");
+  const filtroLista = listaParam
+    ? new Set<string>(
+        listaParam
+          .split(",")
+          .map((s) => s.trim().toLowerCase())
+          .filter((s) => /^\d+-(manha|tarde)$/.test(s))
+      )
+    : null;
+
   const sb = criarClienteAdmin();
   const { data, error } = await sb
     .from("campanha_posts")
@@ -226,6 +239,7 @@ export async function GET(request: Request) {
   for (const p of (data ?? []) as Post[]) {
     if (diasFiltro && !diasFiltro.has(p.dia)) continue;
     if (filtroFalhados && !filtroFalhados.has(`${p.dia}-${p.slot ?? "manha"}`)) continue;
+    if (filtroLista && !filtroLista.has(`${p.dia}-${p.slot ?? "manha"}`)) continue;
     const row = new Array(HEADER.length).fill("");
 
     set(row, "Text", composarTexto(p));
@@ -264,7 +278,9 @@ export async function GET(request: Request) {
   }
 
   const csv = linhas.map((cols) => cols.map(escaparCSV).join(",")).join("\r\n");
-  const sufixo = filtroFalhados
+  const sufixo = filtroLista
+    ? `-lista-${filtroLista.size}`
+    : filtroFalhados
     ? "-falhados"
     : diasFiltro
     ? `-dias-${[...diasFiltro].sort((a, b) => a - b).join("-")}`
