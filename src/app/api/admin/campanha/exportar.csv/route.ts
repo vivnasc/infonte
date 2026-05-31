@@ -189,6 +189,19 @@ export async function GET(request: Request) {
       )
     : null;
 
+  // ?falhados=1 → exporta só as 22 linhas (dia,slot) que falharam
+  // no último import do Metricool. Mesma lista do BotaoRenderFalhados.
+  // Útil para re-importar sem duplicar os 43 já agendados.
+  const falhadosParam = url.searchParams.get("falhados");
+  const DIAS_MANHA_FALHADOS = [3, 8, 11, 13, 14, 19, 20, 29, 30];
+  const DIAS_TARDE_FALHADOS = [5, 10, 11, 12, 13, 14, 16, 17, 18, 19, 20, 29, 30];
+  const filtroFalhados = falhadosParam
+    ? new Set<string>([
+        ...DIAS_MANHA_FALHADOS.map((d) => `${d}-manha`),
+        ...DIAS_TARDE_FALHADOS.map((d) => `${d}-tarde`),
+      ])
+    : null;
+
   const sb = criarClienteAdmin();
   const { data, error } = await sb
     .from("campanha_posts")
@@ -212,6 +225,7 @@ export async function GET(request: Request) {
 
   for (const p of (data ?? []) as Post[]) {
     if (diasFiltro && !diasFiltro.has(p.dia)) continue;
+    if (filtroFalhados && !filtroFalhados.has(`${p.dia}-${p.slot ?? "manha"}`)) continue;
     const row = new Array(HEADER.length).fill("");
 
     set(row, "Text", composarTexto(p));
@@ -250,7 +264,11 @@ export async function GET(request: Request) {
   }
 
   const csv = linhas.map((cols) => cols.map(escaparCSV).join(",")).join("\r\n");
-  const sufixo = diasFiltro ? `-dias-${[...diasFiltro].sort((a, b) => a - b).join("-")}` : "";
+  const sufixo = filtroFalhados
+    ? "-falhados"
+    : diasFiltro
+    ? `-dias-${[...diasFiltro].sort((a, b) => a - b).join("-")}`
+    : "";
   const nome = `infonte-campanha-metricool${sufixo}.csv`;
 
   return new NextResponse("﻿" + csv, {
