@@ -105,10 +105,16 @@ export function BotaoRenderFalhados() {
           : "rever todos os falhados"}
       </button>
       <a
-        href="/api/admin/campanha/zip-falhados"
+        href="/api/admin/campanha/zip-falhados?slot=manha"
         className="estudio-btn ml-2 inline-block"
       >
-        ↓ ZIP todos
+        ↓ ZIP manhã
+      </a>
+      <a
+        href="/api/admin/campanha/zip-falhados?slot=tarde"
+        className="estudio-btn ml-2 inline-block"
+      >
+        ↓ ZIP tarde
       </a>
       {msg && (
         <p

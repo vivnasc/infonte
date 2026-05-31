@@ -14,14 +14,22 @@ export const dynamic = "force-dynamic";
 const DIAS_MANHA = [3, 8, 11, 13, 14, 19, 20, 29, 30];
 const DIAS_TARDE = [5, 10, 11, 12, 13, 14, 16, 17, 18, 19, 20, 29, 30];
 
-export async function GET() {
+export async function GET(request: Request) {
   const admin = await exigirAdmin();
   if (!admin) return NextResponse.json({ erro: "acesso negado" }, { status: 403 });
 
-  const alvos = new Set<string>([
-    ...DIAS_MANHA.map((d) => `${d}-manha`),
-    ...DIAS_TARDE.map((d) => `${d}-tarde`),
-  ]);
+  // ?slot=manha|tarde reduz o ZIP a metade (cabe em memória).
+  // Sem param: tenta tudo (pode falhar com 500 se for grande).
+  const url = new URL(request.url);
+  const slotFiltro = url.searchParams.get("slot");
+
+  const alvos = new Set<string>();
+  if (slotFiltro !== "tarde") {
+    DIAS_MANHA.forEach((d) => alvos.add(`${d}-manha`));
+  }
+  if (slotFiltro !== "manha") {
+    DIAS_TARDE.forEach((d) => alvos.add(`${d}-tarde`));
+  }
   const totalAlvos = alvos.size;
 
   const sb = criarClienteAdmin();
@@ -136,7 +144,7 @@ export async function GET() {
     status: 200,
     headers: {
       "Content-Type": "application/zip",
-      "Content-Disposition": `attachment; filename="infonte-dias-falhados.zip"`,
+      "Content-Disposition": `attachment; filename="infonte-dias-falhados${slotFiltro ? "-" + slotFiltro : ""}.zip"`,
       "Cache-Control": "no-store",
     },
   });
