@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { EB_Garamond, Inter } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import { RegistarSW } from "@/components/RegistarSW";
 import "./globals.css";
 
@@ -70,6 +71,7 @@ export default function RootLayout({
       <body className="font-sans bg-creme text-terra-texto min-h-screen">
         {children}
         <RegistarSW />
+        <Analytics />
       </body>
     </html>
   );
