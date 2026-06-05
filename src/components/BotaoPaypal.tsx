@@ -1,16 +1,26 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export function BotaoPaypal() {
   const [a, setA] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
+  const [desconto, setDesconto] = useState<string | null>(null);
+
+  useEffect(() => {
+    const c = new URLSearchParams(window.location.search).get("desconto");
+    if (c) setDesconto(c.trim().toUpperCase());
+  }, []);
 
   async function comprar() {
     setA(true);
     setErro(null);
     try {
-      const r = await fetch("/api/paypal/criar-ordem", { method: "POST" });
+      const r = await fetch("/api/paypal/criar-ordem", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify(desconto ? { desconto } : {}),
+      });
       const json = await r.json();
       if (json.url_aprovacao) {
         window.location.href = json.url_aprovacao;
@@ -33,6 +43,11 @@ export function BotaoPaypal() {
 
   return (
     <div>
+      {desconto && (
+        <p className="text-sm text-ocre-forte mb-3">
+          Código <strong>{desconto}</strong> aplicado: 25% de desconto.
+        </p>
+      )}
       <button onClick={comprar} disabled={a} className="btn-ocre">
         {a ? "a abrir o PayPal..." : "abrir o percurso completo"}
       </button>

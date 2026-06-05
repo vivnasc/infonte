@@ -8,6 +8,7 @@ import { enviarEmailCompra } from "@/lib/emails";
 export async function GET(request: Request) {
   const url = new URL(request.url);
   const orderId = url.searchParams.get("token");
+  const codigoDesconto = url.searchParams.get("desconto");
   const origem = process.env.NEXT_PUBLIC_SITE_URL ?? url.origin;
 
   if (!orderId) {
@@ -42,6 +43,19 @@ export async function GET(request: Request) {
         .from("utilizadoras")
         .update({ comprou: true })
         .eq("id", compra.utilizadora_id);
+
+      // Marca a conversão na lista de espera, se veio com código.
+      if (codigoDesconto) {
+        try {
+          await admin
+            .from("lista_espera")
+            .update({ convertido_em: new Date().toISOString() })
+            .eq("codigo_desconto", codigoDesconto.toUpperCase())
+            .is("convertido_em", null);
+        } catch (e) {
+          console.warn("marcar conversão lista-espera falhou", e);
+        }
+      }
 
       // Email de confirmação (não bloqueia se falhar)
       try {

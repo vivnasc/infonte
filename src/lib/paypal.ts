@@ -36,8 +36,10 @@ export async function criarOrdemPaypal(opcoes: {
   returnUrl: string;
   cancelUrl: string;
   referencia: string;
+  valor?: string;
 }): Promise<{ id: string; url_aprovacao: string; valor: string; moeda: string }> {
   const token = await obterToken();
+  const valor = opcoes.valor ?? PRECO_USD;
   const r = await fetch(`${baseUrl()}/v2/checkout/orders`, {
     method: "POST",
     headers: {
@@ -50,7 +52,7 @@ export async function criarOrdemPaypal(opcoes: {
         {
           reference_id: opcoes.referencia,
           description: "Infonte, percurso completo (acesso vitalício)",
-          amount: { currency_code: MOEDA, value: PRECO_USD },
+          amount: { currency_code: MOEDA, value: valor },
         },
       ],
       application_context: {
@@ -75,7 +77,7 @@ export async function criarOrdemPaypal(opcoes: {
   return {
     id: j.id,
     url_aprovacao: approve.href,
-    valor: PRECO_USD,
+    valor,
     moeda: MOEDA,
   };
 }
