@@ -2,6 +2,7 @@ import { setRequestLocale } from "next-intl/server";
 import { redirect } from "next/navigation";
 import { getUtilizadoraAtual, criarClienteServidor } from "@/lib/supabase/server";
 import { Link } from "@/i18n/routing";
+import { BannerInstalarApp } from "@/components/BannerInstalarApp";
 
 const HORAS_GATING = 72;
 
@@ -57,28 +58,20 @@ export default async function PainelPage({
       </p>
 
       {sp.paypal === "ok" && (
-        <div className="mt-6 p-5 border border-oliva/40 rounded-lg bg-oliva/5 space-y-3">
-          <p className="font-serif text-castanho">
-            A tua compra está confirmada. Tens agora acesso vitalício às sete
-            etapas.
-          </p>
-          <details className="text-sm text-castanho/80">
-            <summary className="cursor-pointer text-ocre-forte hover:underline">
-              Instalar a Infonte no telemóvel
-            </summary>
-            <div className="mt-3 space-y-2 font-serif">
-              <p>
-                <strong>iPhone/iPad:</strong> no Safari, carrega no botão de
-                partilha (quadrado com seta) e escolhe &ldquo;Adicionar ao ecrã
-                inicial&rdquo;.
-              </p>
-              <p>
-                <strong>Android:</strong> no Chrome, carrega nos três pontos
-                (menu) e escolhe &ldquo;Instalar aplicação&rdquo;.
-              </p>
-            </div>
-          </details>
-        </div>
+        <>
+          <div className="mt-6 p-5 border border-oliva/40 rounded-lg bg-oliva/5">
+            <p className="font-serif text-castanho">
+              A tua compra está confirmada. Tens agora acesso vitalício às sete
+              etapas.
+            </p>
+          </div>
+          <BannerInstalarApp variante="celebracao" />
+        </>
+      )}
+
+      {/* Membro que já comprou (visita normal): convite discreto e dispensável */}
+      {sp.paypal !== "ok" && utilizadora.comprou && (
+        <BannerInstalarApp variante="membro" />
       )}
 
       {sp.paypal === "cancelado" && (
