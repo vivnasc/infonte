@@ -13,12 +13,12 @@ export function PresencaEtapa({ etapa }: { etapa: number }) {
       <p className="font-sans text-[11px] uppercase tracking-[0.32em] text-ocre-forte mt-8">
         uma palavra de Vivianne
       </p>
-      <div className="relative mx-auto mt-6 w-56 md:w-64 aspect-[4/5] rounded-2xl overflow-hidden border border-castanho/15 shadow-sm">
+      <div className="relative mx-auto mt-6 w-full max-w-md aspect-[3/2] rounded-2xl overflow-hidden border border-castanho/15 shadow-sm">
         <Image
           src={p.imagem}
           alt="Vivianne dos Santos"
           fill
-          sizes="(max-width: 768px) 80vw, 256px"
+          sizes="(max-width: 768px) 90vw, 448px"
           className="object-cover"
         />
       </div>
