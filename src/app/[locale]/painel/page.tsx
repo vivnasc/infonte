@@ -63,8 +63,8 @@ export default async function PainelPage({
           <div className="mt-8 rounded-2xl overflow-hidden border border-castanho/15 bg-creme/60 shadow-sm">
             <div className="relative w-full aspect-[16/10]">
               <Image
-                src="/vivianne-sereno.jpg"
-                alt="Vivianne dos Santos"
+                src="/gratidao-sucesso.png"
+                alt="Mãos em concha, em gratidão"
                 fill
                 priority
                 sizes="(max-width: 768px) 100vw, 640px"
