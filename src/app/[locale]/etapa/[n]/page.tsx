@@ -4,7 +4,7 @@ import { getUtilizadoraAtual, criarClienteServidor } from "@/lib/supabase/server
 import { criarClienteAdmin } from "@/lib/supabase/admin";
 import { podeAbrir, HORAS_GATING, dataDeAbertura } from "@/lib/etapas/gating";
 import { EtapaGuiada } from "@/components/EtapaGuiada";
-import { dividirEmPassos } from "@/lib/etapas/passos";
+import { dividirEmPassos, cortarPreambuloEtapa } from "@/lib/etapas/passos";
 import { OfertaCompra } from "@/components/OfertaCompra";
 import { BotaoConcluir } from "@/components/BotaoConcluir";
 import { PresencaEtapa } from "@/components/PresencaEtapa";
@@ -137,11 +137,25 @@ export default async function EtapaPage({
       )}
 
       <EtapaGuiada
-        passos={dividirEmPassos(etapa.corpo_md)}
+        passos={dividirEmPassos(cortarPreambuloEtapa(etapa.corpo_md))}
         respostas={respostas}
       >
         {n === 1 && !utilizadora.comprou && (
           <div className="mb-12">
+            <div className="text-center mb-8 max-w-md mx-auto">
+              <p className="font-serif text-xl md:text-2xl text-castanho leading-relaxed">
+                Acabaste de esvaziar a mesa.
+              </p>
+              <p className="font-serif text-terra-texto/90 mt-4 leading-relaxed">
+                Repara no que sentiste. A maioria das mulheres sente alívio, não
+                perda. Isto foi só a etapa 1, e já mexeu.
+              </p>
+              <p className="font-serif text-terra-texto/90 mt-4 leading-relaxed">
+                As próximas seis pegam no pouco que é mesmo teu e transformam-no
+                numa direção, num plano, num primeiro passo. Não é mais conteúdo.
+                É o caminho todo, com ferramentas que ficam.
+              </p>
+            </div>
             <OfertaCompra />
           </div>
         )}

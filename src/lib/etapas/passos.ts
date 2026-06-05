@@ -54,6 +54,15 @@ function limparTitulo(t: string): string {
   return t.replace(/^bloco\s+[a-z]\s*,?\s*/i, "").trim() || t;
 }
 
+// Corta o preâmbulo (manifesto global) antes do "# ETAPA", para a
+// experiência começar direta no trabalho da etapa. Se não houver "# ETAPA"
+// (etapas sem manifesto), devolve o corpo intacto.
+export function cortarPreambuloEtapa(corpo: string): string {
+  const linhas = corpo.split(/\r?\n/);
+  const idx = linhas.findIndex((l) => /^#\s*ETAPA/i.test(l));
+  return idx > 0 ? linhas.slice(idx).join("\n") : corpo;
+}
+
 export function dividirEmPassos(corpo: string): Passo[] {
   const nos = parseEtapa(corpo);
   const passos: Passo[] = [];
