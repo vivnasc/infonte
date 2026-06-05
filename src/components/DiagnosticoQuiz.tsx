@@ -18,14 +18,14 @@ type Passo =
 const PASSOS: Passo[] = [
   {
     tipo: "pergunta",
-    chave: "peso",
-    titulo: "O que mais te pesa, agora?",
+    chave: "dia",
+    titulo: "Como é o teu dia, por dentro?",
     sub: "Escolhe o que sentes mais verdadeiro.",
     opcoes: [
-      { id: "comeco", rotulo: "Começo tudo e não acabo nada" },
-      { id: "pouco", rotulo: "Alcanço metas que, quando chegam, sabem a pouco" },
-      { id: "clareza", rotulo: "Tenho talento a mais e clareza a menos" },
-      { id: "vazio", rotulo: "Faço tanto, e sinto um vazio por baixo" },
+      { id: "comecado", rotulo: "Cheio de coisas começadas, nenhuma acabada" },
+      { id: "vazio", rotulo: "Produtivo por fora, vazio por dentro" },
+      { id: "travado", rotulo: "Travado, sem saber por onde pegar" },
+      { id: "automatico", rotulo: "Em piloto automático, a cumprir o que esperam de mim" },
     ],
   },
   {
@@ -35,17 +35,29 @@ const PASSOS: Passo[] = [
   },
   {
     tipo: "pergunta",
+    chave: "motor",
+    titulo: "O que te puxa a fazer tanto?",
+    sub: "Por baixo da agenda cheia, costuma estar uma só coisa.",
+    opcoes: [
+      { id: "provar", rotulo: "Provar o meu valor" },
+      { id: "medo", rotulo: "Medo de parar" },
+      { id: "comparacao", rotulo: "Comparação com os outros" },
+      { id: "heranca", rotulo: "Um sonho que sinto que tenho de realizar" },
+    ],
+  },
+  {
+    tipo: "pergunta",
     chave: "meta",
     titulo: "Quando alcanças uma meta, sentes-te...",
     opcoes: [
-      { id: "cheia", rotulo: "Cheia" },
+      { id: "cheia", rotulo: "Cheia e em paz" },
       { id: "vazia", rotulo: "Vazia, e já a perseguir a próxima" },
       { id: "alivio", rotulo: "Aliviada uns dias, depois igual" },
     ],
   },
   {
     tipo: "medidor",
-    valor: 45,
+    valor: 55,
     legenda: "A tua clareza está a formar-se. Falta pouco para o teu retrato.",
   },
   {
@@ -59,6 +71,17 @@ const PASSOS: Passo[] = [
       { id: "poucoteu", rotulo: "Pouco. Muito é emprestado ou herdado" },
     ],
   },
+  {
+    tipo: "pergunta",
+    chave: "precisa",
+    titulo: "O que mais precisas, agora?",
+    opcoes: [
+      { id: "largar", rotulo: "Largar o que não é meu" },
+      { id: "direcao", rotulo: "Encontrar uma direção, uma só" },
+      { id: "acao", rotulo: "Transformar uma ideia em ação" },
+      { id: "naosei", rotulo: "Não sei, e isso é que me pesa" },
+    ],
+  },
   { tipo: "montar" },
   { tipo: "resultado" },
 ];
@@ -70,21 +93,36 @@ const CAPTACOES_MONTAR = [
 ];
 
 function retratoDe(respostas: Record<string, string>): string {
-  const teu = respostas["teu"];
+  const partes: string[] = [];
+
+  const motores: Record<string, string> = {
+    provar: "Fazes tanto para provar que vales. Mas o teu valor não está à espera de ser provado.",
+    medo: "A agenda cheia protege-te de parar, e é justamente ao parar que a clareza aparece.",
+    comparacao: "Muito do que persegues entrou por comparação, não por desejo teu.",
+    heranca: "Alguns dos sonhos que carregas não nasceram em ti. Nasceram antes de ti.",
+  };
+  const motor = motores[respostas["motor"] ?? ""];
+  if (motor) partes.push(motor);
+
+  const teus: Record<string, string> = {
+    quase: "Grande parte do que persegues é mesmo teu. O que te falta é foco, não verdade.",
+    metade: "Metade do que persegues é teu. A outra metade pesa sem nunca ter sido tua.",
+    poucoteu: "Muito do que persegues é emprestado ou herdado, e isso dispersa-te sem que escolhesses.",
+  };
+  const teu = teus[respostas["teu"] ?? ""];
+  if (teu) partes.push(teu);
+
   const meta = respostas["meta"];
-  let base =
-    teu === "quase"
-      ? "Corres muito, mas grande parte é mesmo teu. O que te falta é foco, não verdade."
-      : teu === "metade"
-        ? "Metade do que persegues é teu. A outra metade pesa sem nunca ter sido tua."
-        : teu === "poucoteu"
-          ? "Muito do que persegues é emprestado ou herdado. Não é falta de foco, é ruído que não escolheste."
-          : "Andas a perseguir mais do que é teu, e isso dispersa-te.";
   if (meta === "vazia" || meta === "alivio") {
-    base +=
-      " Por isso, quando chegas, sabe a pouco. Não é ingratidão, é sinal de que a meta talvez não fosse tua.";
+    partes.push(
+      "Por isso, quando chegas, sabe a pouco. Não é ingratidão, é sinal de que a meta talvez não fosse tua."
+    );
   }
-  return base;
+
+  if (partes.length === 0) {
+    partes.push("Andas a perseguir mais do que é teu, e isso dispersa-te.");
+  }
+  return partes.join(" ");
 }
 
 export function DiagnosticoQuiz({ fonte = "diagnostico" }: { fonte?: string }) {

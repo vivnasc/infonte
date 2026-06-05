@@ -139,10 +139,10 @@ function ListaEsperaBanner() {
           a subscrição completa abre 1 de Julho
         </p>
         <p className="font-serif text-lg text-castanho mt-2">
-          Entra na lista de espera e recebe 25% de desconto no lançamento.
+          Faz o diagnóstico, entra na lista e recebe 25% de desconto no lançamento.
         </p>
-        <Link href="/lista-espera" className="btn-ocre inline-block mt-4">
-          Lista de espera, abre 1 de Julho
+        <Link href="/diagnostico" className="btn-ocre inline-block mt-4">
+          Descobrir o meu retrato
         </Link>
       </div>
     </section>
@@ -169,15 +169,15 @@ function Hero() {
         a construir a partir do que é verdadeiramente teu.
       </p>
       <div className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-4">
-        <Link href="/etapa/1" className="btn-ocre">
-          Começar a etapa 1, grátis
+        <Link href="/diagnostico" className="btn-ocre">
+          Fazer o diagnóstico, 1 minuto
         </Link>
-        <Link href="/sobre" className="btn-quieto">
-          Conhecer a autora
+        <Link href="/etapa/1" className="btn-quieto">
+          ou começar a etapa 1, grátis
         </Link>
       </div>
       <p className="text-xs text-oliva mt-6">
-        A etapa 1 é gratuita. Não pedimos cartão.
+        Um minuto. Vês quanto do que persegues é mesmo teu, e o teu primeiro passo.
       </p>
     </section>
   );
