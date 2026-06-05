@@ -6,6 +6,7 @@ import "./admin.css";
 const NAV = [
   { href: "/admin", label: "Painel" },
   { href: "/admin/campanha", label: "Campanha 30 dias" },
+  { href: "/admin/lista-espera", label: "Lista de espera" },
   { href: "/admin/preview-tudo", label: "Pré-visualizar tudo" },
   { href: "/admin/renderizados", label: "Renderizados" },
   { href: "/admin/biblioteca", label: "Biblioteca" },

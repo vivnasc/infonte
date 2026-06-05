@@ -74,6 +74,8 @@ export default async function LandingPage({
     <div className="px-6">
       <Hero />
 
+      <ListaEsperaBanner />
+
       <Divisor />
 
       <ComoFunciona />
@@ -126,6 +128,24 @@ export default async function LandingPage({
 
       <FechoCta />
     </div>
+  );
+}
+
+function ListaEsperaBanner() {
+  return (
+    <section className="max-w-2xl mx-auto mb-6">
+      <div className="border border-ocre/40 rounded-2xl bg-creme/70 px-6 py-5 text-center">
+        <p className="font-sans text-[11px] uppercase tracking-[0.28em] text-ocre-forte">
+          a subscrição completa abre 1 de Julho
+        </p>
+        <p className="font-serif text-lg text-castanho mt-2">
+          Entra na lista de espera e recebe 25% de desconto no lançamento.
+        </p>
+        <Link href="/lista-espera" className="btn-ocre inline-block mt-4">
+          Lista de espera, abre 1 de Julho
+        </Link>
+      </div>
+    </section>
   );
 }
 

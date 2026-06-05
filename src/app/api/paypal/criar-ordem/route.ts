@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { criarClienteServidor } from "@/lib/supabase/server";
 import { criarClienteAdmin } from "@/lib/supabase/admin";
 import { criarOrdemPaypal, INFONTE_PRECO } from "@/lib/paypal";
+import { aplicarDesconto } from "@/lib/lista-espera";
 
 export async function POST(request: Request) {
   const supabase = await criarClienteServidor();
@@ -28,11 +29,38 @@ export async function POST(request: Request) {
   const origem =
     process.env.NEXT_PUBLIC_SITE_URL ?? new URL(request.url).origin;
 
+  // Código de desconto da lista de espera (opcional). Se válido, aplica 25%
+  // e propaga o código para o return_url, para a captura marcar a conversão.
+  let codigoDesconto: string | null = null;
+  try {
+    const body = await request.json();
+    const c = (body?.desconto ?? "").toString().trim().toUpperCase();
+    if (c) codigoDesconto = c;
+  } catch {
+    // sem corpo, segue sem desconto
+  }
+
+  let valor = INFONTE_PRECO.valor;
+  let returnQuery = "";
+  if (codigoDesconto) {
+    const admin = criarClienteAdmin();
+    const { data: insc } = await admin
+      .from("lista_espera")
+      .select("id")
+      .eq("codigo_desconto", codigoDesconto)
+      .maybeSingle();
+    if (insc) {
+      valor = aplicarDesconto(parseFloat(INFONTE_PRECO.valor)).toFixed(2);
+      returnQuery = `?desconto=${encodeURIComponent(codigoDesconto)}`;
+    }
+  }
+
   try {
     const ordem = await criarOrdemPaypal({
       referencia: utilizadora.id,
-      // O PayPal adiciona ?token=<orderId>&PayerID=<id> à return_url.
-      returnUrl: `${origem}/api/paypal/capturar`,
+      valor,
+      // O PayPal acrescenta &token=<orderId>&PayerID=<id> à return_url.
+      returnUrl: `${origem}/api/paypal/capturar${returnQuery}`,
       cancelUrl: `${origem}/etapa/1?paypal=cancelado`,
     });
 

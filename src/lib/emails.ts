@@ -40,6 +40,14 @@ async function enviar(o: EnviarOpcoes) {
   return { ok: true };
 }
 
+// Escapar input do utilizador antes de o pôr em HTML de email.
+const esc = (v: string | null | undefined) =>
+  (v ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+
 const moldura = (corpo: string) => `
 <div style="background:#F2E8DC;padding:40px 20px;font-family:Georgia,serif;color:#1F1810;">
   <div style="max-width:560px;margin:0 auto;background:#fffdf8;border:1px solid rgba(74,47,27,0.12);border-radius:12px;padding:32px;">
@@ -129,6 +137,59 @@ export async function enviarEmailBoasVindas(o: { email: string; nome?: string | 
     assunto: "Bem-vinda à Infonte",
     html: moldura(corpo),
   });
+}
+
+// Lista de espera: auto-reply à inscrita (com código) + aviso para a autora.
+// Devolve o resultado do email à inscrita, para o endpoint saber se ficou
+// pendente. A notificação à autora não bloqueia.
+export async function enviarEmailsListaEspera(o: {
+  email: string;
+  nome: string;
+  codigoDesconto: string;
+  fonte?: string | null;
+  total: number;
+}) {
+  const corpoInscrita = `
+    <p>Olá ${esc(o.nome)},</p>
+    <p>Apontada. És das primeiras a saber.</p>
+    <p>A infonte abre no dia <strong>1 de Julho</strong>. Quem entrou na lista
+    de espera tem acesso antecipado e uma condição especial:
+    <strong>25% de desconto</strong> no lançamento.</p>
+    <p>O teu código é:</p>
+    <p style="text-align:center;margin:20px 0;">
+      <span style="display:inline-block;background:#F2E8DC;border:1px solid rgba(74,47,27,0.2);border-radius:8px;padding:12px 20px;font-family:Georgia,serif;font-size:18px;letter-spacing:1px;color:#4A2F1B;">${esc(o.codigoDesconto)}</span>
+    </p>
+    <p>Guarda-o. No dia 1 vais recebê-lo outra vez, com o link para entrares
+    antes de todas. Não precisas de fazer nada até lá.</p>
+    <p>Até breve,<br/>Vivianne dos Santos</p>
+  `;
+
+  const resultado = await enviar({
+    para: o.email,
+    assunto: "Estás na lista, infonte abre 1 de Julho",
+    html: moldura(corpoInscrita),
+  });
+
+  // Aviso para a autora (não bloqueia a inscrição se falhar).
+  try {
+    await enviarNotificacaoAutora({
+      assunto: `Nova inscrição na lista de espera (${o.total} no total)`,
+      corpo: `
+        <p>Nova inscrição na lista de espera da infonte.</p>
+        <p>Nome: <strong>${esc(o.nome)}</strong><br/>
+        Email: ${esc(o.email)}<br/>
+        Fonte: ${esc(o.fonte ?? "direto")}<br/>
+        Código gerado: ${esc(o.codigoDesconto)}</p>
+        <p>Total de inscritas agora: <strong>${o.total}</strong></p>
+        <p>Vês a lista completa em
+        <a href="https://infonte.vivannedossantos.com/admin/lista-espera" style="color:#B8843D;">/admin/lista-espera</a>.</p>
+      `,
+    });
+  } catch (e) {
+    console.warn("[email] aviso autora lista-espera falhou", e);
+  }
+
+  return resultado;
 }
 
 // ═══════════════════════════════════════════════════
