@@ -54,6 +54,31 @@ function limparTitulo(t: string): string {
   return t.replace(/^bloco\s+[a-z]\s*,?\s*/i, "").trim() || t;
 }
 
+// Parte um corpo markdown em grupos de até `max` blocos (parágrafos ou
+// listas, separados por linha em branco), para ecrãs mais leves.
+function agruparBlocos(md: string, max: number): string[] {
+  const blocos = md
+    .split(/\n\s*\n/)
+    .map((s) => s.trim())
+    .filter(Boolean);
+  const grupos: string[] = [];
+  for (let i = 0; i < blocos.length; i += max) {
+    grupos.push(blocos.slice(i, i + max).join("\n\n"));
+  }
+  return grupos;
+}
+
+// Move o passo que contém a ferramenta (campo) para o início, para a etapa
+// começar pela ação, com o ensino a seguir.
+export function comFerramentaPrimeiro(passos: Passo[]): Passo[] {
+  const idx = passos.findIndex((p) => p.partes.some((pt) => pt.tipo === "campo"));
+  if (idx <= 0) return passos;
+  const copia = [...passos];
+  const [ferramenta] = copia.splice(idx, 1);
+  copia.unshift(ferramenta);
+  return copia;
+}
+
 // Corta o preâmbulo (manifesto global) antes do "# ETAPA", para a
 // experiência começar direta no trabalho da etapa. Se não houver "# ETAPA"
 // (etapas sem manifesto), devolve o corpo intacto.
@@ -91,8 +116,17 @@ export function dividirEmPassos(corpo: string): Passo[] {
         if (c.nivel === 2) {
           // "Título visível" é metadado (já é o H1 da página): ignora.
           if (/^t[ií]tulo\s+vis[ií]vel$/i.test(c.titulo)) continue;
-          const p = novoPasso(limparTitulo(c.titulo));
-          if (c.corpo) p.partes.push({ tipo: "html", html: renderMarkdown(c.corpo) });
+          // Parte o corpo em ecrãs leves (até 2 blocos por passo). O título
+          // fica só no primeiro; os seguintes são continuação.
+          const grupos = agruparBlocos(c.corpo, 2);
+          if (grupos.length === 0) {
+            novoPasso(limparTitulo(c.titulo));
+          } else {
+            grupos.forEach((g, idx) => {
+              const p = novoPasso(idx === 0 ? limparTitulo(c.titulo) : null);
+              p.partes.push({ tipo: "html", html: renderMarkdown(g) });
+            });
+          }
           continue;
         }
         // Sem título, ou subtítulo (>=3): anexa ao passo actual.

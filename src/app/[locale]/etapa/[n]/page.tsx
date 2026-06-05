@@ -4,7 +4,11 @@ import { getUtilizadoraAtual, criarClienteServidor } from "@/lib/supabase/server
 import { criarClienteAdmin } from "@/lib/supabase/admin";
 import { podeAbrir, HORAS_GATING, dataDeAbertura } from "@/lib/etapas/gating";
 import { EtapaGuiada } from "@/components/EtapaGuiada";
-import { dividirEmPassos, cortarPreambuloEtapa } from "@/lib/etapas/passos";
+import {
+  dividirEmPassos,
+  cortarPreambuloEtapa,
+  comFerramentaPrimeiro,
+} from "@/lib/etapas/passos";
 import { OfertaCompra } from "@/components/OfertaCompra";
 import { BotaoConcluir } from "@/components/BotaoConcluir";
 import { PresencaEtapa } from "@/components/PresencaEtapa";
@@ -137,7 +141,13 @@ export default async function EtapaPage({
       )}
 
       <EtapaGuiada
-        passos={dividirEmPassos(cortarPreambuloEtapa(etapa.corpo_md))}
+        passos={
+          n === 1
+            ? comFerramentaPrimeiro(
+                dividirEmPassos(cortarPreambuloEtapa(etapa.corpo_md))
+              )
+            : dividirEmPassos(cortarPreambuloEtapa(etapa.corpo_md))
+        }
         respostas={respostas}
       >
         {n === 1 && !utilizadora.comprou && (
