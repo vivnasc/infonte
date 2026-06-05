@@ -3,7 +3,7 @@
   "short_name": "infonte",
   "description": "Um percurso em sete etapas, da dispersão à ação concreta. Da Sete Ecos.",
   "lang": "pt",
-  "start_url": "/",
+  "start_url": "/painel",
   "scope": "/",
   "display": "standalone",
   "background_color": "#2E1D12",

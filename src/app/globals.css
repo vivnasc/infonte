@@ -22,6 +22,17 @@ body {
   font-feature-settings: "kern", "liga", "clig", "calt";
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+  /* Sensação de app: sem flash cinzento ao tocar, sem realce de toque. */
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Em modo PWA instalada (standalone), travar o "puxar para recarregar"
+   e o bounce do scroll, que denunciam um site dentro de um browser. */
+@media (display-mode: standalone) {
+  html,
+  body {
+    overscroll-behavior-y: none;
+  }
 }
 
 .prose-infonte {

@@ -2,9 +2,10 @@
 // Estratégia: cache-first para estáticos da própria origem, network-first
 // para tudo o resto.
 
-const CACHE = "infonte-v1";
+const CACHE = "infonte-v2";
 const PRE_CACHE = [
   "/",
+  "/painel",
   "/manifest.webmanifest",
   "/favicon-192.png",
   "/favicon-512.png",
