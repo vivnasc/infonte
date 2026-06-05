@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { Passo, Parte } from "@/lib/etapas/passos";
 import { CampoResposta } from "./CampoResposta";
+import { EsvaziarMesa } from "./EsvaziarMesa";
 import { Assinatura } from "./Assinatura";
 
 function ParteView({
@@ -21,6 +22,15 @@ function ParteView({
     );
   }
   if (parte.tipo === "campo") {
+    // A etapa 1 ("esvaziar a mesa") tem uma ferramenta interactiva própria.
+    if (parte.bloco_id === "esvaziamento_etapa_1") {
+      return (
+        <EsvaziarMesa
+          bloco_id={parte.bloco_id}
+          valorInicial={respostas[parte.bloco_id] ?? ""}
+        />
+      );
+    }
     return (
       <CampoResposta
         bloco_id={parte.bloco_id}
