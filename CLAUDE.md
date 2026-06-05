@@ -3,6 +3,44 @@
 Notas para o agente Claude Code, para não voltar a sugerir o que aqui está
 desaconselhado.
 
+---
+
+## ESTADO ACTUAL (4 de Junho 2026)
+
+**A campanha de 30 dias está em produção.** Começou 1 de Junho no Metricool
+(IG + TikTok), termina 30 Junho. Os 60 posts foram importados em 3 rondas
+(43 + 4 + 18 = 65 com 5 duplicados a limpar manualmente). Conteúdo, renders
+HD e CSV estão todos a funcionar. Vercel Analytics activado.
+
+**O que está pronto e funciona:**
+- Painel `/admin` é o orchestrator único (reconstruir, render por semana,
+  sync, agendar, CSV Metricool 93 colunas, biblioteca, renderizados)
+- Render HD via GitHub Actions (1080×1350, 4:5, bold dourado, gota SVG)
+- CSV Metricool com header oficial + filtros `?dias`, `?falhados=1`,
+  `?lista=3-manha,5-tarde`
+- Endpoint `diagnostico-falhados` lê dimensões reais dos PNGs
+- Hashtags universais (copy-paste manual no Metricool):
+  `@vivianne.dos.santos\n\n#clareza #foco #bastarse #infonte
+  #desenvolvimentopessoal #mulheres #propósito #mentefocada #produtividade
+  #mulheresempreendedoras #portugal #moçambique #brasil`
+
+**Próxima tarefa pedida pela Vivianne**: lista de espera para o lançamento
+do produto Infonte em **1 de Julho**. Plano completo está na secção
+"TAREFA PARA A PRÓXIMA SESSÃO" mais abaixo neste ficheiro. ~1h de trabalho.
+Há 4 perguntas para fazer-lhe antes de começar (% desconto, copy emails,
+UTM, email duplo).
+
+**O que NÃO fazer**:
+- Não assumir que ela errou se algo está mal. Diagnostica primeiro com
+  endpoint, depois propõe acção.
+- Não pedir-lhe para correr `npm`, abrir GitHub, ou editar ficheiros.
+  Tudo via botão no `/admin` ou URL no browser.
+- Não iterar a adivinhar. Escreve endpoint de diagnóstico se há algo
+  invisível para ti.
+- Ler até ao fim deste ficheiro antes de propor qualquer mudança grande.
+
+---
+
 ## Como a Vivianne trabalha
 
 - **Sem desenvolvimento local.** Tudo é feito via web: Vercel para hosting,
