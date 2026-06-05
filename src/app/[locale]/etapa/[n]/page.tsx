@@ -3,7 +3,8 @@ import { redirect, notFound } from "next/navigation";
 import { getUtilizadoraAtual, criarClienteServidor } from "@/lib/supabase/server";
 import { criarClienteAdmin } from "@/lib/supabase/admin";
 import { podeAbrir, HORAS_GATING, dataDeAbertura } from "@/lib/etapas/gating";
-import { RendererEtapa } from "@/components/RendererEtapa";
+import { EtapaGuiada } from "@/components/EtapaGuiada";
+import { dividirEmPassos } from "@/lib/etapas/passos";
 import { OfertaCompra } from "@/components/OfertaCompra";
 import { BotaoConcluir } from "@/components/BotaoConcluir";
 import { PresencaEtapa } from "@/components/PresencaEtapa";
@@ -135,29 +136,32 @@ export default async function EtapaPage({
         </div>
       )}
 
-      <RendererEtapa corpo={etapa.corpo_md} respostas={respostas} />
+      <EtapaGuiada
+        passos={dividirEmPassos(etapa.corpo_md)}
+        respostas={respostas}
+      >
+        {n === 1 && !utilizadora.comprou && (
+          <div className="mb-12">
+            <OfertaCompra />
+          </div>
+        )}
 
-      {n === 1 && !utilizadora.comprou && (
-        <div className="max-w-leitura mx-auto mt-16">
-          <OfertaCompra />
+        <PresencaEtapa etapa={n} />
+
+        <div className="mt-12 space-y-8">
+          <BotaoConcluir
+            etapa={n}
+            jaConcluida={!!progressoAtual?.concluida_em}
+            abreSeguinteStr={abreSeguinte?.toISOString() ?? null}
+          />
+
+          <div className="text-center">
+            <Link href="/painel" className="btn-quieto inline-block">
+              voltar ao percurso
+            </Link>
+          </div>
         </div>
-      )}
-
-      <PresencaEtapa etapa={n} />
-
-      <div className="max-w-leitura mx-auto mt-16 space-y-8">
-        <BotaoConcluir
-          etapa={n}
-          jaConcluida={!!progressoAtual?.concluida_em}
-          abreSeguinteStr={abreSeguinte?.toISOString() ?? null}
-        />
-
-        <div className="text-center">
-          <Link href="/painel" className="btn-quieto inline-block">
-            voltar ao percurso
-          </Link>
-        </div>
-      </div>
+      </EtapaGuiada>
     </div>
   );
 }
