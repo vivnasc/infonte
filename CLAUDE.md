@@ -543,3 +543,46 @@ inscrever na lista** até essa data.
 - Quer rastrear UTM (`?utm_source=instagram` etc) para ver de onde
   vêm? (sugestão: sim, é uma linha de código extra)
 
+
+---
+
+## Sessão 2026-06-05: Lista de espera (FEITA)
+
+A tarefa da lista de espera foi implementada. Decisões da Vivianne:
+**25% de desconto**, **email duplo** (auto-reply à inscrita + aviso à
+autora), **template editorial** infonte, **rastrear UTM**.
+
+### O que ficou pronto
+
+- **Migração** `supabase/migrations/0007_infonte_lista_espera.sql`,
+  tabela `infonte.lista_espera` (RLS fechado, só service-role). Já
+  corrida no Supabase SQL Editor.
+- **Página pública** `/lista-espera` (nome + email, voz editorial).
+  Captura a origem por `?utm_source=` ou `?fonte=` na coluna `fonte`.
+  Linkar na bio do IG/TikTok com `?utm_source=instagram` etc.
+- **Endpoint** `POST /api/lista-espera`: upsert por email (mantém
+  `criado_em`), gera `INFONTE-EARLY-XXXX`, dispara os dois emails via
+  Resend. Se o Resend falhar, grava na BD na mesma e devolve
+  `emailPendente: true`.
+- **Emails** em `src/lib/emails.ts` → `enviarEmailsListaEspera`. Aviso
+  à autora vai para `ola@vivannedossantos.com` (mesmo destino das
+  notificações de compra).
+- **Admin** `/admin/lista-espera`: contagem, filtro convertidas/não,
+  marcar convertida por linha, exportar CSV
+  (`/api/admin/lista-espera/exportar.csv`).
+
+### Como o desconto funciona (lançamento 1 Julho)
+
+- Constante em `src/lib/lista-espera.ts`: `DESCONTO_PCT = 25`. Mudar
+  aqui muda a percentagem em todo o lado.
+- No checkout, `?desconto=CODIGO` no URL (ex:
+  `/etapa/1?desconto=INFONTE-EARLY-3F9A`). O `BotaoPaypal` lê o código,
+  mostra "25% de desconto" e envia-o ao criar a ordem.
+- `criar-ordem` valida o código contra `lista_espera`. Se existir,
+  aplica 25% sobre os $77 (= $57.75) e propaga o código ao return_url.
+- `capturar` (return do PayPal) marca `convertido_em` na linha desse
+  código quando a compra completa.
+- Sem código, ou código inexistente, fica preço base. Nunca bloqueia.
+- PayPal continua dependente das variáveis (PENDÊNCIA conhecida): o
+  desconto só ganha efeito real quando as credenciais PayPal estiverem
+  na Vercel.
