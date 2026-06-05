@@ -6,6 +6,7 @@ import { podeAbrir, HORAS_GATING, dataDeAbertura } from "@/lib/etapas/gating";
 import { RendererEtapa } from "@/components/RendererEtapa";
 import { OfertaCompra } from "@/components/OfertaCompra";
 import { BotaoConcluir } from "@/components/BotaoConcluir";
+import { PresencaEtapa } from "@/components/PresencaEtapa";
 import { Link } from "@/i18n/routing";
 
 export default async function EtapaPage({
@@ -141,6 +142,8 @@ export default async function EtapaPage({
           <OfertaCompra />
         </div>
       )}
+
+      <PresencaEtapa etapa={n} />
 
       <div className="max-w-leitura mx-auto mt-16 space-y-8">
         <BotaoConcluir
