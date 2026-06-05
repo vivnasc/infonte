@@ -3,19 +3,23 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 
-// Protótipo do "Diagnóstico da dispersão", na coreografia do quiz funnel
-// (uma decisão por ecrã, guia que acompanha, medidor que cresce, retrato
-// que se monta, resultado com peça guardada + email), na voz da infonte.
+// Diagnóstico da dispersão, na coreografia de um quiz funnel (uma decisão
+// por ecrã, guia que reflete as respostas, retrato que se monta, medidor
+// que cresce, mapeamento cinematográfico, resultado com peça guardada +
+// email), na voz e cor da infonte.
 
 type Opcao = { id: string; rotulo: string };
 type Passo =
+  | { tipo: "intro" }
   | { tipo: "pergunta"; chave: string; titulo: string; sub?: string; opcoes: Opcao[] }
-  | { tipo: "guia"; texto: string }
+  | { tipo: "reflexo"; chave: string }
+  | { tipo: "retrato" }
   | { tipo: "medidor"; valor: number; legenda: string }
   | { tipo: "montar" }
   | { tipo: "resultado" };
 
 const PASSOS: Passo[] = [
+  { tipo: "intro" },
   {
     tipo: "pergunta",
     chave: "dia",
@@ -28,11 +32,7 @@ const PASSOS: Passo[] = [
       { id: "automatico", rotulo: "Em piloto automático, a cumprir o que esperam de mim" },
     ],
   },
-  {
-    tipo: "guia",
-    texto:
-      "Não estás dispersa por falta de foco. Estás cheia de coisas que talvez nem sejam tuas. Vamos ver.",
-  },
+  { tipo: "reflexo", chave: "dia" },
   {
     tipo: "pergunta",
     chave: "motor",
@@ -45,6 +45,7 @@ const PASSOS: Passo[] = [
       { id: "heranca", rotulo: "Um sonho que sinto que tenho de realizar" },
     ],
   },
+  { tipo: "retrato" },
   {
     tipo: "pergunta",
     chave: "meta",
@@ -57,8 +58,19 @@ const PASSOS: Passo[] = [
   },
   {
     tipo: "medidor",
-    valor: 55,
-    legenda: "A tua clareza está a formar-se. Falta pouco para o teu retrato.",
+    valor: 40,
+    legenda: "A tua clareza começa a formar-se. Continua, falta o que é mais teu.",
+  },
+  {
+    tipo: "pergunta",
+    chave: "area",
+    titulo: "Onde isto te dispersa mais?",
+    opcoes: [
+      { id: "trabalho", rotulo: "No trabalho e nos projetos" },
+      { id: "relacoes", rotulo: "Nas relações" },
+      { id: "dinheiro", rotulo: "No dinheiro" },
+      { id: "proposito", rotulo: "No propósito, no sentido de tudo" },
+    ],
   },
   {
     tipo: "pergunta",
@@ -69,6 +81,22 @@ const PASSOS: Passo[] = [
       { id: "quase", rotulo: "Quase tudo" },
       { id: "metade", rotulo: "Cerca de metade" },
       { id: "poucoteu", rotulo: "Pouco. Muito é emprestado ou herdado" },
+    ],
+  },
+  { tipo: "reflexo", chave: "teu" },
+  {
+    tipo: "medidor",
+    valor: 78,
+    legenda: "Quase lá. Mais uma, e o teu retrato fica inteiro.",
+  },
+  {
+    tipo: "pergunta",
+    chave: "tempo",
+    titulo: "Há quanto tempo sentes isto?",
+    opcoes: [
+      { id: "recente", rotulo: "Há pouco tempo" },
+      { id: "anos", rotulo: "Há anos" },
+      { id: "sempre", rotulo: "Desde que me lembro" },
     ],
   },
   {
@@ -86,13 +114,83 @@ const PASSOS: Passo[] = [
   { tipo: "resultado" },
 ];
 
+const REFLEXOS: Record<string, Record<string, string>> = {
+  dia: {
+    comecado: "Cheia de começos. O problema nunca foi falta de vontade.",
+    vazio: "Produtiva por fora, vazia por dentro. Guarda isso, vamos voltar lá.",
+    travado: "Travada não é preguiça. É ruído a mais para uma direção só.",
+    automatico: "Piloto automático é viver a vida que esperam de ti, não a tua.",
+  },
+  teu: {
+    quase: "Há muito de ti aí dentro. Falta tirar o que abafa.",
+    metade: "Metade é tua. A outra metade é peso que podes pousar.",
+    poucoteu: "Pouco é teu. Não é falta de foco, é ruído que não escolheste.",
+  },
+};
+
+const FRAGMENTOS: Record<string, Record<string, string>> = {
+  dia: {
+    comecado: "começos sem fim",
+    vazio: "cheia por fora, vazia por dentro",
+    travado: "travada",
+    automatico: "em piloto automático",
+  },
+  motor: {
+    provar: "a provar valor",
+    medo: "em fuga de parar",
+    comparacao: "movida por comparação",
+    heranca: "a carregar heranças",
+  },
+  meta: {
+    cheia: "chega em paz",
+    vazia: "nunca chega",
+    alivio: "alívio curto",
+  },
+  area: {
+    trabalho: "dispersa no trabalho",
+    relacoes: "dispersa nas relações",
+    dinheiro: "dispersa no dinheiro",
+    proposito: "sem propósito claro",
+  },
+  teu: {
+    quase: "quase tudo é teu",
+    metade: "metade é tua",
+    poucoteu: "pouco é teu",
+  },
+  tempo: {
+    recente: "há pouco tempo",
+    anos: "há anos",
+    sempre: "desde sempre",
+  },
+  precisa: {
+    largar: "precisa de largar",
+    direcao: "precisa de direção",
+    acao: "precisa de agir",
+    naosei: "precisa de clareza",
+  },
+};
+
+const ORDEM_FRAG = ["dia", "motor", "meta", "area", "teu", "tempo", "precisa"];
+
+function fragmentosDe(resp: Record<string, string>): string[] {
+  const out: string[] = [];
+  for (const chave of ORDEM_FRAG) {
+    const v = resp[chave];
+    const frag = v ? FRAGMENTOS[chave]?.[v] : undefined;
+    if (frag) out.push(frag);
+  }
+  return out;
+}
+
 const CAPTACOES_MONTAR = [
   "A ouvir o que disseste...",
-  "A separar o que é teu do que é emprestado...",
+  "A separar o teu do emprestado...",
+  "A reconhecer os teus padrões...",
   "A desenhar o teu retrato...",
+  "Quase pronto...",
 ];
 
-function retratoDe(respostas: Record<string, string>): string {
+function retratoDe(resp: Record<string, string>): string {
   const partes: string[] = [];
 
   const motores: Record<string, string> = {
@@ -101,7 +199,7 @@ function retratoDe(respostas: Record<string, string>): string {
     comparacao: "Muito do que persegues entrou por comparação, não por desejo teu.",
     heranca: "Alguns dos sonhos que carregas não nasceram em ti. Nasceram antes de ti.",
   };
-  const motor = motores[respostas["motor"] ?? ""];
+  const motor = motores[resp["motor"] ?? ""];
   if (motor) partes.push(motor);
 
   const teus: Record<string, string> = {
@@ -109,14 +207,16 @@ function retratoDe(respostas: Record<string, string>): string {
     metade: "Metade do que persegues é teu. A outra metade pesa sem nunca ter sido tua.",
     poucoteu: "Muito do que persegues é emprestado ou herdado, e isso dispersa-te sem que escolhesses.",
   };
-  const teu = teus[respostas["teu"] ?? ""];
+  const teu = teus[resp["teu"] ?? ""];
   if (teu) partes.push(teu);
 
-  const meta = respostas["meta"];
-  if (meta === "vazia" || meta === "alivio") {
+  if (resp["meta"] === "vazia" || resp["meta"] === "alivio") {
     partes.push(
       "Por isso, quando chegas, sabe a pouco. Não é ingratidão, é sinal de que a meta talvez não fosse tua."
     );
+  }
+  if (resp["tempo"] === "sempre" || resp["tempo"] === "anos") {
+    partes.push("Carregas isto há demasiado tempo para continuar a achar que é normal.");
   }
 
   if (partes.length === 0) {
@@ -142,7 +242,7 @@ export function DiagnosticoQuiz({ fonte = "diagnostico" }: { fonte?: string }) {
   function escolher(chave: string, id: string) {
     setRespostas((r) => ({ ...r, [chave]: id }));
     setSelecionado(id);
-    setTimeout(avancar, 320);
+    setTimeout(avancar, 300);
   }
 
   useEffect(() => {
@@ -151,8 +251,7 @@ export function DiagnosticoQuiz({ fonte = "diagnostico" }: { fonte?: string }) {
 
   return (
     <div ref={topo} className="max-w-md mx-auto px-6 pt-8 pb-16 min-h-[80vh] flex flex-col">
-      {/* progresso */}
-      {passo.tipo !== "resultado" && (
+      {passo.tipo !== "resultado" && passo.tipo !== "intro" && (
         <div className="h-1 rounded-full bg-castanho/10 overflow-hidden mb-10">
           <div
             className="h-full bg-ocre transition-all duration-500"
@@ -162,15 +261,15 @@ export function DiagnosticoQuiz({ fonte = "diagnostico" }: { fonte?: string }) {
       )}
 
       <div key={i} className="flex-1 etapa-passo" data-activo="true">
+        {passo.tipo === "intro" && <Intro onComecar={avancar} />}
+
         {passo.tipo === "pergunta" && (
           <div>
             <h2 className="font-serif text-2xl md:text-3xl text-castanho leading-tight text-center">
               {passo.titulo}
             </h2>
             {passo.sub && (
-              <p className="font-serif text-terra-texto/70 text-center mt-3">
-                {passo.sub}
-              </p>
+              <p className="font-serif text-terra-texto/70 text-center mt-3">{passo.sub}</p>
             )}
             <div className="mt-8 space-y-3">
               {passo.opcoes.map((o) => (
@@ -190,7 +289,16 @@ export function DiagnosticoQuiz({ fonte = "diagnostico" }: { fonte?: string }) {
           </div>
         )}
 
-        {passo.tipo === "guia" && <Guia texto={passo.texto} onContinuar={avancar} />}
+        {passo.tipo === "reflexo" && (
+          <Reflexo
+            texto={REFLEXOS[passo.chave]?.[respostas[passo.chave] ?? ""] ?? ""}
+            onContinuar={avancar}
+          />
+        )}
+
+        {passo.tipo === "retrato" && (
+          <RetratoEmConstrucao fragmentos={fragmentosDe(respostas)} onContinuar={avancar} />
+        )}
 
         {passo.tipo === "medidor" && (
           <Medidor valor={passo.valor} legenda={passo.legenda} onContinuar={avancar} />
@@ -199,14 +307,41 @@ export function DiagnosticoQuiz({ fonte = "diagnostico" }: { fonte?: string }) {
         {passo.tipo === "montar" && <Montar onPronto={avancar} />}
 
         {passo.tipo === "resultado" && (
-          <Resultado retrato={retratoDe(respostas)} fonte={fonte} />
+          <Resultado
+            retrato={retratoDe(respostas)}
+            fragmentos={fragmentosDe(respostas)}
+            fonte={fonte}
+          />
         )}
       </div>
     </div>
   );
 }
 
-function Guia({ texto, onContinuar }: { texto: string; onContinuar: () => void }) {
+function Intro({ onComecar }: { onComecar: () => void }) {
+  return (
+    <div className="text-center pt-16">
+      <div className="relative w-14 h-20 mx-auto">
+        <Image src="/gota.svg" alt="" fill className="object-contain" />
+      </div>
+      <p className="font-sans text-[11px] uppercase tracking-[0.32em] text-ocre-forte mt-8">
+        diagnóstico da dispersão
+      </p>
+      <h1 className="font-serif text-3xl md:text-4xl text-castanho mt-4 leading-tight">
+        Em um minuto, vê quanto do que persegues é mesmo teu.
+      </h1>
+      <p className="font-serif text-terra-texto/80 mt-5 leading-relaxed max-w-sm mx-auto">
+        Sete perguntas, sem certo nem errado. No fim, o teu retrato e o teu
+        primeiro passo.
+      </p>
+      <button onClick={onComecar} className="btn-ocre mt-10">
+        começar
+      </button>
+    </div>
+  );
+}
+
+function Reflexo({ texto, onContinuar }: { texto: string; onContinuar: () => void }) {
   return (
     <div className="text-center pt-6">
       <div className="relative w-16 h-16 mx-auto rounded-full overflow-hidden border border-ocre/40">
@@ -216,6 +351,42 @@ function Guia({ texto, onContinuar }: { texto: string; onContinuar: () => void }
         <p className="font-serif text-lg text-castanho italic leading-relaxed">{texto}</p>
       </div>
       <div className="mt-10">
+        <button onClick={onContinuar} className="btn-ocre">
+          continuar
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function RetratoEmConstrucao({
+  fragmentos,
+  onContinuar,
+}: {
+  fragmentos: string[];
+  onContinuar: () => void;
+}) {
+  return (
+    <div className="text-center pt-8">
+      <p className="font-sans text-[11px] uppercase tracking-[0.3em] text-ocre-forte">
+        o teu retrato está a formar-se
+      </p>
+      <div className="mt-6 rounded-2xl border border-castanho/15 bg-creme/60 p-6">
+        <div className="flex flex-wrap justify-center gap-2">
+          {fragmentos.map((f, k) => (
+            <span
+              key={k}
+              className="rounded-full bg-ocre/12 text-ocre-forte px-3 py-1.5 text-sm font-serif"
+            >
+              {f}
+            </span>
+          ))}
+        </div>
+      </div>
+      <p className="font-serif text-terra-texto/80 mt-6 max-w-sm mx-auto leading-relaxed">
+        Já vejo um padrão a desenhar-se. Faltam umas peças.
+      </p>
+      <div className="mt-8">
         <button onClick={onContinuar} className="btn-ocre">
           continuar
         </button>
@@ -235,14 +406,12 @@ function Medidor({
 }) {
   const [v, setV] = useState(0);
   useEffect(() => {
-    const t = setTimeout(() => setV(valor), 80);
+    const t = setTimeout(() => setV(valor), 100);
     return () => clearTimeout(t);
   }, [valor]);
   return (
     <div className="text-center pt-10">
-      <p className="font-sans text-[11px] uppercase tracking-[0.3em] text-oliva">
-        a tua clareza
-      </p>
+      <p className="font-sans text-[11px] uppercase tracking-[0.3em] text-oliva">a tua clareza</p>
       <div className="text-5xl font-serif text-castanho mt-4 tabular-nums">{v}%</div>
       <div className="h-2 rounded-full bg-castanho/10 overflow-hidden mt-5 max-w-xs mx-auto">
         <div
@@ -264,29 +433,53 @@ function Medidor({
 
 function Montar({ onPronto }: { onPronto: () => void }) {
   const [idx, setIdx] = useState(0);
+  const [pct, setPct] = useState(0);
   useEffect(() => {
-    const interval = setInterval(
+    const captacoes = setInterval(
       () => setIdx((v) => Math.min(CAPTACOES_MONTAR.length - 1, v + 1)),
-      900
+      1100
     );
-    const fim = setTimeout(onPronto, 3000);
+    const barra = setInterval(() => setPct((v) => Math.min(100, v + 2)), 110);
+    const fim = setTimeout(onPronto, 5600);
     return () => {
-      clearInterval(interval);
+      clearInterval(captacoes);
+      clearInterval(barra);
       clearTimeout(fim);
     };
   }, [onPronto]);
   return (
-    <div className="text-center pt-20">
-      <div className="w-12 h-12 mx-auto rounded-full border-2 border-ocre/30 border-t-ocre animate-spin" />
-      <p className="font-serif text-xl text-castanho mt-8">A montar o teu retrato</p>
+    <div className="text-center pt-16">
+      {/* radar de gota: anéis a pulsar à volta da gota */}
+      <div className="relative w-32 h-32 mx-auto">
+        <span className="absolute inset-0 rounded-full bg-ocre/20 animate-ping" />
+        <span
+          className="absolute inset-4 rounded-full bg-ocre/20 animate-ping"
+          style={{ animationDelay: "0.4s" }}
+        />
+        <span className="absolute inset-0 flex items-center justify-center">
+          <Image src="/gota.svg" alt="" width={36} height={48} />
+        </span>
+      </div>
+      <p className="font-serif text-xl text-castanho mt-10">A montar o teu retrato</p>
       <p key={idx} className="font-serif text-terra-texto/70 mt-3 etapa-passo" data-activo="true">
         {CAPTACOES_MONTAR[idx]}
       </p>
+      <div className="h-1 rounded-full bg-castanho/10 overflow-hidden mt-6 max-w-[12rem] mx-auto">
+        <div className="h-full bg-ocre transition-all duration-100" style={{ width: `${pct}%` }} />
+      </div>
     </div>
   );
 }
 
-function Resultado({ retrato, fonte }: { retrato: string; fonte: string }) {
+function Resultado({
+  retrato,
+  fragmentos,
+  fonte,
+}: {
+  retrato: string;
+  fragmentos: string[];
+  fonte: string;
+}) {
   const [email, setEmail] = useState("");
   const [a, setA] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
@@ -318,7 +511,7 @@ function Resultado({ retrato, fonte }: { retrato: string; fonte: string }) {
   return (
     <div className="pt-2">
       <p className="font-sans text-[11px] uppercase tracking-[0.3em] text-ocre-forte text-center">
-        o teu retrato agora
+        o teu retrato
       </p>
 
       <div className="mt-5 rounded-2xl overflow-hidden border border-castanho/15 bg-creme/60">
@@ -332,44 +525,48 @@ function Resultado({ retrato, fonte }: { retrato: string; fonte: string }) {
           />
         </div>
         <div className="p-6">
+          <div className="flex flex-wrap gap-2 mb-4">
+            {fragmentos.map((f, k) => (
+              <span
+                key={k}
+                className="rounded-full bg-ocre/12 text-ocre-forte px-3 py-1 text-xs font-serif"
+              >
+                {f}
+              </span>
+            ))}
+          </div>
           <p className="font-serif text-lg text-castanho leading-relaxed">{retrato}</p>
         </div>
       </div>
 
       {!feito ? (
-        <>
-          {/* a peça guardada */}
-          <div className="mt-6 rounded-2xl border border-ocre/40 bg-white/40 p-6 text-center">
-            <p className="font-sans text-[11px] uppercase tracking-[0.28em] text-oliva">
-              o teu primeiro passo
-            </p>
-            <p
-              className="font-serif text-2xl text-castanho mt-3 blur-sm select-none"
-              aria-hidden
-            >
-              esvaziar a mesa e largar o que
-            </p>
-            <p className="font-serif text-terra-texto/80 mt-4 leading-relaxed">
-              Deixa o email e recebe o teu primeiro passo, mais acesso antecipado
-              e 25% de desconto no lançamento de 1 de Julho.
-            </p>
-            <form onSubmit={submeter} className="mt-5 space-y-3">
-              <input
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="o teu email"
-                className="w-full px-4 py-3 rounded-xl border border-castanho/25 bg-white/70 text-center focus:border-ocre focus:outline-none"
-              />
-              {erro && <p className="text-sm text-red-800">{erro}</p>}
-              <button type="submit" disabled={a} className="btn-ocre w-full disabled:opacity-60">
-                {a ? "a revelar..." : "revelar o meu primeiro passo"}
-              </button>
-            </form>
-            <p className="text-xs text-oliva mt-3">Sem ruído. Só o aviso do lançamento.</p>
-          </div>
-        </>
+        <div className="mt-6 rounded-2xl border border-ocre/40 bg-white/40 p-6 text-center">
+          <p className="font-sans text-[11px] uppercase tracking-[0.28em] text-oliva">
+            o teu primeiro passo
+          </p>
+          <p className="font-serif text-2xl text-castanho mt-3 blur-sm select-none" aria-hidden>
+            esvaziar a mesa e largar o que
+          </p>
+          <p className="font-serif text-terra-texto/80 mt-4 leading-relaxed">
+            Deixa o email e recebe o teu primeiro passo, mais acesso antecipado e
+            25% de desconto no lançamento de 1 de Julho.
+          </p>
+          <form onSubmit={submeter} className="mt-5 space-y-3">
+            <input
+              type="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="o teu email"
+              className="w-full px-4 py-3 rounded-xl border border-castanho/25 bg-white/70 text-center focus:border-ocre focus:outline-none"
+            />
+            {erro && <p className="text-sm text-red-800">{erro}</p>}
+            <button type="submit" disabled={a} className="btn-ocre w-full disabled:opacity-60">
+              {a ? "a revelar..." : "revelar o meu primeiro passo"}
+            </button>
+          </form>
+          <p className="text-xs text-oliva mt-3">Sem ruído. Só o aviso do lançamento.</p>
+        </div>
       ) : (
         <div className="mt-6 rounded-2xl border border-ocre/40 bg-creme/70 p-7 text-center">
           <p className="font-sans text-[11px] uppercase tracking-[0.28em] text-ocre-forte">
