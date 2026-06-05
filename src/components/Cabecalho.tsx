@@ -30,8 +30,14 @@ export async function Cabecalho() {
             </span>
           </span>
         </Link>
-        <nav className="flex items-center gap-6 text-sm font-sans text-castanho">
-          <Link href="/sobre" className="hover:text-ocre-forte transition-colors">
+        <nav className="flex items-center gap-4 sm:gap-6 text-sm font-sans text-castanho">
+          <Link
+            href="/lista-espera"
+            className="rounded-full bg-ocre/15 text-ocre-forte px-3 py-1.5 hover:bg-ocre/25 transition-colors whitespace-nowrap"
+          >
+            Lista de espera
+          </Link>
+          <Link href="/sobre" className="hidden sm:inline hover:text-ocre-forte transition-colors">
             {t("sobre")}
           </Link>
           {utilizadora ? (
