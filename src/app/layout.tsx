@@ -25,6 +25,11 @@ export const metadata: Metadata = {
   description:
     "A abundância não responde a quem a persegue, responde a quem se basta. Um percurso de Vivianne dos Santos, da Sete Ecos.",
   manifest: "/manifest.webmanifest",
+  appleWebApp: {
+    capable: true,
+    title: "infonte",
+    statusBarStyle: "default",
+  },
   openGraph: {
     title: "infonte, um percurso em sete etapas",
     description:
@@ -59,6 +64,7 @@ export const viewport: Viewport = {
   themeColor: "#2E1D12",
   width: "device-width",
   initialScale: 1,
+  viewportFit: "cover",
 };
 
 export default function RootLayout({
