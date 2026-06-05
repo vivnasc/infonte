@@ -16,16 +16,16 @@ export async function POST(request: Request) {
     return NextResponse.json({ erro: "corpo inválido" }, { status: 400 });
   }
 
-  const nome = (body.nome ?? "").trim();
   const email = (body.email ?? "").trim().toLowerCase();
   const fonte = ((body.fonte ?? "").trim().toLowerCase() || null) as string | null;
 
-  if (!nome) {
-    return NextResponse.json({ erro: "Falta o nome." }, { status: 400 });
-  }
   if (!EMAIL_RE.test(email)) {
     return NextResponse.json({ erro: "Email inválido." }, { status: 400 });
   }
+
+  // O nome é opcional (o diagnóstico pede só email, como a Astroline).
+  // Se vier vazio, derivamos da parte antes do @.
+  const nome = (body.nome ?? "").trim() || email.split("@")[0];
 
   const sb = criarClienteAdmin();
 
