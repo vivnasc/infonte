@@ -15,8 +15,11 @@ type Passo =
   | { tipo: "reflexo"; chave: string }
   | { tipo: "retrato" }
   | { tipo: "medidor"; valor: number; legenda: string }
+  | { tipo: "mesa" }
   | { tipo: "montar" }
   | { tipo: "resultado" };
+
+const CHAVE_MESA = "infonte-mesa-inicial";
 
 const PASSOS: Passo[] = [
   { tipo: "intro" },
@@ -110,6 +113,7 @@ const PASSOS: Passo[] = [
       { id: "naosei", rotulo: "Não sei, e isso é que me pesa" },
     ],
   },
+  { tipo: "mesa" },
   { tipo: "montar" },
   { tipo: "resultado" },
 ];
@@ -304,6 +308,8 @@ export function DiagnosticoQuiz({ fonte = "diagnostico" }: { fonte?: string }) {
           <Medidor valor={passo.valor} legenda={passo.legenda} onContinuar={avancar} />
         )}
 
+        {passo.tipo === "mesa" && <MesaInicial onContinuar={avancar} />}
+
         {passo.tipo === "montar" && <Montar onPronto={avancar} />}
 
         {passo.tipo === "resultado" && (
@@ -424,6 +430,86 @@ function Medidor({
       </p>
       <div className="mt-10">
         <button onClick={onContinuar} className="btn-ocre">
+          continuar
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function MesaInicial({ onContinuar }: { onContinuar: () => void }) {
+  const [rascunho, setRascunho] = useState("");
+  const [itens, setItens] = useState<string[]>([]);
+
+  function adicionar() {
+    const t = rascunho.trim();
+    if (!t) return;
+    setItens((x) => [...x, t]);
+    setRascunho("");
+  }
+
+  function continuar() {
+    try {
+      localStorage.setItem(CHAVE_MESA, JSON.stringify(itens));
+    } catch {
+      /* sem localStorage, segue na mesma */
+    }
+    onContinuar();
+  }
+
+  return (
+    <div className="pt-2">
+      <h2 className="font-serif text-2xl md:text-3xl text-castanho leading-tight text-center">
+        Antes do teu primeiro passo, põe na mesa o que andas a perseguir.
+      </h2>
+      <p className="font-serif text-terra-texto/70 text-center mt-3">
+        Três ou quatro chegam. Vais trabalhá-las já a seguir, na etapa 1.
+      </p>
+
+      <div className="mt-6 flex gap-2">
+        <input
+          value={rascunho}
+          onChange={(e) => setRascunho(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              adicionar();
+            }
+          }}
+          placeholder="uma coisa de cada vez..."
+          className="flex-1 px-4 py-3 rounded-xl border border-castanho/25 bg-white/70 focus:border-ocre focus:outline-none"
+        />
+        <button onClick={adicionar} className="btn-ocre whitespace-nowrap px-5">
+          pôr na mesa
+        </button>
+      </div>
+
+      {itens.length > 0 && (
+        <ul className="mt-4 space-y-2">
+          {itens.map((t, k) => (
+            <li
+              key={k}
+              className="flex items-center justify-between gap-3 px-4 py-3 rounded-xl border border-castanho/15 bg-white/50 font-serif text-castanho"
+            >
+              <span>{t}</span>
+              <button
+                onClick={() => setItens((x) => x.filter((_, i) => i !== k))}
+                className="text-castanho/40 hover:text-castanho text-lg leading-none"
+                aria-label="remover"
+              >
+                ×
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      <div className="mt-8 text-center">
+        <button
+          onClick={continuar}
+          disabled={itens.length === 0}
+          className="btn-ocre disabled:opacity-50"
+        >
           continuar
         </button>
       </div>
@@ -574,11 +660,11 @@ function Resultado({
           </p>
           <h3 className="font-serif text-2xl text-castanho mt-3">Esvaziar a mesa.</h3>
           <p className="font-serif text-terra-texto/85 mt-4 leading-relaxed">
-            Largar o que nem era teu, para veres o que fica. Está na etapa 1, e é
-            tua, grátis.
+            O que puseste na mesa já está à tua espera na etapa 1. Vamos ver, uma
+            a uma, o que é mesmo teu, e largar o resto. É tua, grátis.
           </p>
           <a href="/etapa/1" className="btn-ocre inline-block mt-6">
-            começar a etapa 1
+            esvaziar a mesa, na etapa 1
           </a>
           <p className="text-xs text-oliva mt-4">
             Guardámos o teu lugar na lista. Código {feito.codigo}.

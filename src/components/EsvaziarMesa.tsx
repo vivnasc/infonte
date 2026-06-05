@@ -111,6 +111,30 @@ export function EsvaziarMesa({
     setRevelado(false);
   }, [fase]);
 
+  // Continuidade com o diagnóstico: se a mesa vier de lá (e ainda não houver
+  // nada gravado), começa já com essas coisas, prontas a marcar.
+  useEffect(() => {
+    if (items.length > 0 || valorInicial.trim()) return;
+    try {
+      const raw = localStorage.getItem("infonte-mesa-inicial");
+      if (!raw) return;
+      const arr = JSON.parse(raw) as unknown;
+      if (!Array.isArray(arr)) return;
+      const seeded: Item[] = arr
+        .filter((t) => typeof t === "string" && t.trim())
+        .map((t) => ({ id: contador++, texto: String(t).trim(), tag: null }));
+      if (seeded.length > 0) {
+        setItems(seeded);
+        setFase("marcar");
+        guardar(seeded);
+        localStorage.removeItem("infonte-mesa-inicial");
+      }
+    } catch {
+      /* ignora seed inválido */
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   useEffect(() => {
     return () => {
       if (timer.current) clearTimeout(timer.current);
