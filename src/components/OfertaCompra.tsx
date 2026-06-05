@@ -1,8 +1,19 @@
+import Image from "next/image";
 import { BotaoPaypal } from "./BotaoPaypal";
 
 export function OfertaCompra() {
   return (
-    <div className="border border-ocre/40 rounded-2xl p-8 bg-creme/70 text-center">
+    <div className="border border-ocre/40 rounded-2xl overflow-hidden bg-creme/70 text-center">
+      <div className="relative w-full aspect-[16/9]">
+        <Image
+          src="/gratidao-venda.png"
+          alt="Vivianne dos Santos"
+          fill
+          sizes="(max-width: 768px) 100vw, 640px"
+          className="object-cover object-top"
+        />
+      </div>
+      <div className="p-8">
       <p className="font-sans text-xs uppercase tracking-[0.25em] text-oliva">
         o percurso completo
       </p>
@@ -29,6 +40,7 @@ export function OfertaCompra() {
       <p className="text-xs text-oliva mt-3">
         Pagamento processado pelo PayPal.
       </p>
+      </div>
     </div>
   );
 }

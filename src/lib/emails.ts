@@ -72,17 +72,24 @@ const moldura = (corpo: string) => `
 export async function enviarEmailCompra(o: { email: string; nome?: string | null }) {
   const nome = o.nome ? `, ${o.nome}` : "";
   const corpo = `
+    <p style="text-align:center;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#9A6C2C;margin:0;">Obrigada</p>
+    <h2 style="font-family:Georgia,serif;font-weight:normal;text-align:center;font-size:22px;color:#4A2F1B;margin:8px 0 24px;">A tua travessia começa agora.</h2>
     <p>Olá${nome}.</p>
-    <p>A tua compra do percurso completo da Infonte está confirmada. Tens agora acesso vitalício às sete etapas e às ferramentas que ficam.</p>
-    <p>Podes aceder ao teu percurso a qualquer momento em <a href="https://infonte.vivannedossantos.com/painel" style="color:#B8843D;">infonte.vivannedossantos.com/painel</a>.</p>
-    <p>A etapa 2 abre 3 dias depois de abrires a etapa 1. Aviso-te quando for tempo.</p>
+    <p>A tua compra do percurso completo da infonte está confirmada. Tens agora <strong>acesso vitalício</strong> às sete etapas e às ferramentas que ficam para a vida.</p>
+    <p style="text-align:center;margin:28px 0;">
+      <a href="https://infonte.vivannedossantos.com/painel" style="display:inline-block;background:#EBAE4A;color:#2A1C12;padding:14px 36px;border-radius:12px;text-decoration:none;font-family:Inter,sans-serif;font-size:14px;font-weight:600;">
+        Abrir o meu percurso
+      </a>
+    </p>
+    <p>A etapa 2 abre 3 dias depois de abrires a etapa 1. Aviso-te quando for tempo, sem pressa.</p>
+    <p style="font-size:13px;color:#5C5C3E;">Guarda este email. É o teu recibo e a tua porta de entrada.</p>
     <p>Em paz,<br/>Vivianne</p>
   `;
 
   // Email para a cliente
   const resultado = await enviar({
     para: o.email,
-    assunto: "Abriste o percurso completo da Infonte",
+    assunto: "Obrigada. O teu percurso da infonte está aberto",
     html: moldura(corpo),
   });
 

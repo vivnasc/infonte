@@ -79,12 +79,12 @@ export function BannerInstalarApp({ variante = "membro" }: { variante?: Variante
 
   const titulo =
     variante === "celebracao"
-      ? "A tua travessia começa agora."
+      ? "Instala a infonte e leva-a contigo."
       : "Leva a infonte contigo.";
 
   const intro =
     variante === "celebracao"
-      ? "Tens acesso vitalício às sete etapas. Instala a infonte no telemóvel e ela fica ali, à mão, como uma app dedicada, com tudo guardado."
+      ? "Antes de começares, instala a infonte no telemóvel. Fica ali, à mão, como uma app dedicada, com o teu percurso todo guardado."
       : "Instala a infonte no ecrã inicial e abre o teu percurso como uma app, sem ir à App Store nem ao Google Play.";
 
   return (

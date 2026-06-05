@@ -2,6 +2,7 @@ import { setRequestLocale } from "next-intl/server";
 import { redirect } from "next/navigation";
 import { getUtilizadoraAtual, criarClienteServidor } from "@/lib/supabase/server";
 import { Link } from "@/i18n/routing";
+import Image from "next/image";
 import { BannerInstalarApp } from "@/components/BannerInstalarApp";
 
 const HORAS_GATING = 72;
@@ -59,11 +60,39 @@ export default async function PainelPage({
 
       {sp.paypal === "ok" && (
         <>
-          <div className="mt-6 p-5 border border-oliva/40 rounded-lg bg-oliva/5">
-            <p className="font-serif text-castanho">
-              A tua compra está confirmada. Tens agora acesso vitalício às sete
-              etapas.
-            </p>
+          <div className="mt-8 rounded-2xl overflow-hidden border border-castanho/15 bg-creme/60 shadow-sm">
+            <div className="relative w-full aspect-[16/10]">
+              <Image
+                src="/gratidao-sucesso.png"
+                alt="Mãos em concha, em gratidão"
+                fill
+                priority
+                sizes="(max-width: 768px) 100vw, 640px"
+                className="object-cover"
+              />
+            </div>
+            <div className="p-7 text-center">
+              <p className="font-sans text-[11px] uppercase tracking-[0.32em] text-ocre-forte">
+                obrigada
+              </p>
+              <h2 className="font-serif text-2xl md:text-3xl text-castanho mt-2 leading-tight">
+                A tua travessia começa agora.
+              </h2>
+              <p className="font-serif text-terra-texto/90 mt-4 leading-relaxed max-w-md mx-auto">
+                O pagamento foi confirmado. Tens agora acesso vitalício às sete
+                etapas e às ferramentas que ficam para a vida. Vais receber um
+                email com o teu recibo dentro de momentos.
+              </p>
+              <div className="mt-5 flex justify-center">
+                <Image
+                  src="/gota.svg"
+                  alt=""
+                  width={18}
+                  height={24}
+                  aria-hidden
+                />
+              </div>
+            </div>
           </div>
           <BannerInstalarApp variante="celebracao" />
         </>
