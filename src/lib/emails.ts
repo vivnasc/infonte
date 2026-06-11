@@ -177,20 +177,23 @@ export async function enviarEmailsListaEspera(o: {
     html: moldura(corpoInscrita),
   });
 
-  // Aviso para a autora (não bloqueia a inscrição se falhar).
+  // Aviso para a autora, com assunto filtrável "Lista de espera infonte: <email>"
+  // (não bloqueia a inscrição se falhar).
   try {
-    await enviarNotificacaoAutora({
-      assunto: `Nova inscrição na lista de espera (${o.total} no total)`,
-      corpo: `
+    await enviar({
+      para: EMAIL_AUTORA,
+      assunto: `Lista de espera infonte: ${o.email}`,
+      replyTo: EMAIL_AUTORA,
+      html: moldura(`
         <p>Nova inscrição na lista de espera da infonte.</p>
-        <p>Nome: <strong>${esc(o.nome)}</strong><br/>
-        Email: ${esc(o.email)}<br/>
+        <p>Email: <strong>${esc(o.email)}</strong><br/>
+        Nome: ${esc(o.nome)}<br/>
         Fonte: ${esc(o.fonte ?? "direto")}<br/>
         Código gerado: ${esc(o.codigoDesconto)}</p>
         <p>Total de inscritas agora: <strong>${o.total}</strong></p>
         <p>Vês a lista completa em
         <a href="https://infonte.vivannedossantos.com/admin/lista-espera" style="color:#B8843D;">/admin/lista-espera</a>.</p>
-      `,
+      `),
     });
   } catch (e) {
     console.warn("[email] aviso autora lista-espera falhou", e);

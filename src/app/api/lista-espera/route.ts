@@ -71,22 +71,21 @@ export async function POST(request: Request) {
     .select("id", { count: "exact", head: true });
   const total = count ?? 0;
 
-  // Emails só na primeira inscrição. Nunca bloqueiam a inscrição.
+  // Emails em cada inscrição (confirmação gentil à pessoa + aviso filtrável
+  // à autora). Nunca bloqueiam a inscrição.
   let emailPendente = false;
-  if (!jaEstava) {
-    try {
-      const r = await enviarEmailsListaEspera({
-        nome,
-        email,
-        codigoDesconto,
-        fonte,
-        total,
-      });
-      if (!r.ok) emailPendente = true;
-    } catch (e) {
-      console.warn("[lista-espera] email falhou", e);
-      emailPendente = true;
-    }
+  try {
+    const r = await enviarEmailsListaEspera({
+      nome,
+      email,
+      codigoDesconto,
+      fonte,
+      total,
+    });
+    if (!r.ok) emailPendente = true;
+  } catch (e) {
+    console.warn("[lista-espera] email falhou", e);
+    emailPendente = true;
   }
 
   return NextResponse.json({
