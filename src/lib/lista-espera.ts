@@ -7,6 +7,11 @@ import { randomUUID } from "node:crypto";
 // Desconto para quem entrou na lista de espera antes do lançamento.
 export const DESCONTO_PCT = 25;
 
+// Pré-lançamento: enquanto for true, a app não mostra botões de compra
+// (evita tentativas de pagamento antes do PayPal estar pronto) e manda
+// tudo para a lista de espera. Pôr a false no dia do lançamento (1 Julho).
+export const PRE_LANCAMENTO = true;
+
 // Código pessoal, ex: "INFONTE-EARLY-3F9A". Os 4 chars vêm de um uuid,
 // suficiente para não colidir na escala desta lista.
 export function gerarCodigoDesconto(): string {
